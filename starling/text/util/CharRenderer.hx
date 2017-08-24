@@ -1,0 +1,119 @@
+package starling.text.util;
+
+import openfl.display.Bitmap;
+import openfl.display.BitmapData;
+
+
+import starling.display.Quad;
+import starling.text.model.layout.Char;
+import starling.display.Image;
+import starling.display.Image;
+
+#if starling2
+	import starling.display.MeshBatch;
+#else
+	import starling.display.QuadBatch;
+#end
+
+import starling.events.Event;
+import starling.text.BitmapChar;
+import starling.text.TextDisplay;
+import starling.textures.Texture;
+
+
+/**
+ * ...
+ * @author P.J.Shand
+ */
+
+#if starling2
+	typedef QuadBatch = MeshBatch;
+#end
+
+class CharRenderer
+{
+	
+	private var textDisplay:TextDisplay;
+	private var images = new Array<Image>();
+	private var quadBatches:Map<String, QuadBatch> = new Map();
+	private var lineQuads = new Array<Quad>();
+
+	@:allow(starling.text)
+	private function new(textDisplay:TextDisplay)
+	{
+		this.textDisplay = textDisplay;
+	}
+	
+	public function setColor(value:UInt):Void
+	{
+		for (quadBatch in quadBatches) 
+		{
+			quadBatch.color = value;
+		}
+	}
+	
+	public function render(characters:Array<Char>) 
+	{
+		for(quadBatch in quadBatches){
+			#if starling2
+				quadBatch.clear();
+			#else
+				quadBatch.reset();
+			#end
+		}
+		
+		for (image in images){
+			image.dispose();
+		}
+		
+		images = new Array<Image>();
+		
+		for (j in 0...characters.length) 
+		{
+			var char:Char = characters[j];
+			if (textDisplay.maxLines != null && char.lineNumber >= textDisplay.maxLines) break;
+			//if (char.line.outsizeBounds) break; // needs a bit of a rethink
+			
+			if (!char.visible) continue;
+			if (char.charFormat.bitmapChar != null) {
+				if (char.charFormat.bitmapChar.texture != null){	
+					if (char.charFormat.bitmapChar.texture.height != 0 && char.charFormat.bitmapChar.texture.width != 0) {
+						var image:Image = char.charFormat.bitmapChar.createImage();
+						image.scaleX = image.scaleY = char.scale;
+						
+						image.x = Math.round(char.x);
+						image.y = Math.round(char.y);
+						
+						image.color = char.charFormat.format.color;
+						
+						image.touchable = false;
+						images.push(image);
+						
+						var quadBatch = quadBatches[char.charFormat.format.face];
+						if (quadBatch==null){
+							quadBatch = new QuadBatch();
+							quadBatch.batchable = true;
+							quadBatch.touchable = false;
+							textDisplay.addChildAt(quadBatch, 1); 
+							quadBatches[char.charFormat.format.face] = quadBatch;
+						}
+						#if starling2
+							quadBatch.addMesh(image);
+						#else
+							quadBatch.addImage(image);
+						#end
+					}
+				}
+			}
+		}
+		
+		setColor(textDisplay.color);
+	}
+	
+	public function dispose() 
+	{
+		for (image in images){
+			image.dispose();
+		}
+	}
+}

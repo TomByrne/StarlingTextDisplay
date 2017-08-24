@@ -1,0 +1,119 @@
+package starling.text.model.layout;
+
+import starling.text.model.layout.Char;
+
+/**
+ * ...
+ * @author P.J.Shand
+ */
+class Line
+{
+	public var index:Int;
+	public var _height:Float = 9;
+	public var height(get, null):Float;
+	
+	private var _width:Float = 0;
+	public var width(get, null):Float;
+	public var y:Float = 0;
+	public var x:Float = 0;
+	public var chars = new Array<Char>();
+	public var validJustify(get, null):Bool;
+	
+	private var _largestChar:Char;
+	public var largestChar(get, null):Char;
+	public var leading(get, null):Float;
+	//public var outsizeBounds:Bool = false; // Needs a bit of a rethink
+	public var visible:Bool = true;
+	
+	@:isVar public var isEmptyLine(get, null):Bool;
+	
+	public function new() { }	
+	
+	function get_height():Float 
+	{
+		return _height;
+	}
+	
+	public function calcHeight():Void 
+	{
+		_height = largestChar.getLineHeight();
+	}
+	
+	function get_validJustify():Bool 
+	{
+		var char:Char = chars[chars.length - 1];
+		if (char.character == "\r") return false;
+		return true;
+	}
+	
+	function get_leading():Float
+	{
+		var _v:Float = Math.NEGATIVE_INFINITY;
+		for (j in 0...chars.length) 
+		{
+			var char:Char = chars[j];
+			if (char.charFormat.format.leading == null) continue;
+			if (_v < char.charFormat.format.leading && !char.isEndChar) {
+				_v = char.charFormat.format.leading;
+			}
+		}
+		if (_v == Math.NEGATIVE_INFINITY) _v = 0;
+		return _v;
+	}
+	
+	function get_largestChar():Char 
+	{
+		for (j in 0...chars.length) 
+		{
+			var char:Char = chars[j];
+			if (char.isEndChar) continue;
+			
+			if (_largestChar == null) {
+				_largestChar = char;
+			}
+			else if (_largestChar.getLineHeight() < char.getLineHeight()) {
+				_largestChar = char;
+			}
+		}
+		if (_largestChar == null) _largestChar = chars[0];
+		return _largestChar;
+	}
+	
+	function get_width():Float 
+	{
+		var v:Float = 0;
+		var validChar:Bool = false;
+		var lastKerning:Null<Float> = null;
+		for (i in 0...chars.length) 
+		{
+			var char = chars[i];
+			if (char.character != " " && char.character != "\n" && char.character != "\r") validChar = true;
+			if (validChar && char.charFormat.bitmapChar != null) {
+				v += char.charFormat.bitmapChar.xAdvance * char.scale;
+				lastKerning = char.charFormat.format.kerning;
+				if (lastKerning != null) v += lastKerning;
+			}
+		}
+		if (lastKerning != null) v -= lastKerning;
+		return v;
+	}
+	
+	function get_isEmptyLine():Bool 
+	{
+		var emptyChars:Array<String> = [" ", "\r", "\t", "\n"];
+		for (i in 0...chars.length) 
+		{
+			var emptyCount:Int = 0;
+			for (j in 0...emptyChars.length) 
+			{
+				if (chars[i].character != emptyChars[j]) {
+					emptyCount++;
+				}
+			}
+			if (emptyCount != emptyChars.length - 1) {
+				return false;
+			}
+		}
+		return true;
+	}
+}

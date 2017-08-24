@@ -1,0 +1,548 @@
+package starling.text.model.layout;
+
+import openfl.geom.Point;
+import openfl.geom.Rectangle;
+import starling.text.BitmapFont;
+import starling.text.model.format.InputFormat;
+import starling.text.model.format.CharFormat;
+import starling.text.model.layout.Char;
+import starling.text.model.layout.Line;
+import starling.text.model.selection.Selection;
+import starling.text.model.layout.Word;
+import starling.display.Quad;
+import starling.events.Event;
+import starling.events.EventDispatcher;
+import starling.text.BitmapChar;
+import starling.text.TextDisplay;
+import starling.text.util.CharacterHelper;
+
+/*#if starling2
+	import starling.utils.Align;
+#else*/
+	import starling.utils.HAlign;
+	import starling.utils.VAlign;
+//#end
+
+import starling.text.TextFieldAutoSize;
+
+/**
+ * ...
+ * @author P.J.Shand
+ */
+class CharLayout extends EventDispatcher
+{
+	private var lineNumber:Int;
+	private var placement:Point;
+	private var words:Array<Word>;
+	private var charLinePositionX:Int;
+	private var textDisplay:TextDisplay;
+	private var _endChar:EndChar;
+	private var endChar(get, null):EndChar;
+	private var changeEvent:Event;
+	private var resizeEvent:Event;
+	var wordBreakFound:Bool;
+	var limitReached:Bool;
+	
+	public var characters = new Array<Char>();
+	public var allCharacters:Array<Char>;
+	public var lines = new Array<Line>();
+	
+	@:allow(starling.text)
+	private function new(textDisplay:TextDisplay) 
+	{
+		super();
+		this.textDisplay = textDisplay;
+		
+		_endChar = new EndChar("", 0, textDisplay);
+		_endChar.isEndChar = true;
+		allCharacters = [_endChar];
+		
+		resizeEvent = new Event(Event.RESIZE);
+		changeEvent = new Event(Event.CHANGE);
+	}
+	
+	public function process() 
+	{
+		this.characters = textDisplay.contentModel.characters;
+		this.allCharacters = characters.concat([_endChar]);
+		
+		setPlacementX();
+		findWords();
+		findLineHeight();
+		findLinePositions();
+		setLinePositions();
+		
+		var sizeChange = calcTextSize();
+		this.dispatchEvent(resizeEvent);
+		align();
+		
+		textDisplay._textBounds.x = Math.POSITIVE_INFINITY;
+		if (lines.length > 0) textDisplay._textBounds.y = lines[0].y;
+		for (i in 0...lines.length) 
+		{
+			if (textDisplay._textBounds.x > lines[i].x) textDisplay._textBounds.x = lines[i].x;
+		}
+		if (textDisplay._textBounds.x == Math.POSITIVE_INFINITY) {
+			textDisplay._textBounds.x = 0;
+		}
+		
+		this.dispatchEvent(changeEvent);
+		if (sizeChange && textDisplay.hasEventListener(Event.RESIZE)){
+			textDisplay.dispatchEvent(new Event(Event.RESIZE));
+		}
+	}
+	
+	public function getChar(index:Int):Char
+	{
+		if (index >= characters.length) return null;
+		return characters[index];
+	}
+	
+	public function getCharOrEnd(index:Int):Char
+	{
+		if (index >= characters.length) return endChar;
+		return characters[index];
+	}
+	
+	public function getWordByPosition(_x:Float, _y:Float):Word
+	{
+		var char:Char = getCharByPosition(_x, _y, false);
+		if (char == null || words == null) return null;
+		
+		for (word in words) 
+		{
+			if (word == null) continue;
+			if (word.containsIndex(char.index)) {
+				return word;
+			}
+		}
+		return null;
+	}
+	
+	public function getCharByPosition(_x:Float, _y:Float, allowEndChar:Bool=true):Char
+	{
+		var closestIndex:Int = -1;
+		var closestValue:Float = Math.POSITIVE_INFINITY;
+		
+		for (i in 0...lines.length) 
+		{
+			var top:Float = lines[i].y;
+			var bottom:Float = lines[i].y + lines[i].height;
+			if (_y > top && _y < bottom) {
+				closestIndex = i;
+				break;
+			}
+			else {
+				var dif:Float = Math.abs(lines[i].y - _y);
+				if (Math.abs(dif) < closestValue) {
+					closestValue = dif;
+					closestIndex = i;
+				}
+				else {
+					break; // closest found and now moving away from closest line
+				}
+			}	
+		}
+		if (closestIndex == -1){
+			return null;
+		}
+		return getCharByLineAndPosX(closestIndex, _x, allowEndChar);
+	}
+	
+	public function getCharByLineAndPosX(lineNumber:Int, _x:Float, allowEndChar:Bool=true):Char
+	{
+		var closestChar:Char = null;
+		var closestValue:Float = Math.POSITIVE_INFINITY;
+		
+		if (lineNumber > lines.length - 1) lineNumber = lines.length - 1;
+		if (lineNumber < 0) lineNumber = 0;
+		
+		var line:Line = lines[lineNumber];
+		
+		for(char in line.chars){
+			var dif:Float = Math.abs(char.x - _x);
+			if (dif < closestValue) {
+				closestValue = dif;
+				closestChar = char;
+			}
+		}
+		return (allowEndChar || closestChar!=endChar ? closestChar : null);
+	}
+	
+	public function getLine(index:Int):Line
+	{
+		return lines[index];
+	}
+	
+	public function remove(start:Int, end:Int):Void
+	{
+		characters.splice(start, end - start);
+		for (i in start...characters.length) 
+		{
+			characters[i].index -= end - start;
+		}
+		textDisplay.selection.index = start;
+		process();
+	}
+	
+	public function add(newStr:String, index:Int):Void
+	{
+		var format:InputFormat = textDisplay.formatModel.defaultFormat;
+		var font:BitmapFont = textDisplay.formatModel.defaultFont;
+		
+		if (textDisplay.caret.format != null){
+			format = textDisplay.caret.format.clone();
+			font = textDisplay.caret.font;
+		}
+		
+		var newStrSplit:Array<String> = newStr.split("");
+		for (j in 0...newStrSplit.length) 
+		{
+			var _index:Int = index + j;
+			characters.insert(_index, new Char(newStrSplit[j], _index));
+		}
+		//characters.insert(index, new Char(newStr, index));
+		for (i in (index + newStrSplit.length)...characters.length) 
+		{
+			characters[i].index += newStrSplit.length;
+		}
+		process();
+		textDisplay.selection.index += newStrSplit.length;
+	}
+	
+	function setPlacementX() 
+	{
+		placement = new Point(0, 0);
+		lineNumber = 0;
+		
+		var lastSpaceIndex:Int = 0;
+		charLinePositionX = 0;
+		
+		var i:Int = 0;
+		var goBack:Bool = false;
+		limitReached = false;
+		
+		while (i < allCharacters.length) 
+		{
+			goBack = false;
+			var char:Char = allCharacters[i];
+			char.charFormat = CharacterHelper.findCharFormat(textDisplay, char, textDisplay.contentModel.nodes);
+			
+			if (!textDisplay.allowLineBreaks && (char.character == "\r" || char.character == "\n")) {
+				i++;
+				continue;
+			}
+			
+			if (char.character == " ") {
+				lastSpaceIndex = i;
+				wordBreakFound = true;
+			}
+			
+			if (withinBoundsX(placement.x + char.width) == false && i < allCharacters.length-1 && char.character != " ") {
+				
+				if (lastSpaceIndex != i && wordBreakFound) {
+					var lastSpaceChar:Char = allCharacters[lastSpaceIndex];
+					if (lastSpaceChar.lineNumber == lineNumber) {
+						i = lastSpaceIndex+1;
+						goBack = true;
+					}
+				}
+				progressLine();
+				if (goBack) {
+					var backChar:Char = allCharacters[i];
+					continue;
+				}
+			}
+			
+			char.x = placement.x;
+			if (limitReached) char.visible = false;
+			else char.visible = true;
+			
+			if (char.charFormat.bitmapChar != null) char.x += char.charFormat.bitmapChar.xOffset * char.scale;
+			
+			char.lineNumber = lineNumber;
+			char.charLinePositionX = charLinePositionX;
+			charLinePositionX++;
+			
+			if (char.character != " " || charLinePositionX != 0) {
+				if (char.charFormat.bitmapChar != null) {
+					placement.x += (char.charFormat.bitmapChar.xAdvance * char.scale);
+					if (char.charFormat.format.kerning != null) {
+						placement.x += char.charFormat.format.kerning;
+					}
+				}
+			}
+			
+			if (withinBoundsX(placement.x) == false && i < allCharacters.length-2 && char.character != " ") {
+				if (lastSpaceIndex != i && wordBreakFound) {
+					var lastSpaceChar:Char = allCharacters[lastSpaceIndex];
+					if (lastSpaceChar.lineNumber == lineNumber) {
+						i = lastSpaceIndex + 1;
+						goBack = true;
+					}
+				}
+				progressLine();
+				if (goBack) {
+					var backChar:Char = allCharacters[i];
+					continue;
+				}
+			}
+			else if (char.character == "\r" || char.character == "\n") {
+				progressLine();
+			}
+			i++;
+		}
+	}
+	
+	function findWords() 
+	{
+		words = new Array<Word>();
+		
+		var t:Int = -1;
+		var lt:Int = -1;
+		var word:Word = null;
+		for (i in 0...allCharacters.length) 
+		{
+			var char:Char = allCharacters[i];
+			if (char.character == " ") t = 0;
+			else if (char.character == "\t") t = 1;
+			else if (char.character == "\n") t = 2;
+			else if (char.character == "\r") t = 3;
+			else t = 4;
+			if (lt != t) {
+				word = new Word();
+				word.index = words.length;
+				words.push(word);
+			}
+			word.characters.push(char);
+			lt = t;
+		}
+	}
+	
+	function findLineHeight() 
+	{
+		lines = new Array<Line>();
+		var line:Line = null;
+		for (i in 0...allCharacters.length) {
+			var char:Char = allCharacters[i];
+			if (char.lineNumber >= lines.length) {
+				line = new Line();
+				line.index = lines.length;
+				lines.push(line);
+				
+			}
+			char.line = line;
+			line.chars.push(char);
+		}
+		for (j in 0...lines.length) 
+		{
+			lines[j].calcHeight();
+		}
+	}
+	
+	function findLinePositions() 
+	{
+		var lineStack:Float = 0;
+		var leading:Float = 0;
+		for (line in lines) 
+		{
+			if (line.index > 0) leading += line.leading;
+			line.y = lineStack + leading;
+			/*trace("line.y = " + line.y);*/
+			lineStack += line.height;
+			
+			/*line.outsizeBounds = false;
+			if (!withinBoundsY(line.y + line.height)) {
+				line.outsizeBounds = true;
+			}*/
+		}
+	}
+	
+	function setLinePositions() 
+	{
+		var lastYOffset:Float = Math.NaN;
+		var largestChars = new Array<Char>();
+		var lineHeights = new Array<Float>();
+		for (j in 0...lines.length) 
+		{
+			largestChars.push(lines[j].largestChar);
+			lineHeights.push(lines[j].height);
+		}
+		for (i in 0...allCharacters.length) 
+		{
+			var char:Char = allCharacters[i];
+			var largestChar:Char = largestChars[char.lineNumber];
+			if (char.charFormat.font == null) continue;
+			
+			char.y = char.line.y;
+			char.y -= char.charFormat.font.baseline * char.scale;
+			char.y += lineHeights[char.lineNumber];
+			
+			if (char.charFormat.bitmapChar != null) {
+				
+				if (textDisplay.vAlign == VAlign.TOP) {
+					lastYOffset = (char.charFormat.bitmapChar.yOffset - (char.charFormat.font.lineHeight - char.charFormat.font.baseline)) * char.scale;
+				}
+				else if (textDisplay.vAlign == VAlign.CENTER) {
+					lastYOffset = (char.charFormat.bitmapChar.yOffset - ((char.charFormat.font.lineHeight - char.charFormat.font.baseline) * 0.5)) * char.scale;
+				}
+				else if (textDisplay.vAlign == VAlign.BOTTOM) {
+					lastYOffset = char.charFormat.bitmapChar.yOffset * char.scale;
+				}
+				
+				char.y += lastYOffset;
+			}else if (!Math.isNaN(lastYOffset)){
+				char.y += lastYOffset;
+			}
+		}
+	}
+	
+	function calcTextSize() : Bool
+	{
+		var bounds:Rectangle = new Rectangle();
+		for (i in 0...lines.length) 
+		{
+			var line = lines[i];
+			if (bounds.width < line.width) {
+				bounds.width = line.width;
+			}
+		}
+		
+		if (lines.length > 0) {
+			var firstLine = lines[0];
+			var lastLine = lines[lines.length-1];
+			bounds.x = firstLine.x;
+			bounds.y = firstLine.y;
+			bounds.height = (lastLine.y - firstLine.y) + lastLine.height;
+		}
+		
+		var hasChanged:Bool = true;
+		if (textDisplay._textBounds.width == bounds.width && textDisplay._textBounds.height == bounds.height) hasChanged = false;
+		textDisplay._textBounds.setTo(bounds.x, bounds.y, bounds.width, bounds.height);
+		return hasChanged;
+	}
+	
+	function align() 
+	{
+		
+		var textHeight:Float = textDisplay._textBounds.height;
+		
+		var alignOffsetY:Float = 0;
+		if (textDisplay.targetHeight != null){
+			if (textDisplay.vAlign == VAlign.CENTER){
+				alignOffsetY = (textDisplay.targetBounds.height - textHeight) / 2;
+			}
+			else if (textDisplay.vAlign == VAlign.BOTTOM) {
+				alignOffsetY = textDisplay.targetBounds.height - textHeight;
+			}
+		}
+		
+		var widestLine:Float = 0;
+		for (i in 0 ... lines.length) 
+		{
+			var line = lines[i];
+			if (widestLine< line.width) {
+				widestLine = line.width;
+			}
+		}
+		
+		var targetWidth:Float = (textDisplay.autoSize == TextFieldAutoSize.HORIZONTAL || textDisplay.autoSize == TextFieldAutoSize.BOTH_DIRECTIONS ? textDisplay.textWidth : textDisplay.targetWidth);
+		
+		var smallestYOffset:Float = Math.NaN;
+		for (i in 0 ... lines.length) 
+		{
+			var line = lines[i];
+			var lineOffset:Float = 0;
+			
+			
+			if (textDisplay.hAlign == HAlign.LEFT) lineOffset = 0;
+			else if (textDisplay.hAlign == HAlign.CENTER) {
+				lineOffset = (targetWidth - line.width) / 2;
+			}
+			else if (textDisplay.hAlign == HAlign.RIGHT || textDisplay.hAlign == HAlign.JUSTIFY) {
+				lineOffset = targetWidth - line.width;
+			}
+			
+			if (textDisplay.hAlign == HAlign.JUSTIFY){
+				//line.width += lineOffset;
+			}else{
+				line.x += lineOffset;
+			}
+			line.y += alignOffsetY;
+			
+			if (textDisplay.vAlign == VAlign.TOP) {
+				line.y -= (line.largestChar.charFormat.font.lineHeight - line.largestChar.charFormat.font.baseline) * line.largestChar.scale;
+			}
+			else if (textDisplay.vAlign == VAlign.CENTER) {
+				line.y -= (line.largestChar.charFormat.font.lineHeight - line.largestChar.charFormat.font.baseline) * line.largestChar.scale * 0.5;
+			}
+			else if (textDisplay.vAlign == VAlign.BOTTOM) {
+				// Do nothing
+			}
+			
+			var first = true;
+			var t:Float = 0;
+			for (char in line.chars) 
+			{
+				if (textDisplay.hAlign == HAlign.JUSTIFY) {
+					if (line.validJustify && char.lineNumber < lines.length - 1) {	
+						var t:Float = char.charLinePositionX / (line.chars.length-2);
+						char.x += lineOffset * t;
+					}
+				}
+				else char.x += lineOffset;
+				
+				char.y += alignOffsetY;
+				
+				if (char.width > 1 && char.charFormat.bitmapChar != null){
+					var offset = (char.charFormat.bitmapChar.yOffset * char.scale) / 2;
+					if (Math.isNaN(smallestYOffset) || smallestYOffset > offset){
+						smallestYOffset = offset;
+					}
+				}
+			}
+		}
+		if(!Math.isNaN(smallestYOffset)){
+			for (line in lines){
+				line.y += smallestYOffset;
+			}
+		}
+	}
+	
+	private function progressLine():Void
+	{
+		wordBreakFound = false;	
+		charLinePositionX = 0;
+		placement.x = 0;
+		lineNumber++;
+		if (!textDisplay.allowLineBreaks) {
+			limitReached = true;
+		}
+	}
+	
+	function withinBoundsX(value:Float):Bool
+	{
+		if (textDisplay.autoSize == TextFieldAutoSize.HORIZONTAL || textDisplay.autoSize == TextFieldAutoSize.BOTH_DIRECTIONS)
+			return true;
+		else if (value < textDisplay.targetWidth) return true;
+		return false;
+	}
+	
+	function withinBoundsY(value:Float):Bool
+	{
+		if (textDisplay.autoSize == TextFieldAutoSize.VERTICAL || textDisplay.autoSize == TextFieldAutoSize.BOTH_DIRECTIONS)
+			return true;
+		else if (value < textDisplay.targetHeight) return true;
+		return false;
+	}
+	
+	function get_endChar():EndChar 
+	{
+		if (characters.length > 0){
+			var char:Char = characters[characters.length - 1];
+			_endChar.charFormat = char.charFormat;
+		}
+		_endChar.index = characters.length;
+		return _endChar;
+	}
+}
