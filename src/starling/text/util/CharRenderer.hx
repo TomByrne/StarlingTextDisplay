@@ -46,10 +46,12 @@ class CharRenderer
 	
 	public function setColor(value:UInt):Void
 	{
+		#if starling2
 		for (quadBatch in quadBatches) 
 		{
 			quadBatch.color = value;
 		}
+		#end
 	}
 	
 	public function render(characters:Array<Char>) 

@@ -113,8 +113,14 @@ class MouseInput
 		#if flash
 			Mouse.cursor = (e.interactsWith(textDisplay.hitArea)) ? MouseCursor.BUTTON:MouseCursor.AUTO;
 		#end
-		var beginTouches:Array<Touch> = e.getTouches(untyped e.target, TouchPhase.BEGAN);
-		var moveTouches:Array<Touch> = e.getTouches(untyped e.target, TouchPhase.MOVED);
+		
+		#if starling2
+			var beginTouches:Array<Touch> = e.getTouches(untyped e.target, TouchPhase.BEGAN);
+			var moveTouches:Array<Touch> = e.getTouches(untyped e.target, TouchPhase.MOVED);
+		#else
+			var beginTouches:Vector<Touch> = e.getTouches(untyped e.target, TouchPhase.BEGAN);
+			var moveTouches:Vector<Touch> = e.getTouches(untyped e.target, TouchPhase.MOVED);
+		#end
 		if (beginTouches.length > 0) {
 			OnBegin(beginTouches[0]);
 		}
