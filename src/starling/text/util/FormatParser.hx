@@ -83,6 +83,9 @@ class FormatParser
 		if (format1.color != format2.color) return false;
 		if (format1.face != format2.face) return false;
 		if (format1.size != format2.size) return false;
+		if (format1.leading != format2.leading) return false;
+		if (format1.kerning != format2.kerning) return false;
+		if (format1.textTransform != format2.textTransform) return false;
 		return true;
 	}
 	
@@ -115,6 +118,7 @@ class FormatParser
 		if (inputFormat.face != null) return false;
 		if (inputFormat.kerning != null) return false;
 		if (inputFormat.leading != null) return false;
+		if (inputFormat.textTransform != null) return false;
 		if (inputFormat.size != null) return false;
 		return true;
 	}
@@ -347,9 +351,8 @@ class FormatParser
 			if (propName.toLowerCase() == "color") 			untyped inputFormat[propName] = Std.parseInt("0x" + propValue.split("#").join(""));
 			else if (propName.toLowerCase() == "face")		untyped inputFormat[propName] = propValue;
 			else if (propName.toLowerCase() == "size")		untyped inputFormat[propName] = Std.parseInt(propValue);
-			// ignore for now, until we reset the database to clear out the huge leading values
-			//else if (propName.toLowerCase() == "kerning")	untyped inputFormat[propName] = Std.parseInt(propValue);
-			//else if (propName.toLowerCase() == "leading")	untyped inputFormat[propName] = Std.parseInt(propValue);
+			else if (propName.toLowerCase() == "kerning")	untyped inputFormat[propName] = Std.parseInt(propValue);
+			else if (propName.toLowerCase() == "leading")	untyped inputFormat[propName] = Std.parseInt(propValue);
 		}
 		return inputFormat;
 	}
@@ -523,6 +526,7 @@ class FormatParser
 		if (inputFormat.face != null) atts += " face='" + inputFormat.face + "'";
 		if (inputFormat.kerning != null && inputFormat.kerning != 0) atts += " kerning='" + inputFormat.kerning + "'";
 		if (inputFormat.leading != null && inputFormat.leading != 0) atts += " leading='" + inputFormat.leading + "'";
+		if (inputFormat.textTransform != null) atts += " transform='" + inputFormat.textTransform + "'";
 		if (inputFormat.size != null) atts += " size='" + inputFormat.size + "'";
 		
 		if (atts != "") atts = "<font" + atts + ">";
@@ -573,6 +577,10 @@ class FormatParser
 		if (copyFrom.leading != null) {
 			if (copyTo.leading == null && incompatible.leading == null) copyTo.leading = incompatible.leading = copyFrom.leading;
 			else if (copyTo.leading != copyFrom.leading) copyTo.leading = null;
+		}
+		if (copyFrom.textTransform != null) {
+			if (copyTo.textTransform == null && incompatible.textTransform == null) copyTo.textTransform = incompatible.textTransform = copyFrom.textTransform;
+			else if (copyTo.textTransform != copyFrom.textTransform) copyTo.textTransform = null;
 		}
 	}
 	
