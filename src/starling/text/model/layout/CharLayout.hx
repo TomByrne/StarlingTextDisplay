@@ -5,6 +5,7 @@ import openfl.geom.Rectangle;
 import starling.text.BitmapFont;
 import starling.text.model.format.InputFormat;
 import starling.text.model.format.CharFormat;
+import starling.text.model.format.TextWrapping;
 import starling.text.model.layout.Char;
 import starling.text.model.layout.Line;
 import starling.text.model.selection.Selection;
@@ -46,6 +47,7 @@ class CharLayout extends EventDispatcher
 	public var characters = new Array<Char>();
 	public var allCharacters:Array<Char>;
 	public var lines = new Array<Line>();
+	public var textWrapping:TextWrapping = TextWrapping.WORD;
 	
 	@:allow(starling.text)
 	private function new(textDisplay:TextDisplay) 
@@ -222,6 +224,8 @@ class CharLayout extends EventDispatcher
 		var goBack:Bool = false;
 		limitReached = false;
 		
+		var hasWrap:Bool = (textWrapping != TextWrapping.NONE);
+		
 		while (i < allCharacters.length) 
 		{
 			goBack = false;
@@ -238,7 +242,7 @@ class CharLayout extends EventDispatcher
 				wordBreakFound = true;
 			}
 			
-			if (withinBoundsX(placement.x + char.width) == false && i < allCharacters.length-1 && char.character != " ") {
+			if (withinBoundsX(placement.x + char.width) == false && i < allCharacters.length-1 && char.character != " " && hasWrap) {
 				
 				if (lastSpaceIndex != i && wordBreakFound) {
 					var lastSpaceChar:Char = allCharacters[lastSpaceIndex];
@@ -273,7 +277,7 @@ class CharLayout extends EventDispatcher
 				}
 			}
 			
-			if (withinBoundsX(placement.x) == false && i < allCharacters.length-2 && char.character != " ") {
+			if (withinBoundsX(placement.x) == false && i < allCharacters.length-2 && char.character != " " && hasWrap) {
 				if (lastSpaceIndex != i && wordBreakFound) {
 					var lastSpaceChar:Char = allCharacters[lastSpaceIndex];
 					if (lastSpaceChar.lineNumber == lineNumber) {

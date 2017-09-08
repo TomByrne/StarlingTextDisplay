@@ -16,6 +16,7 @@ import starling.text.display.Caret;
 import starling.text.display.ClipMask;
 import starling.text.display.Highlight;
 import starling.text.display.HitArea;
+import starling.text.model.format.TextWrapping;
 //import starling.text.control.input.EventForwarder;
 import starling.text.control.input.SoftKeyboardIO;
 import starling.text.display.TargetBounds;
@@ -90,6 +91,7 @@ class TextDisplay extends DisplayObjectContainer
 	@:isVar public var showTextBorder(default, set):Bool = false;
 	@:isVar public var debug(default, set):Bool = false;
 	@:isVar public var clipOverflow(default, set):Bool = false;
+	@:isVar public var textWrapping(default, set):TextWrapping = TextWrapping.WORD;
 	
 	@:allow(starling.text) var targetWidth:Null<Float>;
 	@:allow(starling.text) var targetHeight:Null<Float>;
@@ -423,13 +425,20 @@ class TextDisplay extends DisplayObjectContainer
 		debug = value;
 		this.showBoundsBorder = value;
 		this.showTextBorder = value;
-		return debug;
+		return value;
 	}
 	private function set_clipOverflow(value:Bool):Bool
 	{
 		clipOverflow = value;
 		this.clipMask.Update();
-		return debug;
+		return value;
+	}
+	private function set_textWrapping(value:TextWrapping):TextWrapping
+	{
+		textWrapping = value;
+		this.charLayout.textWrapping = value;
+		charLayout.process();
+		return value;
 	}
 	
 	
