@@ -98,7 +98,7 @@ class TextDisplay extends DisplayObjectContainer
 	
 	@:allow(starling.text) var _textBounds = new Rectangle();
 	
-	public var defaultFormat(get, null):InputFormat;
+	public var defaultFormat(get, set):InputFormat;
 	
 	public var textWidth(get, null):Float;
 	public var textHeight(get, null):Float;
@@ -558,6 +558,15 @@ class TextDisplay extends DisplayObjectContainer
 	
 	function get_defaultFormat():InputFormat 
 	{
+		return formatModel.defaultFormat;
+	}
+	function set_defaultFormat(value:InputFormat):InputFormat 
+	{
+		if(value != null){
+			formatModel.setDefaults(value);
+			charLayout.process();
+			dispatchEvent(new Event(Event.CHANGE));
+		}
 		return formatModel.defaultFormat;
 	}
 	
