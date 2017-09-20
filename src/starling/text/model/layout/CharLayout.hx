@@ -183,8 +183,8 @@ class CharLayout extends EventDispatcher
 		{
 			characters[i].index -= end - start;
 		}
-		textDisplay.selection.index = start;
 		process();
+		textDisplay.selection.index = start; // Must set index after updating text otherwise HistoryControl will modify previous HistoryStep
 	}
 	
 	public function add(newStr:String, index:Int):Void
