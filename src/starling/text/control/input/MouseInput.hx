@@ -6,11 +6,8 @@ import com.imagination.util.geom.Point;
 import openfl.Lib;
 import openfl.Vector;
 import openfl.events.MouseEvent;
-
-#if flash
-	import flash.ui.Mouse;
-	import flash.ui.MouseCursor;
-#end
+import openfl.ui.Mouse;
+import openfl.ui.MouseCursor;
 
 import starling.core.Starling;
 import starling.display.DisplayObject;
@@ -51,6 +48,7 @@ class MouseInput
 	private var selectType:String = SELECT_BY_CHAR;
 	private var pressWord:Word;
 	private var moveWord:Word;
+	private var hovering:Bool;
 	
 	private static function OnMouseDown(e:MouseEvent):Void 
 	{
@@ -103,6 +101,7 @@ class MouseInput
 			textDisplay.hitArea.addEventListener(TouchEvent.TOUCH, OnTouch);
 		}
 		else {
+			setHovering(false);
 			textDisplay.hitArea.removeEventListener(TouchEvent.TOUCH, OnTouch);
 		}
 		return _active;
@@ -110,9 +109,7 @@ class MouseInput
 	
 	private function OnTouch(e:TouchEvent):Void 
 	{
-		#if flash
-			Mouse.cursor = (e.interactsWith(textDisplay.hitArea)) ? MouseCursor.BUTTON:MouseCursor.AUTO;
-		#end
+		setHovering(e.interactsWith(textDisplay.hitArea));
 		
 		#if starling2
 			var beginTouches:Array<Touch> = e.getTouches(untyped e.target, TouchPhase.BEGAN);
@@ -127,6 +124,13 @@ class MouseInput
 		if (moveTouches.length > 0) {
 			OnMove(moveTouches[0]);
 		}
+	}
+	
+	function setHovering(hovering:Bool) 
+	{
+		if (this.hovering == hovering) return;
+		this.hovering = hovering;
+		Mouse.cursor = hovering ? MouseCursor.IBEAM : MouseCursor.AUTO;
 	}
 	
 	private function OnBegin(touch:Touch) 
