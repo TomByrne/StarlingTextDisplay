@@ -394,7 +394,23 @@ class TextDisplay extends DisplayObjectContainer
 	}
 	
 	
-	@:allow(starling.text.control.input.KeyboardInput.addChars)
+	
+	private function replaceSelection(newChars:String):Void 
+	{
+		if (selection.begin != null) {
+			historyControl.setIgnoreChanges(true);
+			clearSelected();
+			historyControl.setIgnoreChanges(false);
+		}
+		
+		if(selection.index == -1){
+			add(newChars, 0);
+			selection.index = newChars.length;
+		}else{
+			add(newChars, selection.index);
+		}
+	}
+	
 	private function add(letter:String, index:Int):Void
 	{
 		if (!allowLineBreaks && SpecialChar.isLineBreak(letter)) return;

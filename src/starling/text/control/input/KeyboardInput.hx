@@ -16,6 +16,7 @@ import starling.text.TextDisplay;
  * ...
  * @author P.J.Shand
  */
+@:access(starling.text.TextDisplay)
 class KeyboardInput
 {
 	private var textDisplay:TextDisplay;
@@ -52,7 +53,7 @@ class KeyboardInput
 				jsCapsLock.check();
 				Delay.nextFrame(DelayInput, [e]);
 			#else
-				addChars(String.fromCharCode(e.charCode));
+				textDisplay.replaceSelection(String.fromCharCode(e.charCode));
 			#end
 		}
 	}
@@ -66,7 +67,7 @@ class KeyboardInput
 			if (isUppercase) char = char.toLowerCase();
 			else char = char.toUpperCase();
 		}
-		addChars(char);
+		textDisplay.replaceSelection(char);
 	}
 	#end
 	
@@ -80,7 +81,7 @@ class KeyboardInput
 		#if !js
 		var pasteStr:String = Clipboard.generalClipboard.getData(ClipboardFormats.TEXT_FORMAT);
 		if (pasteStr != null){
-			addChars(pasteStr);
+			textDisplay.replaceSelection(pasteStr);
 		}
 		#end
 	}
@@ -116,20 +117,6 @@ class KeyboardInput
 		}
 		else {
 			textDisplay.clearSelected(1);
-		}
-	}
-	
-	private function addChars(newChars:String):Void 
-	{
-		if (selection.begin != null) {
-			textDisplay.clearSelected();
-		}
-		
-		if(selection.index == -1){
-			textDisplay.add(newChars, 0);
-			selection.index = newChars.length;
-		}else{
-			textDisplay.add(newChars, selection.index);
 		}
 	}
 	

@@ -24,6 +24,8 @@ class HistoryControl
 	private var selection:Selection;
 	private var textDisplay:TextDisplay;
 	
+	var ignoreChanges:Bool;
+	
 	@:allow(starling.text)
 	private function new(textDisplay:TextDisplay)
 	{
@@ -35,6 +37,11 @@ class HistoryControl
 		
 		textDisplay.charLayout.addEventListener(Event.CHANGE, onTextChange);
 		selection.addEventListener(Event.SELECT, onSelectionChange);
+	}
+	
+	public function setIgnoreChanges(ignore:Bool) : Void
+	{
+		ignoreChanges = ignore;
 	}
 	
 	function OnActiveChange() 
@@ -53,7 +60,7 @@ class HistoryControl
 	
 	private function onSelectionChange(e:Event):Void 
 	{
-		if (historyModel.ignoreChanges || !historyModel.active) return;
+		if (historyModel.ignoreChanges || !historyModel.active || ignoreChanges) return;
 		
 		var currStep:HistoryStep = (historyModel.currStepIndex ==-1 ? null : historyModel.history[historyModel.currStepIndex]);
 		if (currStep!=null){
@@ -65,7 +72,7 @@ class HistoryControl
 	
 	private function onTextChange(e:Event):Void 
 	{
-		if (historyModel.ignoreChanges || !historyModel.active) return;
+		if (historyModel.ignoreChanges || !historyModel.active || ignoreChanges) return;
 		
 		storeStep();
 	}

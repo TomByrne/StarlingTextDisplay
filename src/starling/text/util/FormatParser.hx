@@ -385,7 +385,7 @@ class FormatParser
 			}
 			if (value[i].name != null && startTag != "") output += createEndTag(value[i]);
 		}
-		output = StringTools.replace(output, "" + SpecialChar.NewLine + SpecialChar.Return, "<br/>");
+		output = StringTools.replace(output, "" + SpecialChar.Return + SpecialChar.NewLine, "<br/>");
 		output = StringTools.replace(output, SpecialChar.NewLine, "<br/>");
 		output = StringTools.replace(output, SpecialChar.Return, "<br/>");
 		return output;
