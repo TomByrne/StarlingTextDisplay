@@ -304,11 +304,6 @@ class ContentModel
 	
 	function set_nodes(value:Array<FormatNode>): Array<FormatNode>
 	{
-		for (i in 0...value.length) 
-		{
-			// copy default values to top level nodes 
-			InputFormatHelper.copyMissingValues(value[i].format, textDisplay.formatModel.defaultFormat);
-		}
 		_nodes = value;
 		return _nodes;
 	}

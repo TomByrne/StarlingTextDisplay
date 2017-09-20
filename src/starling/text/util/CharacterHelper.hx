@@ -37,14 +37,14 @@ class CharacterHelper
 		}*/
 		
 		var charFormat:CharFormat = new CharFormat();
-		var format = new InputFormat();
+		var format = charFormat.format;
 		
 		if (nodes.length == 0) format = textDisplay.formatModel.defaultFormat;
 		else applyFormats(format, char, nodes);
 		
-		charFormat.format = format;
-		if (format.face != null) charFormat.font = FontRegistry.getBitmapFont(format.face/*, cast format.size*/);
-		if (charFormat.font == null) charFormat.font = textDisplay.formatModel.defaultFont;
+		updateCharFormat(format, charFormat, textDisplay.formatModel.defaultFont);
+		
+		InputFormatHelper.copyMissingValues(format, textDisplay.defaultFormat);
 		
 		var charID:Int = char.id;
 		if (charFormat.format.textTransform == TextTransform.UPPERCASE) {
@@ -55,6 +55,15 @@ class CharacterHelper
 		}
 		
 		charFormat.bitmapChar = charFormat.font.getChar(charID);
+		
+		return charFormat;
+	}
+	
+	static public function updateCharFormat(format:InputFormat, charFormat:CharFormat, defaultFont:BitmapFont):CharFormat
+	{
+		charFormat.format = format;
+		if (format.face != null) charFormat.font = FontRegistry.getBitmapFont(format.face/*, cast format.size*/);
+		if (charFormat.font == null) charFormat.font = defaultFont;
 		return charFormat;
 	}
 	

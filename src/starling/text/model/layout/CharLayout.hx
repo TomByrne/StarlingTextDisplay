@@ -44,6 +44,7 @@ class CharLayout extends EventDispatcher
 	private var resizeEvent:Event;
 	var wordBreakFound:Bool;
 	var limitReached:Bool;
+	var defaultCharFormat:CharFormat;
 	
 	public var characters = new Array<Char>();
 	public var allCharacters:Array<Char>;
@@ -60,6 +61,8 @@ class CharLayout extends EventDispatcher
 		_endChar.isEndChar = true;
 		allCharacters = [_endChar];
 		
+		defaultCharFormat = new CharFormat();
+		
 		resizeEvent = new Event(Event.RESIZE);
 		changeEvent = new Event(Event.CHANGE);
 	}
@@ -68,6 +71,8 @@ class CharLayout extends EventDispatcher
 	{
 		this.characters = textDisplay.contentModel.characters;
 		this.allCharacters = characters.concat([_endChar]);
+		
+		CharacterHelper.updateCharFormat(textDisplay.defaultFormat, defaultCharFormat, textDisplay.formatModel.defaultFont);
 		
 		setPlacementX();
 		findWords();
@@ -554,6 +559,8 @@ class CharLayout extends EventDispatcher
 		if (characters.length > 0){
 			var char:Char = characters[characters.length - 1];
 			_endChar.charFormat = char.charFormat;
+		}else{
+			_endChar.charFormat = defaultCharFormat;
 		}
 		_endChar.index = characters.length;
 		return _endChar;
