@@ -16,6 +16,7 @@ import starling.events.EventDispatcher;
 import starling.text.BitmapChar;
 import starling.text.TextDisplay;
 import starling.text.util.CharacterHelper;
+import starling.utils.SpecialChar;
 
 /*#if starling2
 	import starling.utils.Align;
@@ -224,6 +225,7 @@ class CharLayout extends EventDispatcher
 		var goBack:Bool = false;
 		limitReached = false;
 		
+		var lastChar:Char = null;
 		var hasWrap:Bool = (textWrapping != TextWrapping.NONE);
 		
 		while (i < allCharacters.length) 
@@ -232,17 +234,17 @@ class CharLayout extends EventDispatcher
 			var char:Char = allCharacters[i];
 			char.charFormat = CharacterHelper.findCharFormat(textDisplay, char, textDisplay.contentModel.nodes);
 			
-			if (!textDisplay.allowLineBreaks && (char.character == "\r" || char.character == "\n")) {
+			if (!textDisplay.allowLineBreaks && (char.character == SpecialChar.Return || char.character == SpecialChar.NewLine)) {
 				i++;
 				continue;
 			}
 			
-			if (char.character == " ") {
+			if (char.character == SpecialChar.Space) {
 				lastSpaceIndex = i;
 				wordBreakFound = true;
 			}
 			
-			if (withinBoundsX(placement.x + char.width) == false && i < allCharacters.length-1 && char.character != " " && hasWrap) {
+			if (withinBoundsX(placement.x + char.width) == false && i < allCharacters.length-1 && char.character != SpecialChar.Space && hasWrap) {
 				
 				if (lastSpaceIndex != i && wordBreakFound) {
 					var lastSpaceChar:Char = allCharacters[lastSpaceIndex];
@@ -268,7 +270,7 @@ class CharLayout extends EventDispatcher
 			char.charLinePositionX = charLinePositionX;
 			charLinePositionX++;
 			
-			if (char.character != " " || charLinePositionX != 0) {
+			if (char.character != SpecialChar.Space || charLinePositionX != 0) {
 				if (char.charFormat.bitmapChar != null) {
 					placement.x += (char.charFormat.bitmapChar.xAdvance * char.scale);
 					if (char.charFormat.format.kerning != null) {
@@ -277,7 +279,7 @@ class CharLayout extends EventDispatcher
 				}
 			}
 			
-			if (withinBoundsX(placement.x) == false && i < allCharacters.length-2 && char.character != " " && hasWrap) {
+			if (withinBoundsX(placement.x) == false && i < allCharacters.length-2 && char.character != SpecialChar.Space && hasWrap) {
 				if (lastSpaceIndex != i && wordBreakFound) {
 					var lastSpaceChar:Char = allCharacters[lastSpaceIndex];
 					if (lastSpaceChar.lineNumber == lineNumber) {
@@ -291,9 +293,16 @@ class CharLayout extends EventDispatcher
 					continue;
 				}
 			}
-			else if (char.character == "\r" || char.character == "\n") {
+			else if (char.character == SpecialChar.Return) {
 				progressLine();
 			}
+			else if (char.character == SpecialChar.NewLine) {
+				if(lastChar == null || lastChar.character != SpecialChar.Return){
+					// The sequence '\r\n' should only be rendered as a single line break
+					progressLine();
+				}
+			}
+			lastChar = char;
 			i++;
 		}
 	}
@@ -308,10 +317,10 @@ class CharLayout extends EventDispatcher
 		for (i in 0...allCharacters.length) 
 		{
 			var char:Char = allCharacters[i];
-			if (char.character == " ") t = 0;
-			else if (char.character == "\t") t = 1;
-			else if (char.character == "\n") t = 2;
-			else if (char.character == "\r") t = 3;
+			if (char.character == SpecialChar.Space) t = 0;
+			else if (char.character == SpecialChar.Tab) t = 1;
+			else if (char.character == SpecialChar.NewLine) t = 2;
+			else if (char.character == SpecialChar.Return) t = 3;
 			else t = 4;
 			if (lt != t) {
 				word = new Word();

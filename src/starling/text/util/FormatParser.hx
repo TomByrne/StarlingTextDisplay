@@ -5,6 +5,7 @@ import openfl.errors.Error;
 import starling.text.model.format.InputFormat;
 import starling.text.model.layout.Char;
 import starling.text.util.FormatParser.FormatNode;
+import starling.utils.SpecialChar;
 
 /**
  * ...
@@ -136,8 +137,8 @@ class FormatParser
 	{
 		if (v == null) return null;
 		var value:String = v;
-		value = new EReg ("<br>", "g").replace (value, "\n");
-		value = new EReg ("<br/>", "g").replace (value, "\n");
+		value = new EReg ("<br>", "g").replace (value, SpecialChar.NewLine);
+		value = new EReg ("<br/>", "g").replace (value, SpecialChar.NewLine);
 		return Xml.parse("<xml>" + value + "</xml>").firstChild();
 	}
 	
@@ -384,7 +385,10 @@ class FormatParser
 			}
 			if (value[i].name != null && startTag != "") output += createEndTag(value[i]);
 		}
-		return output.split("\n").join("<br/>").split("\r").join("<br/>");
+		output = StringTools.replace(output, "" + SpecialChar.NewLine + SpecialChar.Return, "<br/>");
+		output = StringTools.replace(output, SpecialChar.NewLine, "<br/>");
+		output = StringTools.replace(output, SpecialChar.Return, "<br/>");
+		return output;
 	}
 	
 	public static function nodesToPlainText(value:Array<FormatNode>):String
@@ -475,7 +479,7 @@ class FormatParser
 				}
 			}
 		}
-		output = output.split("\n").join("<br/>").split("\r").join("<br/>");
+		output = output.split(SpecialChar.NewLine).join("<br/>").split(SpecialChar.Return).join("<br/>");
 		//var xml:Xml = clearString(output);
 		
 		formatLengths.sort(SortByStartAndEnd);
@@ -607,7 +611,7 @@ class FormatParser
 	
 	static public function removeLineBreaks(v:String) 
 	{
-		return v.split("\r").join("").split("\n").join("").split("<br>").join("").split("<br/>").join("");
+		return v.split(SpecialChar.Return).join("").split(SpecialChar.NewLine).join("").split("<br>").join("").split("<br/>").join("");
 	}
 }
 

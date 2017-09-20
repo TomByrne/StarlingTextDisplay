@@ -7,6 +7,7 @@ import starling.text.model.layout.Char;
 import starling.text.model.layout.CharLayout;
 import starling.text.model.selection.Selection;
 import starling.core.Starling;
+import starling.utils.SpecialChar;
 
 /**
  * ...
@@ -59,23 +60,23 @@ class KeyboardShortcuts
 	function findWordIndex(fromIndex:Int, offset:Int) : Int
 	{
 		if (offset < 0){
-			if (textDisplay.value.charAt(fromIndex-1) == " "){
+			if (textDisplay.value.charAt(fromIndex-1) == SpecialChar.Space){
 				fromIndex--;
 			}
-			if (textDisplay.value.charAt(fromIndex) == " "){
+			if (textDisplay.value.charAt(fromIndex) == SpecialChar.Space){
 				fromIndex--;
 			}
-			var index:Int = lastIndexOf(textDisplay.value, [" ", "\n", "\r"], fromIndex);
+			var index:Int = lastIndexOf(textDisplay.value, SpecialChar.WhiteSpace, fromIndex);
 			if (index == -1){
 				return 0;
 			}else{
 				return index + 1;
 			}
 		}else{
-			if (textDisplay.value.charAt(fromIndex) == " "){
+			if (textDisplay.value.charAt(fromIndex) == SpecialChar.Space){
 				fromIndex++;
 			}
-			var index:Int = indexOf(textDisplay.value, [" ", "\n", "\r"], fromIndex);
+			var index:Int = indexOf(textDisplay.value, SpecialChar.WhiteSpace, fromIndex);
 			if (index == -1){
 				return textDisplay.value.length;
 			}else{

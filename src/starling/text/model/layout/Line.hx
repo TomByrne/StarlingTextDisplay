@@ -1,6 +1,7 @@
 package starling.text.model.layout;
 
 import starling.text.model.layout.Char;
+import starling.utils.SpecialChar;
 
 /**
  * ...
@@ -42,7 +43,7 @@ class Line
 	function get_validJustify():Bool 
 	{
 		var char:Char = chars[chars.length - 1];
-		if (char.character == "\r") return false;
+		if (SpecialChar.isLineBreak(char.character)) return false;
 		return true;
 	}
 	
@@ -87,7 +88,7 @@ class Line
 		for (i in 0...chars.length) 
 		{
 			var char = chars[i];
-			if (char.character != " " && char.character != "\n" && char.character != "\r") validChar = true;
+			if (!SpecialChar.isWhitespace(char.character)) validChar = true;
 			if (validChar && char.charFormat.bitmapChar != null) {
 				v += char.charFormat.bitmapChar.xAdvance * char.scale;
 				lastKerning = char.charFormat.format.kerning;
@@ -100,19 +101,9 @@ class Line
 	
 	function get_isEmptyLine():Bool 
 	{
-		var emptyChars:Array<String> = [" ", "\r", "\t", "\n"];
 		for (i in 0...chars.length) 
 		{
-			var emptyCount:Int = 0;
-			for (j in 0...emptyChars.length) 
-			{
-				if (chars[i].character != emptyChars[j]) {
-					emptyCount++;
-				}
-			}
-			if (emptyCount != emptyChars.length - 1) {
-				return false;
-			}
+			if (!SpecialChar.isWhitespace(chars[i].character)) return false;
 		}
 		return true;
 	}

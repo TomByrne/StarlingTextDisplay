@@ -17,6 +17,7 @@ import starling.text.display.ClipMask;
 import starling.text.display.Highlight;
 import starling.text.display.HitArea;
 import starling.text.model.format.TextWrapping;
+import starling.utils.SpecialChar;
 //import starling.text.control.input.EventForwarder;
 import starling.text.control.input.SoftKeyboardIO;
 import starling.text.display.TargetBounds;
@@ -396,7 +397,7 @@ class TextDisplay extends DisplayObjectContainer
 	@:allow(starling.text.control.input.KeyboardInput.addChars)
 	private function add(letter:String, index:Int):Void
 	{
-		if (!allowLineBreaks && (letter == "\n" || letter == "\r")) return;
+		if (!allowLineBreaks && SpecialChar.isLineBreak(letter)) return;
 		if (maxCharacters != null){
 			if (_value.length >= maxCharacters) return;
 		}

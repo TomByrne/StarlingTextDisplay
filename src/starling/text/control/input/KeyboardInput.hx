@@ -77,15 +77,17 @@ class KeyboardInput
 	
 	private function paste():Void 
 	{
-		#if flash
+		#if !js
 		var pasteStr:String = Clipboard.generalClipboard.getData(ClipboardFormats.TEXT_FORMAT);
-		if (pasteStr != null) addChars(pasteStr);
+		if (pasteStr != null){
+			addChars(pasteStr);
+		}
 		#end
 	}
 	
-	private function copy(cut:Bool=false):Void 
+	private function copy():Void 
 	{
-		#if flash
+		#if !js
 		if (selection.begin != null) {
 			var value:String = textDisplay.value.substring(selection.begin, selection.end);
 			Clipboard.generalClipboard.clear();
@@ -97,7 +99,7 @@ class KeyboardInput
 	private function cut():Void 
 	{
 		if (selection.begin != null) {
-			copy(true);
+			copy();
 			textDisplay.clearSelected();
 		}
 	}

@@ -83,6 +83,7 @@ class Selection extends EventDispatcher
 	
 	function get_line():Int 
 	{
+		if (index == -1) return -1;
 		return textDisplay.charLayout.getCharOrEnd(index).lineNumber;
 	}
 	
