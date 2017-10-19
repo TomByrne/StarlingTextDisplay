@@ -37,6 +37,8 @@ class CharRenderer
 	private var images = new Array<Image>();
 	private var quadBatches:Map<String, QuadBatch> = new Map();
 	private var lineQuads = new Array<Quad>();
+	var characters:Array<Char>;
+	var color:Null<UInt>;
 
 	@:allow(starling.text)
 	private function new(textDisplay:TextDisplay)
@@ -44,8 +46,9 @@ class CharRenderer
 		this.textDisplay = textDisplay;
 	}
 	
-	public function setColor(value:UInt):Void
+	public function setColor(color:Null<UInt>):Void
 	{
+		this.color = color;
 		#if starling2
 		for (quadBatch in quadBatches) 
 		{
@@ -56,6 +59,7 @@ class CharRenderer
 	
 	public function render(characters:Array<Char>) 
 	{
+		this.characters = characters;
 		for(quadBatch in quadBatches){
 			#if starling2
 				quadBatch.clear();
@@ -83,10 +87,11 @@ class CharRenderer
 						var image:Image = char.charFormat.bitmapChar.createImage();
 						image.scaleX = image.scaleY = char.scale;
 						
-						image.x = Math.round(char.x);
-						image.y = Math.round(char.y);
+						image.x = char.x;
+						image.y = char.y;
 						
-						image.color = char.charFormat.format.color;
+						if (color == null) image.color = char.charFormat.format.color;
+						else image.color = color;
 						
 						image.touchable = false;
 						images.push(image);

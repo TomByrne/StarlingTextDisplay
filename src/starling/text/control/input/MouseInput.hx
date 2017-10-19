@@ -111,13 +111,13 @@ class MouseInput
 	{
 		setHovering(e.interactsWith(textDisplay.hitArea));
 		
-		#if starling2
-			var beginTouches:Array<Touch> = e.getTouches(untyped e.target, TouchPhase.BEGAN);
-			var moveTouches:Array<Touch> = e.getTouches(untyped e.target, TouchPhase.MOVED);
-		#else
+		//#if starling2
+			//var beginTouches:Array<Touch> = e.getTouches(untyped e.target, TouchPhase.BEGAN);
+			//var moveTouches:Array<Touch> = e.getTouches(untyped e.target, TouchPhase.MOVED);
+		//#else
 			var beginTouches:Vector<Touch> = e.getTouches(untyped e.target, TouchPhase.BEGAN);
 			var moveTouches:Vector<Touch> = e.getTouches(untyped e.target, TouchPhase.MOVED);
-		#end
+		//#end
 		if (beginTouches.length > 0) {
 			OnBegin(beginTouches[0]);
 		}
