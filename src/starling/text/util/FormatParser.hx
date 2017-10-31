@@ -241,7 +241,7 @@ class FormatParser
 	
 	static function xmlToNodes(xml:Xml, parent:FormatNode):FormatNode
 	{
-		//trace("convert:" + xml);
+		trace("convert:" + xml);
 		
 		var node:FormatNode = new FormatNode();
 		node.parent = parent;
@@ -344,7 +344,8 @@ class FormatParser
 	{
 		
 		var inputFormat = new InputFormat();
-		for (i in 0...formatAttribute.length) 
+		var len:Int = formatAttribute.length;
+		for (i in 0...len)
 		{
 			var propName:String = formatAttribute[i].key;
 			var propValue:String = formatAttribute[i].value;
