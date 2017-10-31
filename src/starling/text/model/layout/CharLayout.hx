@@ -73,7 +73,6 @@ class CharLayout extends EventDispatcher
 		this.allCharacters = characters.concat([_endChar]);
 		
 		var iformat:InputFormat = textDisplay.defaultFormat;
-		trace(iformat);
 		CharacterHelper.updateCharFormat(textDisplay.defaultFormat, defaultCharFormat, textDisplay.formatModel.defaultFont);
 		
 		setPlacementX();

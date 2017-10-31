@@ -353,7 +353,7 @@ class TextDisplay extends DisplayObjectContainer
 		createCharacters();
 		if (_value.length > 0) selection.index = 0;
 		else selection.clear();
-		links.update(
+		links.update();
 		return _value;
 	}
 	
