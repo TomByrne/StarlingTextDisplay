@@ -114,7 +114,7 @@ class CharRenderer
 			}
 		}
 		
-		setColor(textDisplay.color);
+		//setColor(textDisplay.color);
 	}
 	
 	public function dispose() 
