@@ -87,6 +87,7 @@ class FormatParser
 		if (format1.leading != format2.leading) return false;
 		if (format1.kerning != format2.kerning) return false;
 		if (format1.textTransform != format2.textTransform) return false;
+		if (format1.href != format2.href) return false;
 		return true;
 	}
 	
@@ -121,6 +122,7 @@ class FormatParser
 		if (inputFormat.leading != null) return false;
 		if (inputFormat.textTransform != null) return false;
 		if (inputFormat.size != null) return false;
+		if (inputFormat.href != null) return false;
 		return true;
 	}
 	
@@ -241,8 +243,6 @@ class FormatParser
 	
 	static function xmlToNodes(xml:Xml, parent:FormatNode):FormatNode
 	{
-		//trace("convert:" + xml);
-		
 		var node:FormatNode = new FormatNode();
 		node.parent = parent;
 		
@@ -344,7 +344,8 @@ class FormatParser
 	{
 		
 		var inputFormat = new InputFormat();
-		for (i in 0...formatAttribute.length) 
+		var len:Int = formatAttribute.length;
+		for (i in 0...len)
 		{
 			var propName:String = formatAttribute[i].key;
 			var propValue:String = formatAttribute[i].value;
@@ -354,6 +355,10 @@ class FormatParser
 			else if (propName.toLowerCase() == "size")		untyped inputFormat[propName] = Std.parseInt(propValue);
 			else if (propName.toLowerCase() == "kerning")	untyped inputFormat[propName] = Std.parseInt(propValue);
 			else if (propName.toLowerCase() == "leading")	untyped inputFormat[propName] = Std.parseInt(propValue);
+			else if (propName.toLowerCase() == "href")		{
+				untyped inputFormat[propName] = propValue;
+			}
+			
 		}
 		return inputFormat;
 	}
@@ -531,6 +536,7 @@ class FormatParser
 		if (inputFormat.kerning != null && inputFormat.kerning != 0) atts += " kerning='" + inputFormat.kerning + "'";
 		if (inputFormat.leading != null && inputFormat.leading != 0) atts += " leading='" + inputFormat.leading + "'";
 		if (inputFormat.textTransform != null) atts += " transform='" + inputFormat.textTransform + "'";
+		if (inputFormat.href != null) atts += " href='" + inputFormat.href + "'";
 		if (inputFormat.size != null) atts += " size='" + inputFormat.size + "'";
 		
 		if (atts != "") atts = "<font" + atts + ">";
@@ -585,6 +591,10 @@ class FormatParser
 		if (copyFrom.textTransform != null) {
 			if (copyTo.textTransform == null && incompatible.textTransform == null) copyTo.textTransform = incompatible.textTransform = copyFrom.textTransform;
 			else if (copyTo.textTransform != copyFrom.textTransform) copyTo.textTransform = null;
+		}
+		if (copyFrom.href != null) {
+			if (copyTo.href == null && incompatible.href == null) copyTo.href = incompatible.href = copyFrom.href;
+			else if (copyTo.href != copyFrom.href) copyTo.href = null;
 		}
 	}
 	
