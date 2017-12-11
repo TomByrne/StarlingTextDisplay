@@ -404,6 +404,7 @@ class TextDisplay extends DisplayObjectContainer
 	private function replaceSelection(newChars:String):Void 
 	{
 		if (selection.begin != null) {
+			checkKeyboardHistory();
 			historyControl.setIgnoreChanges(true);
 			clearSelected();
 			historyControl.setIgnoreChanges(false);
