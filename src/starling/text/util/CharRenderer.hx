@@ -74,6 +74,7 @@ class CharRenderer
 		
 		images = new Array<Image>();
 		
+		setColor(textDisplay.color);
 		for (j in 0...characters.length) 
 		{
 			var char:Char = characters[j];
@@ -90,8 +91,21 @@ class CharRenderer
 						image.x = char.x;
 						image.y = char.y;
 						
-						if (color == null) image.color = char.charFormat.format.color;
+						
+						/*
+						if (color == null) 
+							image.color = char.charFormat.format.color;
 						else image.color = color;
+						*/
+						
+											
+						if (char.charFormat.format.color != null)
+						{
+							image.color = char.charFormat.format.color;
+						}
+						else
+							image.color = color;
+						
 						
 						image.touchable = false;
 						images.push(image);

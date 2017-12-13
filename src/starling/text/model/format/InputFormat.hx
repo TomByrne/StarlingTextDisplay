@@ -13,8 +13,9 @@ class InputFormat
 	public var kerning:Null<Float>; // letter spacing
 	public var leading:Null<Float>; // line spacing
 	public var textTransform:TextTransform;
+	public var href:String;
 	
-	public function new(?face:String, ?size:Null<Int>, ?color:Null<UInt>, ?kerning:Null<Float>, ?leading:Null<Float>, ?textTransform:TextTransform) 
+	public function new(?face:String, ?size:Null<Int>, ?color:Null<UInt>, ?kerning:Null<Float>, ?leading:Null<Float>, ?textTransform:TextTransform, ?href:String) 
 	{
 		this.face = face;
 		this.size = size;
@@ -22,6 +23,7 @@ class InputFormat
 		this.kerning = kerning;
 		this.leading = leading;
 		if (textTransform != null) this.textTransform = textTransform;
+		this.href = href;
 	}
 	
 	public function toString():String
@@ -33,6 +35,7 @@ class InputFormat
 		returnVal += "kerning = " + kerning + "\n";
 		returnVal += "leading = " + leading + "\n";
 		returnVal += "textTransform = " + textTransform + "\n";
+		returnVal += "href = " + href + "\n";
 		return returnVal;
 	}
 	
@@ -45,6 +48,7 @@ class InputFormat
 		inputFormat.kerning = this.kerning;
 		inputFormat.leading = this.leading;
 		inputFormat.textTransform = this.textTransform;
+		inputFormat.href = this.href;
 		return inputFormat;
 	}
 }

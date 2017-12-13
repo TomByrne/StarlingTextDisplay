@@ -17,6 +17,7 @@ import starling.text.TextDisplay;
  * @author P.J.Shand
  */
 @:access(starling.text.TextDisplay)
+@:access(starling.text.model.history.HistoryModel)
 class KeyboardInput
 {
 	private var textDisplay:TextDisplay;
@@ -44,6 +45,9 @@ class KeyboardInput
 		//trace(e.charCode+" "+e.keyCode);
 		if (e.keyCode == Keyboard.DELETE) delete();
 		else if (e.keyCode == Keyboard.BACKSPACE) backspace();
+		else if (e.keyCode == Keyboard.ESCAPE) ignore();
+		else if (!textDisplay.allowLineBreaks && e.keyCode == Keyboard.ENTER) ignore();
+		
 		else if (e.charCode == 118 && e.ctrlKey) paste();
 		else if (e.charCode == 99 && e.ctrlKey) copy();
 		else if (e.charCode == 120 && e.ctrlKey) cut();
@@ -108,6 +112,11 @@ class KeyboardInput
 	private function backspace():Void
 	{
 		textDisplay.clearSelected(0);
+	}
+	
+	private function ignore():Void
+	{
+		// ignore
 	}
 	
 	private function delete():Void

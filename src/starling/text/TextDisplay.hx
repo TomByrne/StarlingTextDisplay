@@ -16,6 +16,7 @@ import starling.text.display.Caret;
 import starling.text.display.ClipMask;
 import starling.text.display.Highlight;
 import starling.text.display.HitArea;
+import starling.text.display.Links;
 import starling.text.model.format.TextWrapping;
 import starling.utils.SpecialChar;
 //import starling.text.control.input.EventForwarder;
@@ -52,6 +53,7 @@ class TextDisplay extends DisplayObjectContainer
 	@:allow(starling.text) var targetBounds:TargetBounds;
 	@:allow(starling.text) var hitArea:HitArea;
 	@:allow(starling.text) var clipMask:ClipMask;
+	@:allow(starling.text) var links:Links;
 	
 	// MODEL
 	@:allow(starling.text) var formatModel:FormatModel;
@@ -206,6 +208,9 @@ class TextDisplay extends DisplayObjectContainer
 		
 		hitArea = new HitArea(this, width, height);
 		addChild(hitArea);
+		
+		links = new Links(this);
+		addChild(links);
 	}
 	
 	function createControllers() 
@@ -348,6 +353,7 @@ class TextDisplay extends DisplayObjectContainer
 		createCharacters();
 		if (_value.length > 0) selection.index = 0;
 		else selection.clear();
+		links.update();
 		return _value;
 	}
 	
@@ -398,6 +404,7 @@ class TextDisplay extends DisplayObjectContainer
 	private function replaceSelection(newChars:String):Void 
 	{
 		if (selection.begin != null) {
+			checkKeyboardHistory();
 			historyControl.setIgnoreChanges(true);
 			clearSelected();
 			historyControl.setIgnoreChanges(false);
