@@ -39,6 +39,7 @@ class JSCapsLock
 	{
 		// ensure the event object is defined
 		if (e == null) e = untyped __js__("window.event");
+		if (e == null) return;
 		
 		// store the prior status of the caps lock key
 		var priorCapsLock:Bool = capsLock;
