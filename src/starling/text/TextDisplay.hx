@@ -598,6 +598,7 @@ class TextDisplay extends DisplayObjectContainer
 	
 	override function dispose() 
 	{
+		TextDisplay.focusDispatcher.removeEventListener(TextDisplayEvent.FOCUS, OnFocusChange);
 		super.dispose();
 		charRenderer.dispose();
 	}
