@@ -122,5 +122,6 @@ class CharRenderer
 		for (image in images){
 			image.dispose();
 		}
+		quadBatches = new Map();
 	}
 }
