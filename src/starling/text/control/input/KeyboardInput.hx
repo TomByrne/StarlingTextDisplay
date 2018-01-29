@@ -20,16 +20,17 @@ import starling.text.TextDisplay;
 @:access(starling.text.model.history.HistoryModel)
 class KeyboardInput
 {
+	#if js
+	static var uppercaseRegEx:EReg = ~/[A-Z]/;
+	static var jsCapsLock = new JSCapsLock();
+	static var jsCopyPaste = new JSCopyPaste();
+	#end
+	
 	private var textDisplay:TextDisplay;
 	private var selection:Selection;
 	
 	private var _active:Null<Bool> = null;
 	public var active(get, set):Null<Bool>;
-	
-	#if js
-	var uppercaseRegEx:EReg = ~/[A-Z]/;
-	var jsCapsLock = new JSCapsLock();
-	#end
 	
 	@:allow(starling.text)
 	private function new(textDisplay:TextDisplay)
@@ -42,7 +43,7 @@ class KeyboardInput
 	{
 		if (e.isDefaultPrevented()) return;
 		
-		//trace(e.charCode+" "+e.keyCode);
+		trace(e.charCode+" "+e.keyCode);
 		if (e.keyCode == Keyboard.DELETE) delete();
 		else if (e.keyCode == Keyboard.BACKSPACE) backspace();
 		else if (e.keyCode == Keyboard.ESCAPE) ignore();
@@ -82,6 +83,7 @@ class KeyboardInput
 	
 	private function paste():Void 
 	{
+		trace("paste");
 		#if !js
 		var pasteStr:String = Clipboard.generalClipboard.getData(ClipboardFormats.TEXT_FORMAT);
 		if (pasteStr != null){
@@ -92,6 +94,7 @@ class KeyboardInput
 	
 	private function copy():Void 
 	{
+		trace("copy");
 		#if !js
 		if (selection.begin != null) {
 			var value:String = textDisplay.value.substring(selection.begin, selection.end);
@@ -140,9 +143,15 @@ class KeyboardInput
 		_active = value;
 		
 		if (_active) {
+			#if js
+				jsCopyPaste.focusedTextDisplay = textDisplay;
+			#end
 			textDisplay.addEventListener(KeyboardEvent.KEY_DOWN, OnKeyDown);
 		}
 		else {
+			#if js
+				if(jsCopyPaste.focusedTextDisplay == textDisplay) jsCopyPaste.focusedTextDisplay = null;
+			#end
 			textDisplay.removeEventListener(KeyboardEvent.KEY_DOWN, OnKeyDown);
 		}
 		
