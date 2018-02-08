@@ -43,7 +43,7 @@ class KeyboardInput
 	{
 		if (e.isDefaultPrevented()) return;
 		
-		trace(e.charCode+" "+e.keyCode);
+		//trace(e.charCode+" "+e.keyCode);
 		if (e.keyCode == Keyboard.DELETE) delete();
 		else if (e.keyCode == Keyboard.BACKSPACE) backspace();
 		else if (e.keyCode == Keyboard.ESCAPE) ignore();
