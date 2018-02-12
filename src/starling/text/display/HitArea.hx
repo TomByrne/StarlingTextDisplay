@@ -54,12 +54,14 @@ class HitArea extends Sprite
 	
 	private function updateBorder() 
 	{
+		var w = this.width;
+		var h = this.height;
 		border.clear();
 		border.beginFill(0xFF0000);
-		border.drawRectangle(textBounds.x, textBounds.y, width, borderThinkness);
-		border.drawRectangle(textBounds.x, textBounds.y + height - borderThinkness, width, borderThinkness);
-		border.drawRectangle(textBounds.x, textBounds.y + borderThinkness, borderThinkness, height - (borderThinkness * 2));
-		border.drawRectangle(textBounds.x + width - borderThinkness, textBounds.y + borderThinkness, borderThinkness, height - (borderThinkness * 2));
+		border.drawRectangle(textBounds.x, textBounds.y, w, borderThinkness);
+		border.drawRectangle(textBounds.x, textBounds.y + h - borderThinkness, w, borderThinkness);
+		border.drawRectangle(textBounds.x, textBounds.y + borderThinkness, borderThinkness, h - (borderThinkness * 2));
+		border.drawRectangle(textBounds.x + w - borderThinkness, textBounds.y + borderThinkness, borderThinkness, h - (borderThinkness * 2));
 	}
 	
 	private function set_showBorder(value:Bool):Bool
