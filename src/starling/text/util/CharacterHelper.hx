@@ -62,7 +62,10 @@ class CharacterHelper
 	static public function updateCharFormat(format:InputFormat, charFormat:CharFormat, defaultFont:BitmapFont):CharFormat
 	{
 		charFormat.format = format;
-		if (format.face != null) charFormat.font = FontRegistry.getBitmapFont(format.face/*, cast format.size*/);
+		if (format.face != null){
+			charFormat.font = FontRegistry.getBitmapFont(format.face);
+			if(charFormat.font == null) charFormat.font = FontRegistry.getBitmapFont(FontRegistry.findBitmapName(format.face, cast format.size));
+		}
 		if (charFormat.font == null) charFormat.font = defaultFont;
 		return charFormat;
 	}

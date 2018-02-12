@@ -52,11 +52,13 @@ class MouseInput
 	
 	private static function OnMouseDown(e:MouseEvent):Void 
 	{
-		Delay.nextFrame(RemoveFocus);
+		if (TextDisplay.focus != null) return;
+		Delay.nextFrame(RemoveFocus.bind(TextDisplay.focus));
 	}
 	
-	static private function RemoveFocus() 
+	static private function RemoveFocus(wasFocus:TextDisplay) 
 	{
+		if (TextDisplay.focus != wasFocus) return;
 		TextDisplay.focus = null;
 	}
 	
