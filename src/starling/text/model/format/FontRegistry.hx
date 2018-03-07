@@ -53,6 +53,7 @@ class FontRegistry
 		if (fontFamily == null) return null;
 		return fontFamily.closest(size);
 		*/
+		if (name == null) return null;
 		var name = name.toLowerCase();
 		return bitmapFonts[name];
 	}

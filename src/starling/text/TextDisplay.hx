@@ -257,6 +257,10 @@ class TextDisplay extends DisplayObjectContainer
 		charLayout.process();
 		dispatchEvent(new Event(Event.CHANGE));
 	}
+	public function getFormat(begin:Int, end:Int):InputFormat
+	{
+		return FormatParser.getFormat(this, contentModel.nodes, begin, end);
+	}
 	
 	public function getSelectionFormat():InputFormat
 	{
@@ -598,6 +602,7 @@ class TextDisplay extends DisplayObjectContainer
 	
 	override function dispose() 
 	{
+		TextDisplay.focusDispatcher.removeEventListener(TextDisplayEvent.FOCUS, OnFocusChange);
 		super.dispose();
 		charRenderer.dispose();
 	}
