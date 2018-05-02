@@ -1,8 +1,8 @@
 package starling.text.control.input;
 
 import com.imagination.core.managers.touch.TouchManager;
-import com.imagination.delay.Delay;
 import com.imagination.util.geom.Point;
+import com.imagination.util.time.EnterFrame;
 import openfl.Lib;
 import openfl.Vector;
 import openfl.events.MouseEvent;
@@ -50,14 +50,18 @@ class MouseInput
 	private var moveWord:Word;
 	private var hovering:Bool;
 	
+	static private var pendingRemoveFocus:Void->Void;
+	
 	private static function OnMouseDown(e:MouseEvent):Void 
 	{
 		if (TextDisplay.focus != null) return;
-		Delay.nextFrame(RemoveFocus.bind(TextDisplay.focus));
+		pendingRemoveFocus = RemoveFocus.bind(TextDisplay.focus);
+		EnterFrame.delay(RemoveFocus.bind(TextDisplay.focus));
 	}
 	
 	static private function RemoveFocus(wasFocus:TextDisplay) 
 	{
+		pendingRemoveFocus = null;
 		if (TextDisplay.focus != wasFocus) return;
 		TextDisplay.focus = null;
 	}
@@ -137,7 +141,7 @@ class MouseInput
 	
 	private function OnBegin(touch:Touch) 
 	{
-		Delay.killDelay(RemoveFocus);
+		if(pendingRemoveFocus != null) EnterFrame.remove(pendingRemoveFocus);
 		
 		TextDisplay.focus = textDisplay;
 		lastPressTime = pressTime;

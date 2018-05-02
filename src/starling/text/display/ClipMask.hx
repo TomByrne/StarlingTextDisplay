@@ -1,6 +1,6 @@
 package starling.text.display;
 
-import com.imagination.delay.Delay;
+import com.imagination.util.time.EnterFrame;
 import starling.display.Quad;
 import starling.events.Event;
 
@@ -34,7 +34,7 @@ class ClipMask extends Quad
 	private function UpdateMark(e:Event):Void 
 	{
 		Update();
-		Delay.byFrames(2, Update);
+		EnterFrame.delay(Update, 2);
 	}
 	
 	public function Update():Void 
