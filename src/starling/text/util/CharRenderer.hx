@@ -52,7 +52,7 @@ class CharRenderer
 		#if starling2
 		for (quadBatch in quadBatches) 
 		{
-			quadBatch.color = value;
+			quadBatch.color = color;
 		}
 		#end
 	}
