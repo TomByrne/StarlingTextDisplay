@@ -54,8 +54,8 @@ class HitArea extends Sprite
 	
 	private function updateBorder() 
 	{
-		var w = this.width;
-		var h = this.height;
+		var w = textDisplay.targetWidth;
+		var h = textDisplay.targetHeight;
 		border.clear();
 		border.beginFill(0xFF0000);
 		border.drawRectangle(textBounds.x, textBounds.y, w, borderThinkness);
