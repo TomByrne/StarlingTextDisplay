@@ -350,14 +350,12 @@ class FormatParser
 			var propName:String = formatAttribute[i].key;
 			var propValue:String = formatAttribute[i].value;
 			
-			if (propName.toLowerCase() == "color") 			untyped inputFormat[propName] = Std.parseInt("0x" + propValue.split("#").join(""));
-			else if (propName.toLowerCase() == "face")		untyped inputFormat[propName] = propValue;
-			else if (propName.toLowerCase() == "size")		untyped inputFormat[propName] = Std.parseInt(propValue);
-			else if (propName.toLowerCase() == "kerning")	untyped inputFormat[propName] = Std.parseInt(propValue);
-			else if (propName.toLowerCase() == "leading")	untyped inputFormat[propName] = Std.parseInt(propValue);
-			else if (propName.toLowerCase() == "href")		{
-				untyped inputFormat[propName] = propValue;
-			}
+			if (propName.toLowerCase() == "color") 			Reflect.setField(inputFormat, propName, Std.parseInt("0x" + propValue.split("#").join("")));
+			else if (propName.toLowerCase() == "face")		Reflect.setField(inputFormat, propName, propValue);
+			else if (propName.toLowerCase() == "size")		Reflect.setField(inputFormat, propName, Std.parseInt(propValue));
+			else if (propName.toLowerCase() == "kerning")	Reflect.setField(inputFormat, propName, Std.parseInt(propValue));
+			else if (propName.toLowerCase() == "leading")	Reflect.setField(inputFormat, propName, Std.parseInt(propValue));
+			else if (propName.toLowerCase() == "href")		Reflect.setField(inputFormat, propName, propValue);
 			
 		}
 		return inputFormat;
