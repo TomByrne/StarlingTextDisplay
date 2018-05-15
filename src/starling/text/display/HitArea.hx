@@ -41,6 +41,8 @@ class HitArea extends Sprite
 	
 	private function OnLayoutChange(e:Event):Void 
 	{
+		if (textDisplay.stage == null) return;
+		
 		textBounds.setTo(textDisplay.targetBounds.x, textDisplay.targetBounds.y, textDisplay.targetBounds.width, textDisplay.targetBounds.height);
 		
 		background.x = textBounds.x;
