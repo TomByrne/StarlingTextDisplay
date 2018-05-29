@@ -1,5 +1,6 @@
 package starling.text.control.input;
-import com.imagination.delay.Delay;
+
+import com.imagination.util.time.EnterFrame;
 import js.Browser;
 import js.html.ClipboardEvent;
 import js.html.InputElement;
@@ -76,7 +77,7 @@ class JSCopyPaste
 	function OnInputPaste(e:ClipboardEvent) 
 	{
 		input.value = "";
-		Delay.nextFrame(PasteOnNextFrame, []);
+		EnterFrame.delay(PasteOnNextFrame);
 	}
 	
 	function PasteOnNextFrame() 
@@ -92,7 +93,7 @@ class JSCopyPaste
 	{
 		if (ignoreChanges) return;
 		input.focus();
-		Delay.nextFrame(NextFrameSelectionChange, [focusedTextDisplay.getSelectedText()]);
+		EnterFrame.delay(NextFrameSelectionChange.vind(focusedTextDisplay.getSelectedText()));
 	}
 	
 	function NextFrameSelectionChange(value:String) 

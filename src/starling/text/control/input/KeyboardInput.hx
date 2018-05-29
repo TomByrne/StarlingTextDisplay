@@ -1,8 +1,8 @@
 package starling.text.control.input;
 
-import com.imagination.delay.Delay;
 import com.imagination.util.signals.Signal.Signal0;
 import com.imagination.util.signals.Signal.Signal1;
+import com.imagination.util.time.EnterFrame;
 import openfl.ui.Keyboard;
 import starling.text.model.layout.CharLayout;
 import starling.text.model.selection.Selection;
@@ -56,7 +56,7 @@ class KeyboardInput
 		else if (e.charCode != 0 && !e.ctrlKey && !e.altKey) {
 			#if js
 				jsCapsLock.check();
-				Delay.nextFrame(DelayInput, [e]);
+				EnterFrame.delay(DelayInput.bind(e));
 			#else
 				textDisplay.replaceSelection(String.fromCharCode(e.charCode));
 			#end
