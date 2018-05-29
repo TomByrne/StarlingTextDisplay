@@ -93,7 +93,7 @@ class JSCopyPaste
 	{
 		if (ignoreChanges) return;
 		input.focus();
-		EnterFrame.delay(NextFrameSelectionChange.vind(focusedTextDisplay.getSelectedText()));
+		EnterFrame.delay(NextFrameSelectionChange.bind(focusedTextDisplay.getSelectedText()));
 	}
 	
 	function NextFrameSelectionChange(value:String) 
