@@ -141,7 +141,6 @@ class TextDisplay extends DisplayObjectContainer
 		
 		createModels();
 		createUtils();
-		createIO();
 		createDisplays(width, height);
 		
 		changeControl = new ChangeControl(this);
@@ -185,12 +184,6 @@ class TextDisplay extends DisplayObjectContainer
 		charRenderer = new CharRenderer(this);
 	}
 	
-	function createIO() 
-	{
-		//eventForwarder = new EventForwarder(this);
-		softKeyboardIO = new SoftKeyboardIO(this);
-	}
-	
 	function createDisplays(width:Float, height:Null<Float>) 
 	{
 		targetBounds = new TargetBounds(this, width, height);
@@ -215,6 +208,7 @@ class TextDisplay extends DisplayObjectContainer
 	
 	function createControllers() 
 	{
+		if (softKeyboardIO == null) softKeyboardIO = new SoftKeyboardIO(this);
 		if (keyboardShortcuts == null) keyboardShortcuts = new KeyboardShortcuts(this);
 		if (keyboardInput == null) keyboardInput = new KeyboardInput(this);
 		if (mouseInput == null) mouseInput = new MouseInput(this);

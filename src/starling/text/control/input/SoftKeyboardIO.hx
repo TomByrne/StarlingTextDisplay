@@ -17,6 +17,8 @@ class SoftKeyboardIO
 {
 	private var textDisplay:TextDisplay;
 	private static var nativeTextField:TextField;
+	
+	var hasFocus:Bool;
 
 	@:allow(starling.text)
 	private function new(textDisplay:TextDisplay)
@@ -28,7 +30,6 @@ class SoftKeyboardIO
 			nativeTextField.y = -1000000; // place off stage
 			nativeTextField.type = TextFieldType.INPUT;
 			nativeTextField.needsSoftKeyboard = true;
-			Starling.current.nativeStage.addChild(nativeTextField);
 		}
 		
 		textDisplay.addEventListener(starling.events.Event.FOCUS_CHANGE, OnFocusChange);
@@ -36,9 +37,14 @@ class SoftKeyboardIO
 	
 	private function OnFocusChange(e:starling.events.Event):Void 
 	{
-		if (textDisplay.hasFocus) {
-			//nativeTextField.text = "";
+		if (textDisplay.hasFocus == hasFocus) return;
+		hasFocus = textDisplay.hasFocus;
+		
+		if (hasFocus) {
+			Starling.current.nativeStage.addChild(nativeTextField);
 			nativeTextField.requestSoftKeyboard();
+		}else{
+			Starling.current.nativeStage.removeChild(nativeTextField);
 		}
 	}
 }
