@@ -141,7 +141,10 @@ class MouseInput
 	
 	private function OnBegin(touch:Touch) 
 	{
-		if(pendingRemoveFocus != null) EnterFrame.remove(pendingRemoveFocus);
+		if (pendingRemoveFocus != null){
+			EnterFrame.remove(pendingRemoveFocus);
+			pendingRemoveFocus = null;
+		}
 		
 		TextDisplay.focus = textDisplay;
 		lastPressTime = pressTime;
