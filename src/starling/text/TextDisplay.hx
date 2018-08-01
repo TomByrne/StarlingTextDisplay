@@ -198,16 +198,25 @@ class TextDisplay extends DisplayObjectContainer
 		
 		clipMask = new ClipMask(this);
 		addChild(clipMask);
-		
-		hitArea = new HitArea(this, width, height);
-		addChild(hitArea);
-		
-		links = new Links(this);
-		addChild(links);
 	}
 	
-	function createControllers() 
+	function createHitArea()
 	{
+		if (hitArea == null){
+			hitArea = new HitArea(this, width, height);
+			addChild(hitArea);
+		}
+	}
+	
+	function createEditability() 
+	{
+		createHitArea();
+		
+		if (links == null){
+			links = new Links(this);
+			addChild(links);
+		}
+		
 		if (softKeyboardIO == null) softKeyboardIO = new SoftKeyboardIO(this);
 		if (keyboardShortcuts == null) keyboardShortcuts = new KeyboardShortcuts(this);
 		if (keyboardInput == null) keyboardInput = new KeyboardInput(this);
@@ -351,7 +360,11 @@ class TextDisplay extends DisplayObjectContainer
 		createCharacters();
 		if (_value.length > 0) selection.index = 0;
 		else selection.clear();
-		links.update();
+		
+		if(links != null){
+			links.update();
+		}
+		
 		return _value;
 	}
 	
@@ -440,8 +453,8 @@ class TextDisplay extends DisplayObjectContainer
 		dispatchEvent(new Event(Event.CHANGE));
 	}
 	
-	private function set_showBoundsBorder(value:Bool):Bool	{ return hitArea.showBorder = value; }
-	private function set_showTextBorder(value:Bool):Bool	{ return hitArea.showBorder = value; }
+	private function set_showBoundsBorder(value:Bool):Bool	{ createHitArea(); return hitArea.showBorder = value; }
+	private function set_showTextBorder(value:Bool):Bool	{ createHitArea(); return hitArea.showBorder = value; }
 	private function set_debug(value:Bool):Bool
 	{
 		debug = value;
@@ -514,7 +527,7 @@ class TextDisplay extends DisplayObjectContainer
 	{
 		if (editable) {
 			
-			createControllers();
+			createEditability();
 			
 			//eventForwarder.active = hasFocus;
 			keyboardInput.active = keyboardShortcuts.active = caret.active = hasFocus;
