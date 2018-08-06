@@ -39,14 +39,14 @@ class ClipMask extends Quad
 	
 	public function Update():Void 
 	{
-		this.width = textDisplay.targetBounds.width;
-		this.height = textDisplay.targetBounds.height;
+		this.width = textDisplay.width;
+		this.height = textDisplay.height;
 		if (textDisplay.charLayout.lines.length > 0) {
 			var lastLineHeight:Float = textDisplay.charLayout.lines[textDisplay.charLayout.lines.length - 1].height;
 			this.height += lastLineHeight;
 		}
 		
-		if (textDisplay.clipOverflow && (textDisplay.textBounds.width > textDisplay.targetBounds.width || textDisplay.textBounds.height > textDisplay.targetBounds.height)) {
+		if (textDisplay.clipOverflow && (textDisplay.textBounds.width > textDisplay.width || textDisplay.textBounds.height > textDisplay.height)) {
 			this.visible = true;
 			textDisplay.mask = this;
 		}

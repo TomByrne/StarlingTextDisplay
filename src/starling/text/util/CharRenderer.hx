@@ -101,7 +101,8 @@ class CharRenderer
 							quadBatch = new QuadBatch();
 							quadBatch.batchable = true;
 							quadBatch.touchable = false;
-							textDisplay.addChildAt(quadBatch, 1); 
+							if (textDisplay.numChildren > 0) textDisplay.addChildAt(quadBatch, 1);
+							else textDisplay.addChild(quadBatch); 
 							quadBatches[char.charFormat.format.face] = quadBatch;
 						}
 						#if starling2

@@ -53,6 +53,7 @@ class Caret extends DisplayObjectContainer
 		timer = new Timer(500, 0);
 		timer.addEventListener(TimerEvent.TIMER, OnTick);
 		
+		OnSelectionChange(null);
 	}
 	
 	private function OnTick(e:TimerEvent):Void 

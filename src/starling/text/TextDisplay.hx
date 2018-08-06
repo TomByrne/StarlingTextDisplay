@@ -1,6 +1,7 @@
 package starling.text;
 
 import openfl.geom.Rectangle;
+import starling.display.Border;
 import starling.display.DisplayObjectContainer;
 import starling.display.Quad;
 import starling.events.Event;
@@ -21,7 +22,7 @@ import starling.text.model.format.TextWrapping;
 import starling.utils.SpecialChar;
 //import starling.text.control.input.EventForwarder;
 import starling.text.control.input.SoftKeyboardIO;
-import starling.text.display.TargetBounds;
+import starling.text.control.BoundsControl;
 import starling.text.model.content.ContentModel;
 import starling.text.model.format.FormatModel;
 
@@ -50,10 +51,11 @@ class TextDisplay extends DisplayObjectContainer
 	// DISPLAY
 	@:allow(starling.text) var caret:Caret;
 	@:allow(starling.text) var highlight:Highlight;
-	@:allow(starling.text) var targetBounds:TargetBounds;
 	@:allow(starling.text) var hitArea:HitArea;
 	@:allow(starling.text) var clipMask:ClipMask;
 	@:allow(starling.text) var links:Links;
+	@:allow(starling.text) var boundsBorder:Border;
+	@:allow(starling.text) var textBorder:Border;
 	
 	// MODEL
 	@:allow(starling.text) var formatModel:FormatModel;
@@ -62,6 +64,7 @@ class TextDisplay extends DisplayObjectContainer
 	@:allow(starling.text) var charLayout:CharLayout;
 	@:allow(starling.text) var historyModel:HistoryModel;
 	@:allow(starling.text) var alignment:Alignment;
+	@:allow(starling.text) var boundsControl:BoundsControl;
 	
 	// UTILS
 	@:allow(starling.text) var charRenderer:CharRenderer;
@@ -98,6 +101,8 @@ class TextDisplay extends DisplayObjectContainer
 	
 	@:allow(starling.text) var targetWidth:Null<Float>;
 	@:allow(starling.text) var targetHeight:Null<Float>;
+	@:allow(starling.text) var actualWidth:Null<Float>;
+	@:allow(starling.text) var actualHeight:Null<Float>;
 	
 	@:allow(starling.text) var _textBounds = new Rectangle();
 	
@@ -127,21 +132,25 @@ class TextDisplay extends DisplayObjectContainer
 	@:isVar public static var focus(get, set):TextDisplay = null;
 	static var focusDispatcher = new EventDispatcher();
 	
+	var editabilitySetup:Bool = false;
+	
 	public function new(width:Null<Float>=null, height:Null<Float>=null) 
 	{
 		super();
 		
+		if (height == null && width == null) autoSize = TextFieldAutoSize.BOTH_DIRECTIONS;
+		else if (height == null) autoSize = TextFieldAutoSize.VERTICAL;
+		else if (width == null) autoSize = TextFieldAutoSize.HORIZONTAL
+		else autoSize = TextFieldAutoSize.NONE;
+		
 		targetWidth = width;
 		targetHeight = height;
-		
-		if (targetHeight == null && targetWidth == null) autoSize = TextFieldAutoSize.BOTH_DIRECTIONS;
-		else if (targetHeight == null) autoSize = TextFieldAutoSize.VERTICAL;
-		else if (targetWidth == null) autoSize = TextFieldAutoSize.HORIZONTAL
-		else autoSize = TextFieldAutoSize.NONE;
+		actualWidth = width == null ? 100 : width;
+		actualHeight = height == null ? 100 : height;
 		
 		createModels();
 		createUtils();
-		createDisplays(width, height);
+		createDisplays();
 		
 		changeControl = new ChangeControl(this);
 		createListeners();
@@ -177,6 +186,7 @@ class TextDisplay extends DisplayObjectContainer
 		selection = new Selection(this);
 		historyModel = new HistoryModel(this);
 		alignment = new Alignment(this);
+		boundsControl = new BoundsControl(this);
 	}
 	
 	function createUtils() 
@@ -184,44 +194,35 @@ class TextDisplay extends DisplayObjectContainer
 		charRenderer = new CharRenderer(this);
 	}
 	
-	function createDisplays(width:Float, height:Null<Float>) 
+	function createDisplays() 
 	{
-		targetBounds = new TargetBounds(this, width, height);
-		addChild(targetBounds);
-		
-		highlight = new Highlight(this);
-		addChild(highlight);
-		highlight.touchable = false;
-		
-		caret = new Caret(this);
-		addChild(caret);
 		
 		clipMask = new ClipMask(this);
 		addChild(clipMask);
 	}
 	
-	function createHitArea()
-	{
-		if (hitArea == null){
-			hitArea = new HitArea(this, width, height);
-			addChild(hitArea);
-		}
-	}
-	
 	function createEditability() 
 	{
-		createHitArea();
+		if (editabilitySetup) return;
+		editabilitySetup = true;
 		
-		if (links == null){
-			links = new Links(this);
-			addChild(links);
-		}
 		
-		if (softKeyboardIO == null) softKeyboardIO = new SoftKeyboardIO(this);
-		if (keyboardShortcuts == null) keyboardShortcuts = new KeyboardShortcuts(this);
-		if (keyboardInput == null) keyboardInput = new KeyboardInput(this);
-		if (mouseInput == null) mouseInput = new MouseInput(this);
-		if (clickFocus == null) clickFocus = new ClickFocus(this);
+		createHighlight();
+		
+		hitArea = new HitArea(this, width, height);
+		addChild(hitArea);
+	
+		links = new Links(this);
+		addChild(links);
+	
+		caret = new Caret(this);
+		addChild(caret);
+		
+		softKeyboardIO = new SoftKeyboardIO(this);
+		keyboardShortcuts = new KeyboardShortcuts(this);
+		keyboardInput = new KeyboardInput(this);
+		mouseInput = new MouseInput(this);
+		clickFocus = new ClickFocus(this);
 	}
 	
 	
@@ -415,7 +416,7 @@ class TextDisplay extends DisplayObjectContainer
 	private function replaceSelection(newChars:String):Void 
 	{
 		if (selection.begin != null) {
-			checkKeyboardHistory();
+			createKeyboardHistory();
 			historyControl.setIgnoreChanges(true);
 			clearSelected();
 			historyControl.setIgnoreChanges(false);
@@ -453,8 +454,8 @@ class TextDisplay extends DisplayObjectContainer
 		dispatchEvent(new Event(Event.CHANGE));
 	}
 	
-	private function set_showBoundsBorder(value:Bool):Bool	{ createHitArea(); return hitArea.showBorder = value; }
-	private function set_showTextBorder(value:Bool):Bool	{ createHitArea(); return hitArea.showBorder = value; }
+	private function set_showBoundsBorder(value:Bool):Bool	{ return boundsControl.showBoundsBorder = value; }
+	private function set_showTextBorder(value:Bool):Bool	{ return boundsControl.showTextBorder = value; }
 	private function set_debug(value:Bool):Bool
 	{
 		debug = value;
@@ -482,10 +483,10 @@ class TextDisplay extends DisplayObjectContainer
 	private function get_hAlign():String					{ return alignment.hAlign; }
 	private function set_hAlign(value:String):String		{ return alignment.hAlign = value; }
 	
-	private function get_highlightAlpha():Float				{ return highlight.highlightAlpha; }
-	private function set_highlightAlpha(value:Float):Float	{ return highlight.highlightAlpha = value; }
-	private function get_highlightColour():UInt				{ return highlight.highlightColour; }
-	private function set_highlightColour(value:UInt):UInt	{ return highlight.highlightColour = value; }
+	private function get_highlightAlpha():Float				{ createHighlight(); return highlight.highlightAlpha; }
+	private function set_highlightAlpha(value:Float):Float	{ createHighlight(); return highlight.highlightAlpha = value; }
+	private function get_highlightColour():UInt				{ createHighlight(); return highlight.highlightColour; }
+	private function set_highlightColour(value:UInt):UInt	{ createHighlight(); return highlight.highlightColour = value; }
 	
 	private function get_textHeight():Float 				{ return _textBounds.height; }
 	private function get_textWidth():Float 					{ return _textBounds.width; }
@@ -493,23 +494,21 @@ class TextDisplay extends DisplayObjectContainer
 	
 	
 	
-	override function get_height():Float { return targetBounds.getBounds(parent).height; }
+	override function get_height():Float { return actualHeight; }
 	override function set_height(value:Float):Float 
 	{
 		if (targetHeight == value) return value;
 		targetHeight = value;
-		//targetBounds.height = value; // This will change the scaleY of targetBounds, which should stay 1
 		charLayout.process();
 		dispatchEvent(new TextDisplayEvent(TextDisplayEvent.SIZE_CHANGE));
 		return value;
 	}
 	
-	override function get_width():Float { return targetBounds.getBounds(parent).width; }
+	override function get_width():Float { return actualWidth; }
 	override function set_width(value:Float):Float 
 	{
 		if (targetWidth == value) return value;
 		targetWidth = value;
-		//targetBounds.width = value;
 		charLayout.process();
 		dispatchEvent(new TextDisplayEvent(TextDisplayEvent.SIZE_CHANGE));
 		return value;
@@ -529,20 +528,20 @@ class TextDisplay extends DisplayObjectContainer
 			
 			createEditability();
 			
-			//eventForwarder.active = hasFocus;
 			keyboardInput.active = keyboardShortcuts.active = caret.active = hasFocus;
 			mouseInput.active = true;
-			highlight.visible = true;
+			if (highlight != null) highlight.visible = true;
 			if (historyControl != null) historyModel.active = hasFocus;
 			
 		}
 		else {
-			//eventForwarder.active = false;
-			if (keyboardInput != null) keyboardInput.active = false;
-			if (keyboardShortcuts != null) keyboardShortcuts.active = false;
-			if (mouseInput != null) mouseInput.active = false;
-			caret.active = false;
-			highlight.visible = false;
+			if(editabilitySetup){
+				keyboardInput.active = false;
+				keyboardShortcuts.active = false;
+				mouseInput.active = false;
+				caret.active = false;
+			}
+			if (highlight != null) highlight.visible = false;
 			if (historyControl != null) historyModel.active = false;
 		}
 	}
@@ -555,7 +554,7 @@ class TextDisplay extends DisplayObjectContainer
 	
 	function set_undoSteps(value:Int):Int 
 	{
-		checkKeyboardHistory();
+		createKeyboardHistory();
 		return historyModel.undoSteps = value;
 	}
 	
@@ -567,15 +566,25 @@ class TextDisplay extends DisplayObjectContainer
 	
 	function set_clearUndoOnFocusLoss(value:Bool):Bool 
 	{
-		checkKeyboardHistory();
+		createKeyboardHistory();
 		return historyModel.clearUndoOnFocusLoss = value;
 	}
 	
-	function checkKeyboardHistory() 
+	function createKeyboardHistory() 
 	{
 		if (historyControl == null){
 			historyControl = new HistoryControl(this);
 			historyModel.active = hasFocus && editable;
+		}
+	}
+	
+	function createHighlight() 
+	{
+		if (highlight == null){
+			highlight = new Highlight(this);
+			addChildAt(highlight, 0);
+			highlight.touchable = false;
+			highlight.visible = hasFocus && editable;
 		}
 	}
 	
