@@ -7,7 +7,7 @@ import starling.rendering.Painter;
 
 #else
 
-//import starling.core.RenderSupport;
+import starling.core.RenderSupport;
 import starling.display.QuadBatch as MeshBatch;
 
 #end
