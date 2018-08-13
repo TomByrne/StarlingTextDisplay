@@ -1,6 +1,5 @@
 package starling.text.display;
 
-import imagsyd.dsp.view.starling.common.Border;
 import openfl.geom.Rectangle;
 import starling.display.Canvas;
 import starling.display.Quad;
