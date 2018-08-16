@@ -12,6 +12,7 @@ class InputFormat
 	public var color:Null<UInt> = 0xFFFFFF;
 	public var kerning:Null<Float>; // letter spacing
 	public var leading:Null<Float>; // line spacing
+	public var baseline:Null<Float>; // offset baseline
 	public var textTransform:TextTransform;
 	public var href:String;
 	
@@ -34,6 +35,7 @@ class InputFormat
 		returnVal += "color = " + StringTools.hex(color, 6) + "\n";
 		returnVal += "kerning = " + kerning + "\n";
 		returnVal += "leading = " + leading + "\n";
+		returnVal += "baseline = " + baseline + "\n";
 		returnVal += "textTransform = " + textTransform + "\n";
 		returnVal += "href = " + href + "\n";
 		return returnVal;
@@ -47,6 +49,7 @@ class InputFormat
 		inputFormat.color = this.color;
 		inputFormat.kerning = this.kerning;
 		inputFormat.leading = this.leading;
+		inputFormat.baseline = this.baseline;
 		inputFormat.textTransform = this.textTransform;
 		inputFormat.href = this.href;
 		return inputFormat;

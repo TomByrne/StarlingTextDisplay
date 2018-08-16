@@ -86,6 +86,7 @@ class FormatParser
 		if (format1.size != format2.size) return false;
 		if (format1.leading != format2.leading) return false;
 		if (format1.kerning != format2.kerning) return false;
+		if (format1.baseline != format2.baseline) return false;
 		if (format1.textTransform != format2.textTransform) return false;
 		if (format1.href != format2.href) return false;
 		return true;
@@ -119,6 +120,7 @@ class FormatParser
 		if (inputFormat.color != null) return false;
 		if (inputFormat.face != null) return false;
 		if (inputFormat.kerning != null) return false;
+		if (inputFormat.baseline != null) return false;
 		if (inputFormat.leading != null) return false;
 		if (inputFormat.textTransform != null) return false;
 		if (inputFormat.size != null) return false;
@@ -352,9 +354,10 @@ class FormatParser
 			
 			if (propName.toLowerCase() == "color") 			Reflect.setField(inputFormat, propName, Std.parseInt("0x" + propValue.split("#").join("")));
 			else if (propName.toLowerCase() == "face")		Reflect.setField(inputFormat, propName, propValue);
-			else if (propName.toLowerCase() == "size")		Reflect.setField(inputFormat, propName, Std.parseInt(propValue));
-			else if (propName.toLowerCase() == "kerning")	Reflect.setField(inputFormat, propName, Std.parseInt(propValue));
-			else if (propName.toLowerCase() == "leading")	Reflect.setField(inputFormat, propName, Std.parseInt(propValue));
+			else if (propName.toLowerCase() == "size")		Reflect.setField(inputFormat, propName, Std.parseFloat(propValue));
+			else if (propName.toLowerCase() == "kerning")	Reflect.setField(inputFormat, propName, Std.parseFloat(propValue));
+			else if (propName.toLowerCase() == "baseline")	Reflect.setField(inputFormat, propName, Std.parseFloat(propValue));
+			else if (propName.toLowerCase() == "leading")	Reflect.setField(inputFormat, propName, Std.parseFloat(propValue));
 			else if (propName.toLowerCase() == "href")		Reflect.setField(inputFormat, propName, propValue);
 			
 		}
@@ -533,6 +536,7 @@ class FormatParser
 		if (inputFormat.face != null) atts += " face='" + inputFormat.face + "'";
 		if (inputFormat.kerning != null && inputFormat.kerning != 0) atts += " kerning='" + inputFormat.kerning + "'";
 		if (inputFormat.leading != null && inputFormat.leading != 0) atts += " leading='" + inputFormat.leading + "'";
+		if (inputFormat.baseline != null && inputFormat.baseline != 0) atts += " baseline='" + inputFormat.baseline + "'";
 		if (inputFormat.textTransform != null) atts += " transform='" + inputFormat.textTransform + "'";
 		if (inputFormat.href != null) atts += " href='" + inputFormat.href + "'";
 		if (inputFormat.size != null) atts += " size='" + inputFormat.size + "'";
@@ -581,6 +585,10 @@ class FormatParser
 		if (copyFrom.kerning != null) {
 			if (copyTo.kerning == null && incompatible.kerning == null) copyTo.kerning = incompatible.kerning = copyFrom.kerning;
 			else if (copyTo.kerning != copyFrom.kerning) copyTo.kerning = null;
+		}
+		if (copyFrom.baseline != null) {
+			if (copyTo.baseline == null && incompatible.baseline == null) copyTo.baseline = incompatible.baseline = copyFrom.baseline;
+			else if (copyTo.baseline != copyFrom.baseline) copyTo.baseline = null;
 		}
 		if (copyFrom.leading != null) {
 			if (copyTo.leading == null && incompatible.leading == null) copyTo.leading = incompatible.leading = copyFrom.leading;

@@ -22,6 +22,7 @@ class InputFormatHelper
 		if (copyFrom.color != null) copyTo.color = copyFrom.color;
 		if (copyFrom.kerning != null) copyTo.kerning = copyFrom.kerning;
 		if (copyFrom.leading != null) copyTo.leading = copyFrom.leading;
+		if (copyFrom.baseline != null) copyTo.baseline = copyFrom.baseline;
 		if (copyFrom.textTransform != null) copyTo.textTransform = copyFrom.textTransform;
 	}
 	
@@ -33,6 +34,7 @@ class InputFormatHelper
 		if (copyTo.color == null && copyFrom.color != null) copyTo.color = copyFrom.color;
 		if (copyTo.kerning == null && copyFrom.kerning != null) copyTo.kerning = copyFrom.kerning;
 		if (copyTo.leading == null && copyFrom.leading != null) copyTo.leading = copyFrom.leading;
+		if (copyTo.baseline == null && copyFrom.baseline != null) copyTo.baseline = copyFrom.baseline;
 		if (copyTo.textTransform == null && copyFrom.textTransform != null) copyTo.textTransform = copyFrom.textTransform;
 	}
 	
@@ -44,6 +46,7 @@ class InputFormatHelper
 		if (format.color == parent.color) format.color = null;
 		if (format.kerning == parent.kerning) format.kerning = null;
 		if (format.leading == parent.leading) format.leading = null;
+		if (format.baseline == parent.baseline) format.baseline = null;
 		if (format.textTransform == parent.textTransform) format.textTransform = null;
 	}
 }

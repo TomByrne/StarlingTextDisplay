@@ -395,6 +395,7 @@ class CharLayout extends EventDispatcher
 			
 			char.y = char.line.y;
 			char.y -= char.charFormat.font.baseline * char.scale;
+			if(char.charFormat.format.baseline != null) char.y += char.charFormat.format.baseline * char.scale;
 			char.y += lineHeights[char.lineNumber];
 			
 			if (char.charFormat.bitmapChar != null) {
