@@ -24,6 +24,8 @@ class Links extends Sprite
 	{
 		this.textDisplay = textDisplay;
 		super();
+		
+		update();
 	}
 	
 	override public function dispose():Void

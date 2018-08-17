@@ -95,9 +95,27 @@ class CharLayout extends EventDispatcher
 			textDisplay._textBounds.x = 0;
 		}
 		
+		
+		if (textDisplay.autoSize == TextFieldAutoSize.NONE) {
+			textDisplay.actualWidth = textDisplay.targetWidth;
+			textDisplay.actualHeight = textDisplay.targetHeight;
+		}
+		else if (textDisplay.autoSize == TextFieldAutoSize.BOTH_DIRECTIONS) {
+			textDisplay.actualWidth = textDisplay.textWidth;
+			textDisplay.actualHeight = textDisplay.textHeight;
+		}
+		else if (textDisplay.autoSize == TextFieldAutoSize.HORIZONTAL) {
+			textDisplay.actualWidth = textDisplay.textWidth;
+			textDisplay.actualHeight = textDisplay.targetHeight;
+		}
+		else if (textDisplay.autoSize == TextFieldAutoSize.VERTICAL) {
+			textDisplay.actualWidth = textDisplay.targetWidth;
+			textDisplay.actualHeight = textDisplay.textHeight;
+		}
+		
 		this.dispatchEvent(changeEvent);
 		if (sizeChange && textDisplay.hasEventListener(Event.RESIZE)){
-			textDisplay.dispatchEvent(new Event(Event.RESIZE));
+			textDisplay.dispatchEvent(resizeEvent);
 		}
 	}
 	
@@ -199,7 +217,7 @@ class CharLayout extends EventDispatcher
 		var format:InputFormat = textDisplay.formatModel.defaultFormat;
 		var font:BitmapFont = textDisplay.formatModel.defaultFont;
 		
-		if (textDisplay.caret.format != null){
+		if (textDisplay.caret != null && textDisplay.caret.format != null){
 			format = textDisplay.caret.format.clone();
 			font = textDisplay.caret.font;
 		}
@@ -450,10 +468,10 @@ class CharLayout extends EventDispatcher
 		var alignOffsetY:Float = 0;
 		if (textDisplay.targetHeight != null){
 			if (textDisplay.vAlign == VAlign.CENTER){
-				alignOffsetY = (textDisplay.targetBounds.height - textHeight) / 2;
+				alignOffsetY = (textDisplay.targetHeight - textHeight) / 2;
 			}
 			else if (textDisplay.vAlign == VAlign.BOTTOM) {
-				alignOffsetY = textDisplay.targetBounds.height - textHeight;
+				alignOffsetY = textDisplay.targetWidth - textHeight;
 			}
 		}
 		
