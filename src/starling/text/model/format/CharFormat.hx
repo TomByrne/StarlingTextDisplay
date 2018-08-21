@@ -11,22 +11,11 @@ class CharFormat
 {
 	public var bitmapChar:BitmapChar;
 	public var font:BitmapFont;
-	private var _format:InputFormat = new InputFormat();
-	public var format(get, set):InputFormat;
+	public var format:InputFormat = new InputFormat();
 	
 	public function new() 
 	{
 		
-	}
-	
-	function get_format():InputFormat
-	{
-		return _format;
-	}
-	
-	function set_format(value:InputFormat):InputFormat
-	{
-		return _format = value;
 	}
 	
 }

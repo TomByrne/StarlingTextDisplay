@@ -595,6 +595,7 @@ class TextDisplay extends DisplayObjectContainer
 	
 	function set_autoSize(value:String):String 
 	{
+		if (autoSize == value) return value;
 		autoSize = value;
 		if(charLayout != null) charLayout.process();
 		return value;

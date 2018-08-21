@@ -61,6 +61,10 @@ class CharacterHelper
 	
 	static public function updateCharFormat(format:InputFormat, charFormat:CharFormat, defaultFont:BitmapFont):CharFormat
 	{
+		/*trace("baseline: " + format.baseline);
+		if (format.baseline != null){
+			trace("hm");
+		}*/
 		charFormat.format = format;
 		if (format.face != null){
 			charFormat.font = FontRegistry.getBitmapFont(format.face);
