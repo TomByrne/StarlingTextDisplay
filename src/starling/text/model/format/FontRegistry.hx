@@ -53,9 +53,9 @@ class FontRegistry
 		if (fontFamily == null) return null;
 		return fontFamily.closest(size);
 		*/
-		if (name == null) return null;
-		var name = name.toLowerCase();
-		return bitmapFonts[name];
+		var font:BitmapFont = bitmapFonts.get(name);
+		if(font == null) font = bitmapFonts.get(name.toLowerCase());
+		return font;
 	}
 	
 	public static function findBitmapName(name:String, size:Float):String

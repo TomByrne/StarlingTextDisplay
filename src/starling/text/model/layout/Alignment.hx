@@ -36,7 +36,7 @@ class Alignment extends EventDispatcher
 		if (value == null) value = VAlign.TOP;
 		if (vAlign == value) return value;
 		vAlign = value;
-		textDisplay.charLayout.process();
+		textDisplay.markForUpdate();
 		this.dispatchEvent(new Event(Event.CHANGE));
 		return vAlign;
 	}
@@ -44,7 +44,7 @@ class Alignment extends EventDispatcher
 	function set_hAlign(value:String):String 
 	{
 		hAlign = value;
-		textDisplay.charLayout.process();
+		textDisplay.markForUpdate();
 		return hAlign;
 	}
 }

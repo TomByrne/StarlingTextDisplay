@@ -4,7 +4,6 @@ import openfl.geom.Point;
 import openfl.geom.Rectangle;
 import starling.text.BitmapFont;
 import starling.text.model.format.InputFormat;
-import starling.text.model.format.CharFormat;
 import starling.text.model.format.TextWrapping;
 import starling.text.model.layout.Char;
 import starling.text.model.layout.Line;
@@ -44,7 +43,8 @@ class CharLayout extends EventDispatcher
 	private var resizeEvent:Event;
 	var wordBreakFound:Bool;
 	var limitReached:Bool;
-	var defaultCharFormat:CharFormat;
+	
+	var defaultChar:Char;
 	
 	public var characters = new Array<Char>();
 	public var allCharacters:Array<Char>;
@@ -61,19 +61,19 @@ class CharLayout extends EventDispatcher
 		_endChar.isEndChar = true;
 		allCharacters = [_endChar];
 		
-		defaultCharFormat = new CharFormat();
+		defaultChar = new Char(null, 0);
 		
 		resizeEvent = new Event(Event.RESIZE);
 		changeEvent = new Event(Event.CHANGE);
 	}
 	
-	public function process() 
+	public function doProcess() 
 	{
 		this.characters = textDisplay.contentModel.characters;
 		this.allCharacters = characters.concat([_endChar]);
 		
 		var iformat:InputFormat = textDisplay.defaultFormat;
-		CharacterHelper.updateCharFormat(textDisplay.defaultFormat, defaultCharFormat, textDisplay.formatModel.defaultFont);
+		CharacterHelper.updateCharFormat(textDisplay.defaultFormat, defaultChar, textDisplay.formatModel.defaultFont);
 		
 		setPlacementX();
 		findWords();
@@ -208,7 +208,7 @@ class CharLayout extends EventDispatcher
 		{
 			characters[i].index -= end - start;
 		}
-		process();
+		textDisplay.triggerUpdate(true);
 		textDisplay.selection.index = start; // Must set index after updating text otherwise HistoryControl will modify previous HistoryStep
 	}
 	
@@ -233,7 +233,7 @@ class CharLayout extends EventDispatcher
 		{
 			characters[i].index += newStrSplit.length;
 		}
-		process();
+		textDisplay.triggerUpdate(true);
 		textDisplay.selection.index += newStrSplit.length;
 	}
 	
@@ -256,7 +256,7 @@ class CharLayout extends EventDispatcher
 		{
 			goBack = false;
 			var char:Char = allCharacters[i];
-			char.charFormat = CharacterHelper.findCharFormat(textDisplay, char, textDisplay.contentModel.nodes);
+			CharacterHelper.findCharFormat(textDisplay, char, textDisplay.contentModel.nodes);
 			
 			if (!textDisplay.allowLineBreaks && (char.character == SpecialChar.Return || char.character == SpecialChar.NewLine)) {
 				i++;
@@ -288,17 +288,17 @@ class CharLayout extends EventDispatcher
 			if (limitReached) char.visible = false;
 			else char.visible = true;
 			
-			if (char.charFormat.bitmapChar != null) char.x += char.charFormat.bitmapChar.xOffset * char.scale;
+			if (char.bitmapChar != null) char.x += char.bitmapChar.xOffset * char.scale;
 			
 			char.lineNumber = lineNumber;
 			char.charLinePositionX = charLinePositionX;
 			charLinePositionX++;
 			
 			if (char.character != SpecialChar.Space || charLinePositionX != 0) {
-				if (char.charFormat.bitmapChar != null) {
-					placement.x += (char.charFormat.bitmapChar.xAdvance * char.scale);
-					if (char.charFormat.format.kerning != null) {
-						placement.x += char.charFormat.format.kerning;
+				if (char.bitmapChar != null) {
+					placement.x += (char.bitmapChar.xAdvance * char.scale);
+					if (char.format.kerning != null) {
+						placement.x += char.format.kerning;
 					}
 				}
 			}
@@ -409,23 +409,23 @@ class CharLayout extends EventDispatcher
 		{
 			var char:Char = allCharacters[i];
 			var largestChar:Char = largestChars[char.lineNumber];
-			if (char.charFormat.font == null) continue;
+			if (char.font == null) continue;
 			
 			char.y = char.line.y;
-			char.y -= char.charFormat.font.baseline * char.scale;
-			if(char.charFormat.format.baseline != null) char.y += char.charFormat.format.baseline * char.scale;
+			char.y -= char.font.baseline * char.scale;
+			if(char.format.baseline != null) char.y += char.format.baseline * char.scale;
 			char.y += lineHeights[char.lineNumber];
 			
-			if (char.charFormat.bitmapChar != null) {
+			if (char.bitmapChar != null) {
 				
 				if (textDisplay.vAlign == VAlign.TOP) {
-					lastYOffset = (char.charFormat.bitmapChar.yOffset - (char.charFormat.font.lineHeight - char.charFormat.font.baseline)) * char.scale;
+					lastYOffset = (char.bitmapChar.yOffset - (char.font.lineHeight - char.font.baseline)) * char.scale;
 				}
 				else if (textDisplay.vAlign == VAlign.CENTER) {
-					lastYOffset = (char.charFormat.bitmapChar.yOffset - ((char.charFormat.font.lineHeight - char.charFormat.font.baseline) * 0.5)) * char.scale;
+					lastYOffset = (char.bitmapChar.yOffset - ((char.font.lineHeight - char.font.baseline) * 0.5)) * char.scale;
 				}
 				else if (textDisplay.vAlign == VAlign.BOTTOM) {
-					lastYOffset = char.charFormat.bitmapChar.yOffset * char.scale;
+					lastYOffset = char.bitmapChar.yOffset * char.scale;
 				}
 				
 				char.y += lastYOffset;
@@ -471,7 +471,7 @@ class CharLayout extends EventDispatcher
 				alignOffsetY = (textDisplay.targetHeight - textHeight) / 2;
 			}
 			else if (textDisplay.vAlign == VAlign.BOTTOM) {
-				alignOffsetY = textDisplay.targetWidth - textHeight;
+				alignOffsetY = textDisplay.targetHeight - textHeight;
 			}
 		}
 		
@@ -509,10 +509,10 @@ class CharLayout extends EventDispatcher
 			line.y += alignOffsetY;
 			
 			if (textDisplay.vAlign == VAlign.TOP) {
-				line.y -= (line.largestChar.charFormat.font.lineHeight - line.largestChar.charFormat.font.baseline) * line.largestChar.scale;
+				line.y -= (line.largestChar.font.lineHeight - line.largestChar.font.baseline) * line.largestChar.scale;
 			}
 			else if (textDisplay.vAlign == VAlign.CENTER) {
-				line.y -= (line.largestChar.charFormat.font.lineHeight - line.largestChar.charFormat.font.baseline) * line.largestChar.scale * 0.5;
+				line.y -= (line.largestChar.font.lineHeight - line.largestChar.font.baseline) * line.largestChar.scale * 0.5;
 			}
 			else if (textDisplay.vAlign == VAlign.BOTTOM) {
 				// Do nothing
@@ -532,8 +532,8 @@ class CharLayout extends EventDispatcher
 				
 				char.y += alignOffsetY;
 				
-				if (char.width > 1 && char.charFormat.bitmapChar != null){
-					var offset = (char.charFormat.bitmapChar.yOffset * char.scale) / 2;
+				if (char.width > 1 && char.bitmapChar != null){
+					var offset = (char.bitmapChar.yOffset * char.scale) / 2;
 					if (Math.isNaN(smallestYOffset) || smallestYOffset > offset){
 						smallestYOffset = offset;
 					}
@@ -578,9 +578,11 @@ class CharLayout extends EventDispatcher
 	{
 		if (characters.length > 0){
 			var char:Char = characters[characters.length - 1];
-			_endChar.charFormat = char.charFormat;
+			_endChar.font = char.font;
+			_endChar.format = char.format;
 		}else{
-			_endChar.charFormat = defaultCharFormat;
+			_endChar.font = defaultChar.font;
+			_endChar.format = defaultChar.format;
 		}
 		_endChar.index = characters.length;
 		return _endChar;

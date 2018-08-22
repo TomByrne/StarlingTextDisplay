@@ -146,8 +146,8 @@ class Caret extends DisplayObjectContainer
 		
 		if (selectedChar == null) return selectedChar;
 		
-		this.format = selectedChar.charFormat.format.clone();
-		this.font = selectedChar.charFormat.font;
+		this.format = selectedChar.format.clone();
+		this.font = selectedChar.font;
 		quad.color = format.color;
 		return selectedChar;
 	}
