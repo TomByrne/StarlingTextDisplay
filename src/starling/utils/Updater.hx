@@ -35,7 +35,7 @@ class Updater
 		updateHandler();
 	}
 	
-	public function triggerUpdate(force:Bool=true) : Void
+	public function triggerUpdate(?force:Bool) : Void
 	{
 		if (!force && !pendingUpdate) return;
 		

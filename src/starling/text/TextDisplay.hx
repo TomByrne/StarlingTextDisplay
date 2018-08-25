@@ -141,6 +141,8 @@ class TextDisplay extends DisplayObjectContainer
 	{
 		super();
 		
+		updater = new Updater(update);
+		
 		if (height == null && width == null) autoSize = TextFieldAutoSize.BOTH_DIRECTIONS;
 		else if (height == null) autoSize = TextFieldAutoSize.VERTICAL;
 		else if (width == null) autoSize = TextFieldAutoSize.HORIZONTAL
@@ -165,7 +167,6 @@ class TextDisplay extends DisplayObjectContainer
 		addEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
 		addEventListener(Event.REMOVED_FROM_STAGE, onRemovedToStage);
 		
-		updater = new Updater(update);
 		
 	}
 	private function onAddedToStage(e:Event):Void 
