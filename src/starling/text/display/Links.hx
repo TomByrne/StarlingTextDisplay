@@ -7,7 +7,6 @@ import starling.events.Touch;
 import starling.events.TouchEvent;
 import starling.events.TouchPhase;
 import starling.text.model.layout.Char;
-import starling.text.util.FormatParser.FormatAttribute;
 import starling.text.util.FormatParser.FormatNode;
 
 /**
@@ -76,12 +75,16 @@ class Links extends Sprite
 		{
 			var node:FormatNode = formatNodes[i];
 			
-			for (j in 0...node.attributes.length) 
+			/*for (j in 0...node.attributes.length) 
 			{
 				var attribute:FormatAttribute = node.attributes[j];
 				if (attribute.key == "href") {
 					addLinkRange(attribute.value, node.startIndex, node.endIndex);
 				}
+			}*/
+			
+			if (node.format.href != null) {
+				addLinkRange(node.format.href, node.startIndex, node.endIndex);
 			}
 			
 			createLinks(node.children);

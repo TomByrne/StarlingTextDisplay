@@ -53,9 +53,9 @@ class Line
 		for (j in 0...chars.length) 
 		{
 			var char:Char = chars[j];
-			if (char.charFormat.format.leading == null) continue;
-			if (_v < char.charFormat.format.leading && !char.isEndChar) {
-				_v = char.charFormat.format.leading;
+			if (char.format.leading == null) continue;
+			if (_v < char.format.leading && !char.isEndChar) {
+				_v = char.format.leading;
 			}
 		}
 		if (_v == Math.NEGATIVE_INFINITY) _v = 0;
@@ -89,9 +89,9 @@ class Line
 		{
 			var char = chars[i];
 			if (!SpecialChar.isWhitespace(char.character)) validChar = true;
-			if (validChar && char.charFormat.bitmapChar != null) {
-				v += char.charFormat.bitmapChar.xAdvance * char.scale;
-				lastKerning = char.charFormat.format.kerning;
+			if (validChar && char.bitmapChar != null) {
+				v += char.bitmapChar.xAdvance * char.scale;
+				lastKerning = char.format.kerning;
 				if (lastKerning != null) v += lastKerning;
 			}
 		}

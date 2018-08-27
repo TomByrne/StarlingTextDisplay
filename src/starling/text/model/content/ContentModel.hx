@@ -12,6 +12,8 @@ import starling.text.util.InputFormatHelper;
  */
 class ContentModel
 {
+	static var charPool:Array<Char> = [];
+	
 	private var textDisplay:TextDisplay;
 	public var characters = new Array<Char>();
 	//public var chars = new Array<Character>();
@@ -29,15 +31,38 @@ class ContentModel
 	
 	public function update():Void
 	{
-		characters = new Array<Char>();
-		if (textDisplay.value != ""){
+		clearChars();
+		
+		var str:String = textDisplay.value;
+		
+		if (str != ""){
 			
-			var split:Array<String> = textDisplay.value.split("");
-			for (i in 0...split.length) 
+			for (i in 0...str.length) 
 			{
-				var char:Char = new Char(split[i], i);
-				characters.push(char);
+				characters.push(newChar(str.charAt(i), i));
 			}
+		}
+	}
+	
+	function clearChars() 
+	{
+		if (characters.length == 0) return;
+		
+		for (char in characters){
+			char.clear();
+			charPool.push(char);
+		}
+		characters = [];
+	}
+	
+	function newChar(char:String, i:Int) : Char
+	{
+		if (charPool.length > 0){
+			var ret = charPool.pop();
+			ret.init(char, i);
+			return ret;
+		}else{
+			return new Char(char, i);
 		}
 	}
 	
@@ -194,6 +219,7 @@ class ContentModel
 	{
 		if (_nodes.length == 0 && begin == null && end == null) {
 			var plainText:String = FormatParser.nodesToPlainText(nodes);
+			FormatParser.recycleNodes(_nodes);
 			_nodes = FormatParser.textAndFormatToNodes(plainText, format);
 		}
 		else {

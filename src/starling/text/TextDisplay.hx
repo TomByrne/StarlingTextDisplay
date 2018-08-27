@@ -20,6 +20,7 @@ import starling.text.display.HitArea;
 import starling.text.display.Links;
 import starling.text.model.format.TextWrapping;
 import starling.utils.SpecialChar;
+import starling.utils.Updater;
 //import starling.text.control.input.EventForwarder;
 import starling.text.control.input.SoftKeyboardIO;
 import starling.text.control.BoundsControl;
@@ -127,6 +128,8 @@ class TextDisplay extends DisplayObjectContainer
 	
 	public var ellipsis:String = "...";
 	
+	var updater:Updater;
+	
 	@:isVar public var numLines(get, null):Int;
 	
 	@:isVar public static var focus(get, set):TextDisplay = null;
@@ -137,6 +140,8 @@ class TextDisplay extends DisplayObjectContainer
 	public function new(width:Null<Float>=null, height:Null<Float>=null) 
 	{
 		super();
+		
+		updater = new Updater(update);
 		
 		if (height == null && width == null) autoSize = TextFieldAutoSize.BOTH_DIRECTIONS;
 		else if (height == null) autoSize = TextFieldAutoSize.VERTICAL;
@@ -161,6 +166,7 @@ class TextDisplay extends DisplayObjectContainer
 		
 		addEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
 		addEventListener(Event.REMOVED_FROM_STAGE, onRemovedToStage);
+		
 		
 	}
 	private function onAddedToStage(e:Event):Void 
@@ -258,7 +264,7 @@ class TextDisplay extends DisplayObjectContainer
 	{
 		if (begin == null && end == null) formatModel.setDefaults(inputFormat);
 		contentModel.setFormat(inputFormat, begin, end);
-		charLayout.process();
+		markForUpdate();
 		dispatchEvent(new Event(Event.CHANGE));
 	}
 	public function getFormat(begin:Int, end:Int):InputFormat
@@ -314,7 +320,8 @@ class TextDisplay extends DisplayObjectContainer
 		if (maxCharacters != null) {
 			if (v.length >= maxCharacters) v = v.substr(0, maxCharacters - ellipsis.length) + ellipsis;
 		}
-		contentModel.nodes = FormatParser.textAndFormatToNodes(v, defaultFormat);
+		FormatParser.recycleNodes(contentModel.nodes);
+		contentModel.nodes = FormatParser.textAndFormatToNodes(v, defaultFormat.clone());
 		this.value = FormatParser.nodesToPlainText(contentModel.nodes);
 		selection.index = this.value.length;
 		dispatchEvent(new Event(Event.CHANGE));
@@ -332,6 +339,8 @@ class TextDisplay extends DisplayObjectContainer
 		if (v == null) v = "";
 		if (!allowLineBreaks) v = FormatParser.removeLineBreaks(v);
 		else v = v.split("<BR/>").join("<br/>");
+		
+		FormatParser.recycleNodes(contentModel.nodes);
 		contentModel.nodes = FormatParser.htmlToNodes(v);
 		this.value = FormatParser.nodesToPlainText(contentModel.nodes);
 		
@@ -339,6 +348,8 @@ class TextDisplay extends DisplayObjectContainer
 			if (value.length >= maxCharacters) {
 				FormatParser.removeAfterIndex(contentModel.nodes, maxCharacters - ellipsis.length);
 				v = FormatParser.nodesToPlainText(contentModel.nodes) + ellipsis;
+				
+				FormatParser.recycleNodes(contentModel.nodes);
 				contentModel.nodes = FormatParser.htmlToNodes(v);
 				this.value = v;
 			}
@@ -372,7 +383,7 @@ class TextDisplay extends DisplayObjectContainer
 	function createCharacters() 
 	{
 		contentModel.update();
-		charLayout.process();
+		markForUpdate();
 	}
 	
 	function set_hasFocus(value:Null<Bool>):Null<Bool> 
@@ -473,7 +484,7 @@ class TextDisplay extends DisplayObjectContainer
 	{
 		textWrapping = value;
 		this.charLayout.textWrapping = value;
-		charLayout.process();
+		markForUpdate();
 		return value;
 	}
 	
@@ -488,9 +499,9 @@ class TextDisplay extends DisplayObjectContainer
 	private function get_highlightColour():UInt				{ createHighlight(); return highlight.highlightColour; }
 	private function set_highlightColour(value:UInt):UInt	{ createHighlight(); return highlight.highlightColour = value; }
 	
-	private function get_textHeight():Float 				{ return _textBounds.height; }
-	private function get_textWidth():Float 					{ return _textBounds.width; }
-	private function get_textBounds():Rectangle 			{ return _textBounds; }
+	private function get_textHeight():Float 				{ triggerUpdate(); return _textBounds.height; }
+	private function get_textWidth():Float 					{ triggerUpdate(); return _textBounds.width; }
+	private function get_textBounds():Rectangle 			{ triggerUpdate(); return _textBounds; }
 	
 	
 	
@@ -499,7 +510,7 @@ class TextDisplay extends DisplayObjectContainer
 	{
 		if (targetHeight == value) return value;
 		targetHeight = value;
-		charLayout.process();
+		markForUpdate();
 		dispatchEvent(new TextDisplayEvent(TextDisplayEvent.SIZE_CHANGE));
 		return value;
 	}
@@ -509,7 +520,7 @@ class TextDisplay extends DisplayObjectContainer
 	{
 		if (targetWidth == value) return value;
 		targetWidth = value;
-		charLayout.process();
+		markForUpdate();
 		dispatchEvent(new TextDisplayEvent(TextDisplayEvent.SIZE_CHANGE));
 		return value;
 	}
@@ -520,6 +531,22 @@ class TextDisplay extends DisplayObjectContainer
 		editable = value;
 		UpdateActive();
 		return editable;
+	}
+	
+	@:allow(starling.text) function markForUpdate() updater.markForUpdate();
+	@:allow(starling.text) function triggerUpdate(?force:Bool) updater.triggerUpdate(force);
+	function update(){
+		#if debug
+		var startTime = openfl.Lib.getTimer();
+		#end
+		
+		charLayout.doProcess();
+		
+		#if debug
+		var dur = openfl.Lib.getTimer() - startTime;
+		if (dur > 5)
+			trace("TextDisplay took long time to update: " + dur + "ms");
+		#end
 	}
 	
 	function UpdateActive() 
@@ -597,7 +624,7 @@ class TextDisplay extends DisplayObjectContainer
 	{
 		if (autoSize == value) return value;
 		autoSize = value;
-		if(charLayout != null) charLayout.process();
+		if(charLayout != null) markForUpdate();
 		return value;
 	}
 	
@@ -609,7 +636,7 @@ class TextDisplay extends DisplayObjectContainer
 	{
 		if(value != null){
 			formatModel.setDefaults(value);
-			charLayout.process();
+			markForUpdate();
 			dispatchEvent(new Event(Event.CHANGE));
 		}
 		return formatModel.defaultFormat;
