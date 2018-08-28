@@ -3,6 +3,7 @@ package starling.text.control.input;
 import com.imagination.util.signals.Signal.Signal0;
 import com.imagination.util.signals.Signal.Signal1;
 import com.imagination.util.time.EnterFrame;
+import openfl.system.Capabilities;
 import openfl.ui.Keyboard;
 import starling.text.model.layout.CharLayout;
 import starling.text.model.selection.Selection;
@@ -43,23 +44,37 @@ class KeyboardInput
 	{
 		if (e.isDefaultPrevented()) return;
 		
-		//trace(e.charCode+" "+e.keyCode);
-		if (e.keyCode == Keyboard.DELETE) delete();
-		else if (e.keyCode == Keyboard.BACKSPACE) backspace();
-		else if (e.keyCode == Keyboard.ESCAPE) ignore();
-		else if (!textDisplay.allowLineBreaks && e.keyCode == Keyboard.ENTER) ignore();
-		
-		else if (e.charCode == 118 && e.ctrlKey) paste();
-		else if (e.charCode == 99 && e.ctrlKey) copy();
-		else if (e.charCode == 120 && e.ctrlKey) cut();
-		else if (e.charCode == 97  && e.ctrlKey) selectAll();
-		else if (e.charCode != 0 && !e.ctrlKey && !e.altKey) {
-			#if js
-				jsCapsLock.check();
-				EnterFrame.delay(DelayInput.bind(e));
-			#else
-				textDisplay.replaceSelection(String.fromCharCode(e.charCode));
-			#end
+		if (e.altKey){
+			if (Capabilities.os.indexOf("Mac") !=-1){
+				// Mac shortcuts
+				if (e.keyCode == Keyboard.NUMBER_2 || e.keyCode == Keyboard.NUMPAD_2) textDisplay.replaceSelection(String.fromCharCode(8482)); // Trademark
+				else if (e.keyCode == Keyboard.G) textDisplay.replaceSelection(String.fromCharCode(169)); // Copyright
+				else if (e.keyCode == Keyboard.R) textDisplay.replaceSelection(String.fromCharCode(174)); // Registered
+			}else{
+				// Windows Shortcuts
+				if (e.ctrlKey && e.keyCode == Keyboard.T) textDisplay.replaceSelection(String.fromCharCode(8482)); // Trademark
+				else if (e.ctrlKey && e.keyCode == Keyboard.C) textDisplay.replaceSelection(String.fromCharCode(169)); // Copyright
+				else if (e.ctrlKey && e.keyCode == Keyboard.R) textDisplay.replaceSelection(String.fromCharCode(174)); // Registered
+			}
+			
+		}else{
+			if (e.keyCode == Keyboard.DELETE) delete();
+			else if (e.keyCode == Keyboard.BACKSPACE) backspace();
+			else if (e.keyCode == Keyboard.ESCAPE) ignore();
+			else if (!textDisplay.allowLineBreaks && e.keyCode == Keyboard.ENTER) ignore();
+			
+			else if (e.charCode == 118 && e.ctrlKey) paste();
+			else if (e.charCode == 99 && e.ctrlKey) copy();
+			else if (e.charCode == 120 && e.ctrlKey) cut();
+			else if (e.charCode == 97  && e.ctrlKey) selectAll();
+			else if (e.charCode != 0 && !e.ctrlKey) {
+				#if js
+					jsCapsLock.check();
+					EnterFrame.delay(DelayInput.bind(e));
+				#else
+					textDisplay.replaceSelection(String.fromCharCode(e.charCode));
+				#end
+			}
 		}
 	}
 	
