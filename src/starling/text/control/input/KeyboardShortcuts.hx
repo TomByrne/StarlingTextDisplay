@@ -34,14 +34,16 @@ class KeyboardShortcuts
 		if (e.isDefaultPrevented()) return;
 		
 		//trace(e);
-		if (e.keyCode == Keyboard.LEFT && e.shiftKey == false) ChangeIndex( -1, e.ctrlKey);
-		else if (e.keyCode == Keyboard.RIGHT && e.shiftKey == false) ChangeIndex( 1, e.ctrlKey);
-		else if (e.keyCode == Keyboard.LEFT && e.shiftKey == true) ChangeSelected( -1, e.ctrlKey);
-		else if (e.keyCode == Keyboard.RIGHT && e.shiftKey == true) ChangeSelected( 1, e.ctrlKey);
-		else if (e.keyCode == Keyboard.UP && e.shiftKey == false) ChangeLine( -1);
-		else if (e.keyCode == Keyboard.DOWN && e.shiftKey == false) ChangeLine( 1);
-		else if (e.keyCode == Keyboard.UP && e.shiftKey == true) ChangeLineSelected( -1);
-		else if (e.keyCode == Keyboard.DOWN && e.shiftKey == true) ChangeLineSelected( 1);
+		if (!e.altKey){
+			if (e.keyCode == Keyboard.LEFT && e.shiftKey == false) ChangeIndex( -1, e.ctrlKey);
+			else if (e.keyCode == Keyboard.RIGHT && e.shiftKey == false) ChangeIndex( 1, e.ctrlKey);
+			else if (e.keyCode == Keyboard.LEFT && e.shiftKey == true) ChangeSelected( -1, e.ctrlKey);
+			else if (e.keyCode == Keyboard.RIGHT && e.shiftKey == true) ChangeSelected( 1, e.ctrlKey);
+			else if (e.keyCode == Keyboard.UP && e.shiftKey == false) ChangeLine( -1);
+			else if (e.keyCode == Keyboard.DOWN && e.shiftKey == false) ChangeLine( 1);
+			else if (e.keyCode == Keyboard.UP && e.shiftKey == true) ChangeLineSelected( -1);
+			else if (e.keyCode == Keyboard.DOWN && e.shiftKey == true) ChangeLineSelected( 1);
+		}
 	}
 	
 	function ChangeIndex(offset:Int, byWord:Bool) 
