@@ -505,7 +505,7 @@ class TextDisplay extends DisplayObjectContainer
 	
 	
 	
-	override function get_height():Float { return actualHeight; }
+	override function get_height():Float { triggerUpdate(); return actualHeight; }
 	override function set_height(value:Float):Float 
 	{
 		if (targetHeight == value) return value;
@@ -515,7 +515,7 @@ class TextDisplay extends DisplayObjectContainer
 		return value;
 	}
 	
-	override function get_width():Float { return actualWidth; }
+	override function get_width():Float { triggerUpdate(); return actualWidth; }
 	override function set_width(value:Float):Float 
 	{
 		if (targetWidth == value) return value;
