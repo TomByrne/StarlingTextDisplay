@@ -39,7 +39,7 @@ class ContentModel
 			
 			for (i in 0...str.length) 
 			{
-				characters.push(newChar(str.charAt(i), i));
+				characters[i] = newChar(str.charAt(i), i);
 			}
 		}
 	}
@@ -48,9 +48,11 @@ class ContentModel
 	{
 		if (characters.length == 0) return;
 		
+		var length = charPool.length;
 		for (char in characters){
 			char.clear();
-			charPool.push(char);
+			charPool[length] = char;
+			length++;
 		}
 		characters = [];
 	}

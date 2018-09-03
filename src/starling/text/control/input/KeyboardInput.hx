@@ -45,7 +45,7 @@ class KeyboardInput
 		if (e.isDefaultPrevented()) return;
 		
 		if (e.altKey){
-			if (Capabilities.os.indexOf("Mac") !=-1){
+			if (isMac()){
 				// Mac shortcuts
 				if (e.keyCode == Keyboard.NUMBER_2 || e.keyCode == Keyboard.NUMPAD_2) textDisplay.replaceSelection(String.fromCharCode(8482)); // Trademark
 				else if (e.keyCode == Keyboard.G) textDisplay.replaceSelection(String.fromCharCode(169)); // Copyright
@@ -76,6 +76,17 @@ class KeyboardInput
 				#end
 			}
 		}
+	}
+	
+	function isMac() 
+	{
+		var sysName:String;
+		#if js
+			sysName = js.Browser.window.navigator.platform;
+		#else
+			sysName = Capabilities.os;
+		#end
+		return sysName.indexOf("Mac") !=-1 || sysName.indexOf("iPad") !=-1 || sysName.indexOf("iPhone") !=-1 || sysName.indexOf("iPod") !=-1;
 	}
 	
 	#if js
