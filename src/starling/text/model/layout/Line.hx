@@ -10,19 +10,29 @@ import starling.utils.SpecialChar;
 class Line
 {
 	public var index:Int;
+	
 	public var _height:Float = 9;
 	public var height(get, null):Float;
 	
 	private var _width:Float = 0;
 	public var width(get, null):Float;
+	
+	public var _rise:Float;
+	public var rise(get, null):Float;
+	
+	public var _fall:Float;
+	public var fall(get, null):Float;
+	
+	public var _leading:Float;
+	public var leading(get, null):Float;
+	
 	public var y:Float = 0;
 	public var x:Float = 0;
 	public var chars = new Array<Char>();
 	public var validJustify(get, null):Bool;
 	
-	private var _largestChar:Char;
-	public var largestChar(get, null):Char;
-	public var leading(get, null):Float;
+	//private var _largestChar:Char;
+	//public var largestChar(get, null):Char;
 	//public var outsizeBounds:Bool = false; // Needs a bit of a rethink
 	public var visible:Bool = true;
 	
@@ -30,15 +40,38 @@ class Line
 	
 	public function new() { }	
 	
+	public function setRiseFall(rise:Float, fall:Float, leading:Float) 
+	{
+		_height = rise + fall;
+		_rise = rise;
+		_fall = fall;
+		_leading = leading;
+	}
+	
 	function get_height():Float 
 	{
 		return _height;
 	}
 	
-	public function calcHeight():Void 
+	function get_rise():Float 
+	{
+		return _rise;
+	}
+	
+	function get_fall():Float 
+	{
+		return _fall;
+	}
+	
+	function get_leading():Float 
+	{
+		return _leading;
+	}
+	
+	/*public function calcHeight():Void 
 	{
 		_height = largestChar.getLineHeight();
-	}
+	}*/
 	
 	function get_validJustify():Bool 
 	{
@@ -47,7 +80,7 @@ class Line
 		return true;
 	}
 	
-	function get_leading():Float
+	/*function get_leading():Float
 	{
 		var _v:Float = Math.NEGATIVE_INFINITY;
 		for (j in 0...chars.length) 
@@ -60,9 +93,9 @@ class Line
 		}
 		if (_v == Math.NEGATIVE_INFINITY) _v = 0;
 		return _v;
-	}
+	}*/
 	
-	function get_largestChar():Char 
+	/*function get_largestChar():Char 
 	{
 		for (j in 0...chars.length) 
 		{
@@ -78,7 +111,7 @@ class Line
 		}
 		if (_largestChar == null) _largestChar = chars[0];
 		return _largestChar;
-	}
+	}*/
 	
 	function get_width():Float 
 	{

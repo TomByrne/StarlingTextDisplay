@@ -78,7 +78,7 @@ class CharLayout extends EventDispatcher
 		setPlacementX();
 		findWords();
 		findLineHeight();
-		findLinePositions();
+		//findLinePositions();
 		setLinePositions();
 		
 		var sizeChange = calcTextSize();
@@ -256,7 +256,12 @@ class CharLayout extends EventDispatcher
 		{
 			goBack = false;
 			var char:Char = allCharacters[i];
-			CharacterHelper.findCharFormat(textDisplay, char, textDisplay.contentModel.nodes);
+			if (char.isEndChar && lastChar != null){
+				char.font = lastChar.font;
+				char.format = lastChar.format;
+			}else{
+				CharacterHelper.findCharFormat(textDisplay, char, textDisplay.contentModel.nodes);
+			}
 			
 			if (!textDisplay.allowLineBreaks && (char.character == SpecialChar.Return || char.character == SpecialChar.NewLine)) {
 				i++;
@@ -359,79 +364,77 @@ class CharLayout extends EventDispatcher
 	function findLineHeight() 
 	{
 		lines = new Array<Line>();
+		var rise:Float = Math.NaN;
+		var fall:Float = Math.NaN;
+		var leading:Float = Math.NaN;
 		var line:Line = null;
+		var lineStack:Float = 0;
+		var lastFont:BitmapFont = null;
 		for (i in 0...allCharacters.length) {
 			var char:Char = allCharacters[i];
 			if (char.lineNumber >= lines.length) {
+				if (line != null){
+					lineStack = finishLine(line, rise, fall, leading, lineStack);
+				}
+				
 				line = new Line();
 				line.index = lines.length;
 				lines.push(line);
-				
+				rise = Math.NaN;
+				fall = Math.NaN;
+				leading = Math.NaN;
+				lastFont = null;
 			}
 			char.line = line;
+			if (char.font != lastFont){
+				var scale = char.scale;
+				
+				var charRise = char.font.baseline * scale;
+				var charFall = (char.font.lineHeight - char.font.baseline) * scale;
+				var charLeading = char.format.leading;
+				
+				if (Math.isNaN(rise)){
+					rise = charRise;
+					fall = charFall;
+					leading = charLeading;
+				}else{
+					if (rise < charRise) rise = charRise;
+					if (fall < charFall) fall = charFall;
+					if (leading < charLeading) leading = charLeading;
+				}
+				lastFont = char.font;
+			}
 			line.chars.push(char);
 		}
-		for (j in 0...lines.length) 
-		{
-			lines[j].calcHeight();
+		if (line != null){
+			finishLine(line, rise, fall, leading, lineStack);
 		}
 	}
 	
-	function findLinePositions() 
+	function finishLine(line:Line, rise:Float, fall:Float, leading:Float, lineStack:Float) : Float 
 	{
-		var lineStack:Float = 0;
-		var leading:Float = 0;
-		for (line in lines) 
-		{
-			if (line.index > 0) leading += line.leading;
-			line.y = lineStack + leading;
-			/*trace("line.y = " + line.y);*/
-			lineStack += line.height;
-			
-			/*line.outsizeBounds = false;
-			if (!withinBoundsY(line.y + line.height)) {
-				line.outsizeBounds = true;
-			}*/
-		}
+		lineStack += leading;
+		line.setRiseFall(rise, fall, leading);
+		line.y = lineStack;
+		lineStack += line.height;
+		return lineStack;
 	}
 	
 	function setLinePositions() 
 	{
 		var lastYOffset:Float = Math.NaN;
-		var largestChars = new Array<Char>();
-		var lineHeights = new Array<Float>();
-		for (j in 0...lines.length) 
-		{
-			largestChars.push(lines[j].largestChar);
-			lineHeights.push(lines[j].height);
-		}
 		for (i in 0...allCharacters.length) 
 		{
 			var char:Char = allCharacters[i];
-			var largestChar:Char = largestChars[char.lineNumber];
 			if (char.font == null) continue;
 			
-			char.y = char.line.y;
-			char.y -= char.font.baseline * char.scale;
-			if(char.format.baseline != null) char.y += char.format.baseline * char.scale;
-			char.y += lineHeights[char.lineNumber];
+			var scale = char.scale;
 			
-			if (char.bitmapChar != null) {
-				
-				if (textDisplay.vAlign == VAlign.TOP) {
-					lastYOffset = (char.bitmapChar.yOffset - (char.font.lineHeight - char.font.baseline)) * char.scale;
-				}
-				else if (textDisplay.vAlign == VAlign.CENTER) {
-					lastYOffset = (char.bitmapChar.yOffset - ((char.font.lineHeight - char.font.baseline) * 0.5)) * char.scale;
-				}
-				else if (textDisplay.vAlign == VAlign.BOTTOM) {
-					lastYOffset = char.bitmapChar.yOffset * char.scale;
-				}
-				
-				char.y += lastYOffset;
-			}else if (!Math.isNaN(lastYOffset)){
-				char.y += lastYOffset;
-			}
+			char.y = char.line.y + char.line.rise;
+			char.y -= char.font.baseline * scale;
+			if (char.format.baseline != null) char.y += char.format.baseline;
+			
+			if (char.bitmapChar != null) char.y += char.bitmapChar.yOffset * scale;
 		}
 	}
 	
@@ -474,6 +477,7 @@ class CharLayout extends EventDispatcher
 				alignOffsetY = textDisplay.targetHeight - textHeight;
 			}
 		}
+		alignOffsetY -= lines[0].leading;
 		
 		var widestLine:Float = 0;
 		for (i in 0 ... lines.length) 
@@ -508,15 +512,15 @@ class CharLayout extends EventDispatcher
 			}
 			line.y += alignOffsetY;
 			
-			if (textDisplay.vAlign == VAlign.TOP) {
-				line.y -= (line.largestChar.font.lineHeight - line.largestChar.font.baseline) * line.largestChar.scale;
+			/*if (textDisplay.vAlign == VAlign.TOP) {
+				line.y -= line.rise;
 			}
 			else if (textDisplay.vAlign == VAlign.CENTER) {
 				line.y -= (line.largestChar.font.lineHeight - line.largestChar.font.baseline) * line.largestChar.scale * 0.5;
 			}
 			else if (textDisplay.vAlign == VAlign.BOTTOM) {
 				// Do nothing
-			}
+			}*/
 			
 			var first = true;
 			var t:Float = 0;

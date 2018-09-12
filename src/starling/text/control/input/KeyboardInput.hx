@@ -75,6 +75,11 @@ class KeyboardInput
 					textDisplay.replaceSelection(String.fromCharCode(e.charCode));
 				#end
 			}
+			
+			#if debug
+			if (e.keyCode == Keyboard.N && e.ctrlKey)
+				textDisplay.contentModel.logNodes();
+			#end
 		}
 	}
 	

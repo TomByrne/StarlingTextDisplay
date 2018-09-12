@@ -81,32 +81,33 @@ class ContentModel
 		var i:Int = nodes.length - 1;
 		while (i >= 0)
 		{
+			var node = nodes[i];
 			var editLen:Int;
-			var rangeOverlap:RangeOverlap = getOverlap(editStart, editEnd, nodes[i].startIndex, nodes[i].endIndex+1);
+			var rangeOverlap:RangeOverlap = getOverlap(editStart, editEnd, node.startIndex, node.endIndex+1);
 			if (rangeOverlap == RangeOverlap.SURROUND) {
 				nodes.splice(i, 1);
 			}
 			else {
 				if (rangeOverlap == RangeOverlap.INSIDE || rangeOverlap == RangeOverlap.MATCH) {
-					nodes[i].value = removeChars(nodes[i].value, editStart - nodes[i].startIndex, len);	// remove chars
+					node.value = removeChars(node.value, editStart - node.startIndex, len);	// remove chars
 																					// do not remove from start
-					nodes[i].endIndex -= len;										// remove from end
+					node.endIndex -= len;										// remove from end
 				}
 				else if (rangeOverlap == RangeOverlap.TOP_INSIDE) {
-					editLen = editEnd - nodes[i].startIndex;
-					nodes[i].value = removeChars(nodes[i].value, editEnd - editLen - nodes[i].startIndex, editLen); // remove chars
-					nodes[i].startIndex -= len - editLen;							// remove from start
-					nodes[i].endIndex -= len;										// remove from end
+					editLen = editEnd - node.startIndex;
+					node.value = removeChars(node.value, editEnd - editLen - node.startIndex, editLen); // remove chars
+					node.startIndex -= len - editLen;							// remove from start
+					node.endIndex -= len;										// remove from end
 				}
 				else if (rangeOverlap == RangeOverlap.BOTTOM_INSIDE) {
-					editLen = (nodes[i].endIndex+1) - editStart;
+					editLen = (node.endIndex+1) - editStart;
 																					// do not remove from start
-					nodes[i].value = removeChars(nodes[i].value, editStart - nodes[i].startIndex, editLen); // remove chars
-					nodes[i].endIndex -= editLen;									// remove from end
+					node.value = removeChars(node.value, editStart - node.startIndex, editLen); // remove chars
+					node.endIndex -= editLen;									// remove from end
 				}
 				else if (rangeOverlap == RangeOverlap.OUTSIDE_BOTTOM) {
-					nodes[i].startIndex -= len;										// remove from start
-					nodes[i].endIndex -= len;										// remove from end
+					node.startIndex -= len;										// remove from start
+					node.endIndex -= len;										// remove from end
 																					// do not remove chars
 				}
 				else if (rangeOverlap == RangeOverlap.OUTSIDE_TOP) {
@@ -115,8 +116,8 @@ class ContentModel
 																					// do not remove chars
 				}
 				
-				if (nodes[i].children.length > 0) {
-					removeFromNodes(nodes[i].children, editStart, editEnd);
+				if (node.children.length > 0) {
+					removeFromNodes(node.children, editStart, editEnd);
 				}
 			}
 			i--;
@@ -166,10 +167,10 @@ class ContentModel
 	
 	public function insert(letter:String, index:Int) 
 	{
-		insertIntoNodes(nodes, letter, index);
+		insertIntoNodes(_nodes, letter, index);
 	}
 	
-	private function insertIntoNodes(nodes:Array<FormatNode>, letter:String, index:Int) 
+	private function insertIntoNodes(nodes:Array<FormatNode>, letter:String, index:Int)
 	{
 		// Fail safe, apply default format if there is only one node and nothing in it
 		if (nodes.length == 1) {
@@ -182,37 +183,39 @@ class ContentModel
 		
 		for (i in 0...nodes.length) 
 		{
-			if (index <= nodes[i].startIndex && nodes[i].startIndex != 0) {
-				nodes[i].startIndex += letter.length;
-				nodes[i].endIndex += letter.length;
+			var node:FormatNode = nodes[i];
+			if (index <= node.startIndex && node.startIndex != 0) {
+				node.startIndex += letter.length;
+				node.endIndex += letter.length;
 			}
-			else if (index <= nodes[i].endIndex+1) {
+			else if (index <= node.endIndex+1) {
 				
-				nodes[i].endIndex += letter.length;
-				
-				if (nodes[i].children.length == 0) {
-					if (nodes[i].value == null || nodes[i].value == "") {
-						nodes[i].value = letter;
+				if (node.children.length == 0) {
+					if (node.value == null || node.value == "") {
+						node.value = letter;
 					}
 					else if (index == 0) {
-						nodes[i].value = letter + nodes[i].value;
+						node.value = letter + node.value;
 					}
 					else {
-						var split:Array<String> = nodes[i].value.split("");
+						var split:Array<String> = node.value.split("");
 						var newValue:String = "";
 						for (j in 0...split.length) 
 						{
-							var valueIndex:Int = nodes[i].startIndex + j;
+							var valueIndex:Int = node.startIndex + j;
 							newValue += split[j];
 							if (valueIndex+1 == index) newValue += letter;
 						}
-						nodes[i].value = newValue;
+						node.value = newValue;
 					}
+					node.endIndex = node.startIndex + node.value.length - 1;
 				}
 			}
 			
-			if (nodes[i].children.length > 0) {
-				insertIntoNodes(nodes[i].children, letter, index);
+			if (node.children.length > 0) {
+				insertIntoNodes(node.children, letter, index);
+				var length = node.children[node.children.length - 1].endIndex - node.children[0].startIndex;
+				node.endIndex = node.startIndex + length - 1;
 			}
 		}
 	}
@@ -225,7 +228,7 @@ class ContentModel
 			_nodes = FormatParser.textAndFormatToNodes(plainText, format);
 		}
 		else {
-			applyFormatToNodes(nodes, format, begin, end);
+			applyFormatToNodes(_nodes, format, begin, end);
 		}
 	}
 	
@@ -256,16 +259,16 @@ class ContentModel
 			if (testEnd < testBegin) continue;
 			
 			if (node.children.length > 0) {
-				applyFormatToNodes(nodes[i].children, format, testBegin, testEnd);
+				applyFormatToNodes(node.children, format, testBegin, testEnd);
 			}
 			else {
-				if (node.children.length > 0) continue;
+				//if (node.children.length > 0) continue;
 				
 				var rangeOverlap:RangeOverlap = getOverlap(testBegin, testEnd+1, node.startIndex, node.endIndex + 1);
 				
 				if (rangeOverlap == RangeOverlap.MATCH || rangeOverlap == RangeOverlap.SURROUND) {
-					InputFormatHelper.copyActiveValues(nodes[i].format, format);
-					if (nodes[i].parent != null) InputFormatHelper.removeDuplicates(nodes[i].format, nodes[i].parent.format);
+					InputFormatHelper.copyActiveValues(node.format, format);
+					if (node.parent != null) InputFormatHelper.removeDuplicates(node.format, node.parent.format);
 				}
 				else if (node.value != null){
 					if (rangeOverlap == RangeOverlap.INSIDE || rangeOverlap == RangeOverlap.BOTTOM_INSIDE || rangeOverlap == RangeOverlap.TOP_INSIDE) {
@@ -297,7 +300,7 @@ class ContentModel
 							middleNode.value = node.value.substring(testBegin - node.startIndex, (testEnd + 1) - node.startIndex);
 							
 							InputFormatHelper.copyActiveValues(middleNode.format, format);
-							if (node.parent != null) InputFormatHelper.removeDuplicates(middleNode.format, node.parent.format);
+							if (node.parent != null) InputFormatHelper.removeDuplicates(middleNode.format, node.format);
 							
 							if (beginNode != null) node.children.push(beginNode);
 							if (middleNode != null) node.children.push(middleNode);
@@ -335,6 +338,30 @@ class ContentModel
 		_nodes = value;
 		return _nodes;
 	}
+	
+	#if debug
+	public function logNodes(){
+		trace(_logNodes(_nodes, '\n'));
+	}
+	@:access(starling.text.util.FormatParser)
+	function _logNodes(nodes:Array<FormatNode>, tabs:String) : String{
+		var ret = '\n';
+		for (i in 0 ... nodes.length){
+			var node = nodes[i];
+			var value = node.value;
+			ret += tabs + '[' + (i + 1) + "/" + nodes.length + '] - start:' + node.startIndex + ' - end:' + node.endIndex + ' - length:' + (value == null ? null : value.length);
+			ret += tabs + FormatParser.createStartTag(node);
+			if(value != null && value.length > 0){
+				value = StringTools.replace(value, '\n', '\\n');
+				value = StringTools.replace(value, '\r', '\\r');
+				value = StringTools.replace(value, '\t', '\\t');
+				ret += tabs + '"' + value + '"';
+			}
+			if(node.children.length > 0) ret += _logNodes(node.children, tabs + '\t');
+		}
+		return ret;
+	}
+	#end
 }
 
 @:enum abstract RangeOverlap(String) from String to String {
