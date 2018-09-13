@@ -18,17 +18,20 @@ class CharacterHelper
 		
 	}
 	
-	static public function findCharFormat(textDisplay:TextDisplay, char:Char, nodes:Array<FormatNode>):Void
+	inline static public function findCharFormat(textDisplay:TextDisplay, char:Char, nodes:Array<FormatNode>):Void
 	{
 		var format = char.format;
+		format.clear();
 		
-		if (nodes.length == 0) format = textDisplay.formatModel.defaultFormat;
-		else applyFormats(format, char, nodes);
+		if (nodes.length > 0) applyFormats(format, char, nodes);
 		
 		updateCharFormat(format, char, textDisplay.formatModel.defaultFont);
 		
 		InputFormatHelper.copyMissingValues(format, textDisplay.defaultFormat);
-		
+	}
+	
+	inline static public function findBitmapChar(char:Char):Void
+	{
 		var charID:Int = char.id;
 		if (char.format.textTransform == TextTransform.UPPERCASE) {
 			charID = String.fromCharCode(charID).toUpperCase().charCodeAt(0);
@@ -40,7 +43,7 @@ class CharacterHelper
 		char.bitmapChar = char.font.getChar(charID);
 	}
 	
-	static public function updateCharFormat(format:InputFormat, char:Char, defaultFont:BitmapFont):Void
+	inline static public function updateCharFormat(format:InputFormat, char:Char, defaultFont:BitmapFont):Void
 	{
 		char.format = format;
 		if (format.face != null){
@@ -50,7 +53,7 @@ class CharacterHelper
 		if (char.font == null) char.font = defaultFont;
 	}
 	
-	static private function applyFormats(format:InputFormat, char:Char, nodes:Array<FormatNode>) 
+	inline static private function applyFormats(format:InputFormat, char:Char, nodes:Array<FormatNode>) 
 	{
 		for (j in 0...nodes.length) 
 		{

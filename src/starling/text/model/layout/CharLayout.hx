@@ -261,6 +261,7 @@ class CharLayout extends EventDispatcher
 				char.format = lastChar.format;
 			}else{
 				CharacterHelper.findCharFormat(textDisplay, char, textDisplay.contentModel.nodes);
+				CharacterHelper.findBitmapChar(char);
 			}
 			
 			if (!textDisplay.allowLineBreaks && (char.character == SpecialChar.Return || char.character == SpecialChar.NewLine)) {
