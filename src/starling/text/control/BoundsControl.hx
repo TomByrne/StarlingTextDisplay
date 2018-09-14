@@ -22,7 +22,8 @@ class BoundsControl extends Border
 		
 		this.textDisplay = textDisplay;
 		
-		textDisplay.charLayout.addEventListener(Event.CHANGE, OnLayoutChange);
+		textDisplay.addEventListener(TextDisplayEvent.SIZE_CHANGE, OnLayoutChange);
+		textDisplay.charLayout.addEventListener(Event.RESIZE, OnLayoutChange);
 	}
 	
 	

@@ -26,7 +26,7 @@ class ClipMask extends Quad
 		this.textDisplay = textDisplay;
 		
 		textDisplay.addEventListener(TextDisplayEvent.SIZE_CHANGE, UpdateMark);
-		textDisplay.addEventListener(Event.CHANGE, UpdateMark);
+		textDisplay.addEventListener(Event.RESIZE, UpdateMark);
 		textDisplay.alignment.addEventListener(Event.CHANGE, UpdateMark);
 		UpdateMark(null);
 	}

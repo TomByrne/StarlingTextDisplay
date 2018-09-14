@@ -510,7 +510,7 @@ class TextDisplay extends DisplayObjectContainer
 	{
 		if (targetHeight == value) return value;
 		targetHeight = value;
-		markForUpdate();
+		if(alignment.vAlign != VAlign.TOP) markForUpdate();
 		dispatchEvent(new TextDisplayEvent(TextDisplayEvent.SIZE_CHANGE));
 		return value;
 	}
@@ -544,8 +544,10 @@ class TextDisplay extends DisplayObjectContainer
 		
 		#if debug
 		var dur = openfl.Lib.getTimer() - startTime;
-		if (dur > 5)
-			trace("TextDisplay took long time to update: " + dur + "ms");
+		if (dur > 5){
+			var v = StringTools.replace(StringTools.replace(_value, "\n", "\\n"), "\t", "\\t");
+			trace("TextDisplay took long time to update: " + dur + "ms '" + (v.length > 33 ? v.substr(0, 30) + "..." : v) + "' (length: " + _value.length + ")");
+		}
 		#end
 	}
 	
