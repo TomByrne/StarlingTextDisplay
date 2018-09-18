@@ -11,20 +11,26 @@ class Line
 {
 	public var index:Int;
 	
-	public var _height:Float = 9;
+	private var _height:Float = 9;
 	public var height(get, null):Float;
 	
 	private var _width:Float = 0;
 	public var width(get, null):Float;
 	
-	public var _rise:Float;
+	private var _rise:Float;
 	public var rise(get, null):Float;
 	
-	public var _fall:Float;
+	private var _fall:Float;
 	public var fall(get, null):Float;
 	
-	public var _leading:Float;
+	private var _leading:Float;
 	public var leading(get, null):Float;
+	
+	private var _paddingTop:Float;
+	public var paddingTop(get, null):Float;
+	
+	private var _paddingBottom:Float;
+	public var paddingBottom(get, null):Float;
 	
 	public var y:Float = 0;
 	public var x:Float = 0;
@@ -40,12 +46,14 @@ class Line
 	
 	public function new() { }	
 	
-	public function setRiseFall(rise:Float, fall:Float, leading:Float) 
+	public function setMetrics(rise:Float, fall:Float, leading:Float, paddingTop:Float, paddingBottom:Float) 
 	{
 		_height = rise + fall;
 		_rise = rise;
 		_fall = fall;
 		_leading = leading;
+		_paddingTop = paddingTop;
+		_paddingBottom = paddingBottom;
 	}
 	
 	function get_height():Float 
@@ -66,6 +74,16 @@ class Line
 	function get_leading():Float 
 	{
 		return _leading;
+	}
+	
+	function get_paddingTop():Float 
+	{
+		return _paddingTop;
+	}
+	
+	function get_paddingBottom():Float 
+	{
+		return _paddingBottom;
 	}
 	
 	/*public function calcHeight():Void 

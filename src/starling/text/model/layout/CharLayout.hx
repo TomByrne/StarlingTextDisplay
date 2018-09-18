@@ -193,6 +193,7 @@ class CharLayout extends EventDispatcher
 				closestChar = char;
 			}
 		}
+		var endChar = this.endChar; // calling getter validates endChar
 		return (allowEndChar || closestChar!=endChar ? closestChar : null);
 	}
 	
@@ -365,9 +366,13 @@ class CharLayout extends EventDispatcher
 	function findLineHeight() 
 	{
 		lines = new Array<Line>();
+		
 		var rise:Float = Math.NaN;
 		var fall:Float = Math.NaN;
 		var leading:Float = Math.NaN;
+		var top:Float = Math.NaN;
+		var bottom:Float = Math.NaN;
+		
 		var line:Line = null;
 		var lineStack:Float = 0;
 		var lastFont:BitmapFont = null;
@@ -375,7 +380,7 @@ class CharLayout extends EventDispatcher
 			var char:Char = allCharacters[i];
 			if (char.lineNumber >= lines.length) {
 				if (line != null){
-					lineStack = finishLine(line, rise, fall, leading, lineStack);
+					lineStack = finishLine(line, rise, fall, leading, lineStack, top, bottom, lines.length == 1, false);
 				}
 				
 				line = new Line();
@@ -384,6 +389,8 @@ class CharLayout extends EventDispatcher
 				rise = Math.NaN;
 				fall = Math.NaN;
 				leading = Math.NaN;
+				top = Math.NaN;
+				bottom = Math.NaN;
 				lastFont = null;
 			}
 			char.line = line;
@@ -405,25 +412,43 @@ class CharLayout extends EventDispatcher
 				}
 				lastFont = char.font;
 			}
+			
+			if (char.bitmapChar != null && !char.isEndChar && !char.isWhitespace){
+				var charTop:Float = (char.bitmapChar.yOffset * char.scale);
+				var charBottom:Float = ((char.bitmapChar.yOffset + char.bitmapChar.height) * char.scale);
+					
+				if (Math.isNaN(top)){
+					top = charTop;
+					bottom = charBottom;
+				}else{
+					if (top > charTop) top = charTop;
+					if (bottom < charBottom) bottom = charBottom;
+				}
+			}
+			
 			line.chars.push(char);
 		}
 		if (line != null){
-			finishLine(line, rise, fall, leading, lineStack);
+			finishLine(line, rise, fall, leading, lineStack, top, bottom, lines.length == 1, true);
 		}
 	}
 	
-	function finishLine(line:Line, rise:Float, fall:Float, leading:Float, lineStack:Float) : Float 
+	function finishLine(line:Line, rise:Float, fall:Float, leading:Float, lineStack:Float, top:Float, bottom:Float, first:Bool, last:Bool) : Float 
 	{
 		lineStack += leading;
-		line.setRiseFall(rise, fall, leading);
+		
+		var paddingTop:Float = (Math.isNaN(top) ? 0 : top);
+		var paddingBottom:Float = (Math.isNaN(bottom) ? 0 : (rise + fall) - bottom);
+		
+		line.setMetrics(rise, fall, leading, paddingTop, paddingBottom);
 		line.y = lineStack;
+		
 		lineStack += line.height;
 		return lineStack;
 	}
 	
 	function setLinePositions() 
 	{
-		var lastYOffset:Float = Math.NaN;
 		for (i in 0...allCharacters.length) 
 		{
 			var char:Char = allCharacters[i];
@@ -441,44 +466,48 @@ class CharLayout extends EventDispatcher
 	
 	function calcTextSize() : Bool
 	{
-		var bounds:Rectangle = new Rectangle();
+		var boundsX:Float = 0;
+		var boundsY:Float = 0;
+		var boundsW:Float = 0;
+		var boundsH:Float = 0;
+		
 		for (i in 0...lines.length) 
 		{
 			var line = lines[i];
-			if (bounds.width < line.width) {
-				bounds.width = line.width;
+			if (boundsW < line.width) {
+				boundsW = line.width;
 			}
 		}
 		
 		if (lines.length > 0) {
 			var firstLine = lines[0];
 			var lastLine = lines[lines.length-1];
-			bounds.x = firstLine.x;
-			bounds.y = firstLine.y;
-			bounds.height = (lastLine.y - firstLine.y) + lastLine.height;
+			boundsX = firstLine.x;
+			boundsY = firstLine.y + firstLine.paddingTop;// + firstLine.rise - firstLine.top;
+			boundsH = (lastLine.y + lastLine.height - lastLine.paddingBottom) - boundsY;
 		}
 		
 		var hasChanged:Bool = true;
-		if (textDisplay._textBounds.width == bounds.width && textDisplay._textBounds.height == bounds.height) hasChanged = false;
-		textDisplay._textBounds.setTo(bounds.x, bounds.y, bounds.width, bounds.height);
+		if (textDisplay._textBounds.width == boundsW && textDisplay._textBounds.height == boundsH) hasChanged = false;
+		textDisplay._textBounds.setTo(boundsX, boundsY, boundsW, boundsH);
 		return hasChanged;
 	}
 	
 	function align() 
 	{
-		
+		var textY:Float = textDisplay._textBounds.y;
 		var textHeight:Float = textDisplay._textBounds.height;
 		
-		var alignOffsetY:Float = 0;
+		var alignOffsetY:Float = -textY;
 		if (textDisplay.targetHeight != null){
 			if (textDisplay.vAlign == VAlign.CENTER){
-				alignOffsetY = (textDisplay.targetHeight - textHeight) / 2;
+				alignOffsetY += (textDisplay.targetHeight - textHeight) / 2;
 			}
 			else if (textDisplay.vAlign == VAlign.BOTTOM) {
-				alignOffsetY = textDisplay.targetHeight - textHeight;
+				alignOffsetY += textDisplay.targetHeight - textHeight;
 			}
 		}
-		alignOffsetY -= lines[0].leading;
+		//alignOffsetY -= lines[0].leading;
 		
 		var widestLine:Float = 0;
 		for (i in 0 ... lines.length) 
@@ -491,7 +520,6 @@ class CharLayout extends EventDispatcher
 		
 		var targetWidth:Float = (textDisplay.autoSize == TextFieldAutoSize.HORIZONTAL || textDisplay.autoSize == TextFieldAutoSize.BOTH_DIRECTIONS ? textDisplay.textWidth : textDisplay.targetWidth);
 		
-		var smallestYOffset:Float = Math.NaN;
 		for (i in 0 ... lines.length) 
 		{
 			var line = lines[i];
@@ -536,18 +564,6 @@ class CharLayout extends EventDispatcher
 				else char.x += lineOffset;
 				
 				char.y += alignOffsetY;
-				
-				if (char.width > 1 && char.bitmapChar != null){
-					var offset = (char.bitmapChar.yOffset * char.scale) / 2;
-					if (Math.isNaN(smallestYOffset) || smallestYOffset > offset){
-						smallestYOffset = offset;
-					}
-				}
-			}
-		}
-		if(!Math.isNaN(smallestYOffset)){
-			for (line in lines){
-				line.y += smallestYOffset;
 			}
 		}
 	}

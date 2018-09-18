@@ -31,6 +31,9 @@ class Char
 	@:allow(starling.text)
 	private var isEndChar:Bool = false;
 	
+	@:allow(starling.text)
+	private var isWhitespace:Bool = false;
+	
 	
 	public var bitmapChar:BitmapChar;
 	public var font:BitmapFont;
@@ -46,6 +49,7 @@ class Char
 		this.id = character.charCodeAt(0);
 		this.character = character;
 		this.index = index;
+		this.isWhitespace = (character == ' ' || character == '\r' || character == '\n'  || character == '\t');
 	}
 	
 	
