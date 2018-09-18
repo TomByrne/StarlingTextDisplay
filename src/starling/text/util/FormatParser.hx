@@ -16,6 +16,9 @@ class FormatParser
 	//static var AttPool:Array<FormatAttribute> = [];
 	
 	
+	static var incompatibleCheck = new InputFormat();
+	
+	
 	public static function recycleNodes(nodes:Array<FormatNode>):Void
 	{
 		for(node in nodes){
@@ -81,6 +84,19 @@ class FormatParser
 						}
 					}
 					j--;
+				}
+				
+				if (node.children.length == 1){
+					var child = node.children[0];
+					InputFormatHelper.copyActiveValues(node.format, child.format);
+					
+					// TODO: shouldn't have to do this, should already be same
+					node.startIndex = child.startIndex;
+					node.endIndex = child.endIndex;
+					node.value = child.value;
+					
+					node.children = child.children;
+					child.parent = null;
 				}
 			}
 			
@@ -598,7 +614,7 @@ class FormatParser
 		var returnFormat = new InputFormat();
 		if (nodes.length == 0 || begin < 0) return returnFormat;
 		
-		var incompatibleCheck = new InputFormat();
+		incompatibleCheck.clear();
 		
 		if (end == begin) end++;
 		if (end > textDisplay.contentModel.characters.length) {

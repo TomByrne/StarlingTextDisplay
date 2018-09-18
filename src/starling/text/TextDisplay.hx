@@ -264,6 +264,7 @@ class TextDisplay extends DisplayObjectContainer
 	{
 		if (begin == null && end == null) formatModel.setDefaults(inputFormat);
 		contentModel.setFormat(inputFormat, begin, end);
+		FormatParser.mergeNodes(contentModel.nodes);
 		markForUpdate();
 		dispatchEvent(new Event(Event.CHANGE));
 	}
