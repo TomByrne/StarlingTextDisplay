@@ -1,7 +1,10 @@
 package starling.text.util;
 
+#if (haxe_ver>=4)
 import haxe.ds.List;
 import haxe.ds.Map;
+#end
+
 import openfl.Vector;
 import openfl.display.Bitmap;
 import openfl.display.BitmapData;
