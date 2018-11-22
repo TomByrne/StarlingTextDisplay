@@ -1,6 +1,6 @@
 package starling.text.control.input;
 
-import com.imagination.util.time.EnterFrame;
+import imagsyd.time.EnterFrame;
 import js.Browser;
 import js.html.ClipboardEvent;
 import js.html.InputElement;

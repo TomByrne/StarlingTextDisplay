@@ -1,8 +1,7 @@
 package starling.text.control.input;
 
-import com.imagination.core.managers.touch.TouchManager;
-import com.imagination.util.geom.Point;
-import com.imagination.util.time.EnterFrame;
+import imagsyd.geom.Point;
+import imagsyd.time.EnterFrame;
 import openfl.Lib;
 import openfl.Vector;
 import openfl.events.MouseEvent;

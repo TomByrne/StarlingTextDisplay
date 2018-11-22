@@ -3,7 +3,7 @@ package starling.text.display;
 import openfl.events.TimerEvent;
 import openfl.utils.Timer;
 
-import com.imagination.util.geom.Matrix;
+import imagsyd.geom.Matrix;
 
 import starling.text.model.format.InputFormat;
 import starling.text.model.layout.Char;

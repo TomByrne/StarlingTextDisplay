@@ -1,7 +1,5 @@
 package starling.text.control.history;
 
-import com.imagination.util.ds.LinkedList;
-import com.imagination.util.ds.LinkedList.LinkedListItem;
 import openfl.ui.Keyboard;
 import starling.events.Event;
 import starling.text.model.layout.CharLayout;

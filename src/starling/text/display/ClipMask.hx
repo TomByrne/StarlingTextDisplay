@@ -1,6 +1,6 @@
 package starling.text.display;
 
-import com.imagination.util.time.EnterFrame;
+import imagsyd.time.EnterFrame;
 import starling.display.Quad;
 import starling.events.Event;
 

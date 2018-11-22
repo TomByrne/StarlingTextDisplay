@@ -1,8 +1,8 @@
 package starling.text.control.input;
 
-import com.imagination.util.signals.Signal.Signal0;
-import com.imagination.util.signals.Signal.Signal1;
-import com.imagination.util.time.EnterFrame;
+import imagsyd.signals.Signal.Signal0;
+import imagsyd.signals.Signal.Signal1;
+import imagsyd.time.EnterFrame;
 import openfl.system.Capabilities;
 import openfl.ui.Keyboard;
 import starling.text.model.layout.CharLayout;

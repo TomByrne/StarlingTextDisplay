@@ -1,6 +1,6 @@
 package starling.utils;
 
-import com.imagination.util.time.EnterFrame;
+import imagsyd.time.EnterFrame;
 
 /**
  * Creates an update loop.
