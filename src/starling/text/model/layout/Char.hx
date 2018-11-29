@@ -4,7 +4,7 @@ import starling.text.BitmapChar;
 import starling.text.BitmapFont;
 import starling.text.model.format.InputFormat;
 
-using Logger;
+
 
 /**
  * ...
