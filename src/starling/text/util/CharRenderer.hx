@@ -128,7 +128,7 @@ class CharRenderer
 			}
 		}
 		
-		if(textDisplay.color != -1) setColor(textDisplay.color);
+		if(textDisplay.color != -1 && textDisplay.color != null) setColor(textDisplay.color);
 	}
 	
 	/*function clearImages() 

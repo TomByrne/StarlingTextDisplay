@@ -80,7 +80,7 @@ class TextDisplay extends DisplayObjectContainer
 	//private var eventForwarder:EventForwarder;
 	private var clickFocus:ClickFocus;
 	
-	@:isVar public var color(get, set):Int = 0xFFFFFFFF;
+	@:isVar public var color(get, set):Null<UInt> = null;
 	
 	private var _value:String = "";
 	@:allow(starling.text) var value(get, set):String;
@@ -676,7 +676,7 @@ class TextDisplay extends DisplayObjectContainer
 		return color;
 	}
 	
-	function set_color(value:Int):Int 
+	function set_color(value:Null<UInt>):Null<UInt> 
 	{
 		charRenderer.setColor(value);
 		return color = value;
