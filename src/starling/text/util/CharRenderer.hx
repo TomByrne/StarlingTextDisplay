@@ -58,6 +58,8 @@ class CharRenderer
 	public function setColor(color:Null<UInt>):Void
 	{
 		this.color = color;
+		
+		if (color == null) color = 0;
 		#if starling2
 		for (quadBatch in quadBatches) 
 		{
