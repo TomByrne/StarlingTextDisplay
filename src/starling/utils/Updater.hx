@@ -25,7 +25,7 @@ class Updater
 	{
 		if (pendingUpdate) return;
 		pendingUpdate = true;
-		if(active) EnterFrame.signal.addOnceWithPriority(doUpdate, -heirarchyDepth);
+		if(active) EnterFrame.signal.add(doUpdate, true, -heirarchyDepth);
 	}
 	
 	function doUpdate() 
