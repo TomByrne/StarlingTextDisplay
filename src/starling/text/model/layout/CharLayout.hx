@@ -45,6 +45,15 @@ class CharLayout extends EventDispatcher
 	var limitReached:Bool;
 	
 	var defaultChar:Char;
+
+	@:isVar public var snapCharsTo(default, set):Float = 0;
+	function set_snapCharsTo(value:Float) : Float
+	{
+		if(this.snapCharsTo == value) return value;
+		this.snapCharsTo = value;
+		textDisplay.markForUpdate();
+		return value;
+	}
 	
 	public var characters = new Array<Char>();
 	public var allCharacters:Array<Char>;
@@ -456,7 +465,7 @@ class CharLayout extends EventDispatcher
 			
 			var scale = char.scale;
 			
-			char.y = char.line.y + char.line.rise;
+			char.y = snap(char.line.y + char.line.rise);
 			char.y -= char.font.baseline * scale;
 			if (char.format.baseline != null) char.y += char.format.baseline;
 			
@@ -508,6 +517,8 @@ class CharLayout extends EventDispatcher
 			}
 		}
 		//alignOffsetY -= lines[0].leading;
+
+		alignOffsetY = snap(alignOffsetY);
 		
 		var widestLine:Float = 0;
 		for (i in 0 ... lines.length) 
@@ -564,8 +575,18 @@ class CharLayout extends EventDispatcher
 				else char.x += lineOffset;
 				
 				char.y += alignOffsetY;
+				char.x = snap(char.x, true);
 			}
 		}
+	}
+
+	function snap(value:Float, ?forwardOnly:Bool):Float
+	{
+		if(snapCharsTo == 0) return value;
+		value = value / snapCharsTo;
+		if(forwardOnly)value = Math.ceil(value);
+		else value = Math.round(value);
+		return value * snapCharsTo;
 	}
 	
 	private function progressLine():Void

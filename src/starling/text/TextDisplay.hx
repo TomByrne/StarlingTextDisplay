@@ -49,6 +49,8 @@ import starling.text.util.FormatParser;
  */
 class TextDisplay extends DisplayObjectContainer
 {
+	static public var defaultSnapCharsTo:Float = 0;
+
 	// DISPLAY
 	@:allow(starling.text) var caret:Caret;
 	@:allow(starling.text) var highlight:Highlight;
@@ -84,6 +86,8 @@ class TextDisplay extends DisplayObjectContainer
 	
 	private var _value:String = "";
 	@:allow(starling.text) var value(get, set):String;
+	
+	public var snapCharsTo(get, set):Float;
 	
 	// Needs testing after refactoring
 	//@:isVar public var text(default, set):String;
@@ -167,7 +171,7 @@ class TextDisplay extends DisplayObjectContainer
 		addEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
 		addEventListener(Event.REMOVED_FROM_STAGE, onRemovedToStage);
 		
-		
+		this.snapCharsTo = defaultSnapCharsTo;
 	}
 	private function onAddedToStage(e:Event):Void 
 	{
@@ -489,6 +493,8 @@ class TextDisplay extends DisplayObjectContainer
 		return value;
 	}
 	
+	private function get_snapCharsTo():Float				{ return charLayout.snapCharsTo; }
+	private function set_snapCharsTo(value:Float):Float		{ return charLayout.snapCharsTo = value; }
 	
 	private function get_vAlign():String					{ return alignment.vAlign; }
 	private function set_vAlign(value:String):String		{ return alignment.vAlign = value; }
