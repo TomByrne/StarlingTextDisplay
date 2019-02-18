@@ -21,7 +21,7 @@ import starling.text.display.Links;
 import starling.text.model.format.TextWrapping;
 import starling.utils.SpecialChar;
 import starling.utils.Updater;
-//import starling.text.control.input.EventForwarder;
+import starling.text.control.input.EventForwarder;
 import starling.text.control.input.SoftKeyboardIO;
 import starling.text.control.BoundsControl;
 import starling.text.model.content.ContentModel;
@@ -77,7 +77,7 @@ class TextDisplay extends DisplayObjectContainer
 	private var mouseInput:MouseInput;
 	private var softKeyboardIO:SoftKeyboardIO;
 	private var historyControl:HistoryControl;
-	//private var eventForwarder:EventForwarder;
+	private var eventForwarder:EventForwarder;
 	private var clickFocus:ClickFocus;
 	
 	@:isVar public var color(get, set):Null<UInt> = null;
@@ -227,6 +227,7 @@ class TextDisplay extends DisplayObjectContainer
 		softKeyboardIO = new SoftKeyboardIO(this);
 		keyboardShortcuts = new KeyboardShortcuts(this);
 		keyboardInput = new KeyboardInput(this);
+		eventForwarder = new EventForwarder(this);
 		mouseInput = new MouseInput(this);
 		clickFocus = new ClickFocus(this);
 	}
@@ -558,7 +559,7 @@ class TextDisplay extends DisplayObjectContainer
 			
 			createEditability();
 			
-			keyboardInput.active = keyboardShortcuts.active = caret.active = hasFocus;
+			eventForwarder.active = keyboardInput.active = keyboardShortcuts.active = caret.active = hasFocus;
 			mouseInput.active = true;
 			if (highlight != null) highlight.visible = true;
 			if (historyControl != null) historyModel.active = hasFocus;
@@ -566,6 +567,7 @@ class TextDisplay extends DisplayObjectContainer
 		}
 		else {
 			if(editabilitySetup){
+				eventForwarder.active = false;
 				keyboardInput.active = false;
 				keyboardShortcuts.active = false;
 				mouseInput.active = false;

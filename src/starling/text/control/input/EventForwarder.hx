@@ -48,7 +48,7 @@ class EventForwarder
 	{
 		textDisplay.dispatchEvent(convertKeyboardEvent(e));
 		//e.stopPropagation();
-		e.preventDefault();
+		//e.preventDefault();
 	}
 	
 	function convertKeyboardEvent(e:KeyboardEvent) : StarlingKeyboardEvent
