@@ -103,8 +103,10 @@ class CharRenderer
 						
 						image.x = char.x;
 						image.y = char.y;
+						image.rotation = char.rotation;
 						
-						if (color == null) image.color = char.format.color;
+						if (char.color != null) image.color = char.color;
+						else if (color == null) image.color = char.format.color;
 						else image.color = color;
 						
 						//image.touchable = false;
