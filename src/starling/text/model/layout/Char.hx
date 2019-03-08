@@ -58,6 +58,8 @@ class Char
 	{
 		x = 0;
 		y = 0;
+		rotation = 0;
+		color = null;
 		lineNumber = 0;
 		charLinePositionX = 0;
 		character = null;
