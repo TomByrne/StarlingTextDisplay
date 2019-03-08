@@ -1,5 +1,6 @@
 package starling.text.model.history;
-import imagsyd.signals.Signal.Signal0;
+
+import signal.Signal;
 
 /**
  * ...

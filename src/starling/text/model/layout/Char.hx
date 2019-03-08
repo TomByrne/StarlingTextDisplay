@@ -3,7 +3,6 @@ package starling.text.model.layout;
 import starling.text.BitmapChar;
 import starling.text.BitmapFont;
 import starling.text.model.format.InputFormat;
-import color.Color;
 
 
 /**
@@ -15,7 +14,7 @@ class Char
 	public var x:Float = 0;
 	public var y:Float = 0;
 	public var rotation:Float = 0;
-	public var color:Color;
+	public var color:UInt;
 	public var width(get, null):Float = 0;
 	public var height(get, null):Float = 0;
 	public var lineNumber:Int = 0;

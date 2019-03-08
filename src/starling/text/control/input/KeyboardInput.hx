@@ -1,8 +1,8 @@
 package starling.text.control.input;
 
-import imagsyd.signals.Signal.Signal0;
-import imagsyd.signals.Signal.Signal1;
-import imagsyd.time.EnterFrame;
+import starling.time.Tick;
+import signal.Signal;
+import signal.Signal1;
 import openfl.system.Capabilities;
 import openfl.ui.Keyboard;
 import starling.text.model.layout.CharLayout;
@@ -70,7 +70,7 @@ class KeyboardInput
 			else if (e.charCode != 0 && !e.ctrlKey) {
 				#if js
 					jsCapsLock.check();
-					EnterFrame.delay(DelayInput.bind(e));
+					Tick.once(DelayInput.bind(e));
 				#else
 					textDisplay.replaceSelection(String.fromCharCode(e.charCode));
 				#end

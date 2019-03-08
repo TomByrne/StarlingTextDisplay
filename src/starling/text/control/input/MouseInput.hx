@@ -1,7 +1,6 @@
 package starling.text.control.input;
 
-import imagsyd.geom.Point;
-import imagsyd.time.EnterFrame;
+import openfl.geom.Point;
 import openfl.Lib;
 import openfl.Vector;
 import openfl.events.MouseEvent;
@@ -21,6 +20,7 @@ import starling.text.model.layout.Char;
 import starling.text.model.layout.CharLayout;
 import starling.text.model.selection.Selection;
 import starling.text.model.layout.Word;
+import starling.time.Tick;
 
 /**
  * ...
@@ -55,7 +55,7 @@ class MouseInput
 	{
 		if (TextDisplay.focus != null) return;
 		pendingRemoveFocus = RemoveFocus.bind(TextDisplay.focus);
-		EnterFrame.delay(RemoveFocus.bind(TextDisplay.focus));
+		Tick.once(RemoveFocus.bind(TextDisplay.focus));
 	}
 	
 	static private function RemoveFocus(wasFocus:TextDisplay) 
@@ -141,7 +141,7 @@ class MouseInput
 	private function OnBegin(touch:Touch) 
 	{
 		if (pendingRemoveFocus != null){
-			EnterFrame.remove(pendingRemoveFocus);
+			Tick.remove(pendingRemoveFocus);
 			pendingRemoveFocus = null;
 		}
 		

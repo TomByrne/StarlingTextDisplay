@@ -6,6 +6,7 @@ import starling.text.model.layout.Line;
 import starling.display.Canvas;
 import starling.display.DisplayObjectContainer;
 import starling.events.Event;
+import starling.events.TextDisplayEvent;
 
 /**
  * ...
@@ -27,7 +28,7 @@ class Highlight extends DisplayObjectContainer
 		
 		textDisplay.selection.addEventListener(Event.SELECT, OnSelectionChange);
 		textDisplay.charLayout.addEventListener(Event.CHANGE, OnSelectionChange);
-		textDisplay.addEventListener(Event.FOCUS_CHANGE, OnFocusChange);
+		textDisplay.addEventListener(TextDisplayEvent.FOCUS_CHANGE, OnFocusChange);
 		
 	}
 	

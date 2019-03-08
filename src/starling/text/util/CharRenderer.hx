@@ -15,7 +15,7 @@ import starling.text.model.layout.Char;
 import starling.display.Image;
 import starling.display.Image;
 
-#if starling2
+#if (starling >= "2.0.0")
 	import starling.display.MeshBatch;
 #else
 	import starling.display.QuadBatch;
@@ -32,7 +32,7 @@ import starling.textures.Texture;
  * @author P.J.Shand
  */
 
-#if starling2
+#if (starling >= "2.0.0")
 	typedef QuadBatch = MeshBatch;
 #end
 
@@ -60,7 +60,7 @@ class CharRenderer
 		this.color = color;
 		
 		if (color == null) color = 0;
-		#if starling2
+		#if (starling >= "2.0.0")
 		for (quadBatch in quadBatches) 
 		{
 			quadBatch.color = color;
@@ -72,7 +72,7 @@ class CharRenderer
 	{
 		this.characters = characters;
 		for(quadBatch in quadBatches){
-			#if starling2
+			#if (starling >= "2.0.0")
 				quadBatch.clear();
 			#else
 				quadBatch.reset();
@@ -122,7 +122,7 @@ class CharRenderer
 							else textDisplay.addChild(quadBatch); 
 							quadBatches[char.format.face] = quadBatch;
 						}
-						#if starling2
+						#if (starling >= "2.0.0")
 							quadBatch.addMesh(image);
 						#else
 							quadBatch.addImage(image);

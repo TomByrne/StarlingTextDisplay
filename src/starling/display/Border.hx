@@ -1,6 +1,8 @@
 package starling.display;
 
-#if starling2
+import starling.utils.Updater;
+
+#if (starling>="2.0.0")
 
 import starling.display.MeshBatch;
 import starling.rendering.Painter;
@@ -28,7 +30,7 @@ class Border extends MeshBatch
 	var bottom:Quad;
 	var left:Quad;
 	var right:Quad;
-	var invalid:Bool = true;
+	var updater:Updater;
 	
 	var _width:Float;
 	var _height:Float;
@@ -37,6 +39,8 @@ class Border extends MeshBatch
 	public function new(width:Float = 100, height:Float = 100, color:UInt = 0xffffff, thickness:Float = 1, position:BorderPosition = BorderPosition.INSIDE) 
 	{
 		super();
+
+		updater = new Updater(update);
 		
 		batchable = true;
 		touchable = false;
@@ -53,86 +57,58 @@ class Border extends MeshBatch
 		this.position = position;
 	}
 	
-#if starling2
-
-	override public function render(painter:Painter):Void 
+	function update()
 	{
+		clear();
 		
-#else
-
-	function addMesh(q:Quad) addQuad(q);
-	function clear() reset();
-	
-	override public function render(support:RenderSupport, parentAlpha:Float):Void 
-	{
+		top.color = _borderColor;
+		bottom.color = _borderColor;
+		left.color = _borderColor;
+		right.color = _borderColor;
 		
-#end
-
-		if (invalid){
-			clear();
-			
-			top.color = _borderColor;
-			bottom.color = _borderColor;
-			left.color = _borderColor;
-			right.color = _borderColor;
-			
-			var l:Float = 0;
-			var t:Float = 0;
-			var r:Float = _width;
-			var b:Float = _height;
-			
-			switch(position){
-				case OUTSIDE:
-					l -= thickness;
-					t -= thickness;
-					r += thickness;
-					b += thickness;
-				case CENTER:
-					l -= thickness / 2;
-					t -= thickness / 2;
-					r += thickness / 2;
-					b += thickness / 2;
-				case INSIDE:
-					// ignore
-			}
-			
-			top.x = l;
-			top.y = t;
-			top.width = r - l;
-			top.height = thickness;
-			addMesh(top);
-			
-			left.x = l;
-			left.y = t + thickness;
-			left.width = thickness;
-			left.height = b - t - thickness * 2;
-			addMesh(left);
-			
-			bottom.x = l;
-			bottom.y = b - thickness;
-			bottom.width = r - l;
-			bottom.height = thickness;
-			addMesh(bottom);
-			
-			right.x = r - thickness;
-			right.y = t + thickness;
-			right.width = thickness;
-			right.height = b - t - thickness * 2;
-			addMesh(right);
-			
-			invalid = false;
+		var l:Float = 0;
+		var t:Float = 0;
+		var r:Float = _width;
+		var b:Float = _height;
+		
+		switch(position){
+			case OUTSIDE:
+				l -= thickness;
+				t -= thickness;
+				r += thickness;
+				b += thickness;
+			case CENTER:
+				l -= thickness / 2;
+				t -= thickness / 2;
+				r += thickness / 2;
+				b += thickness / 2;
+			case INSIDE:
+				// ignore
 		}
 		
-	
-#if starling2
-
-		super.render(painter);
+		top.x = l;
+		top.y = t;
+		top.width = r - l;
+		top.height = thickness;
+		addMesh(top);
 		
-#else
-	
-		super.render(support, parentAlpha);
+		left.x = l;
+		left.y = t + thickness;
+		left.width = thickness;
+		left.height = b - t - thickness * 2;
+		addMesh(left);
 		
-#end
+		bottom.x = l;
+		bottom.y = b - thickness;
+		bottom.width = r - l;
+		bottom.height = thickness;
+		addMesh(bottom);
+		
+		right.x = r - thickness;
+		right.y = t + thickness;
+		right.width = thickness;
+		right.height = b - t - thickness * 2;
+		addMesh(right);
 	}
 	
 	override function get_width():Float 
@@ -143,7 +119,7 @@ class Border extends MeshBatch
 	{
 		if (_width == value) return value;
 		_width = value;
-		invalid = true;
+		updater.markForUpdate();
 		return value;
 	}
 	
@@ -155,7 +131,7 @@ class Border extends MeshBatch
 	{
 		if (_height == value) return value;
 		_height = value;
-		invalid = true;
+		updater.markForUpdate();
 		return value;
 	}
 	
@@ -163,21 +139,21 @@ class Border extends MeshBatch
 	{
 		if (position == value) return value;
 		position = value;
-		invalid = true;
+		updater.markForUpdate();
 		return value;
 	}
 	function set_thickness(value:Float):Float 
 	{
 		if (thickness == value) return value;
 		thickness = value;
-		invalid = true;
+		updater.markForUpdate();
 		return value;
 	}
 	function set_borderColor(value:UInt):UInt 
 	{
 		if (_borderColor == value) return value;
 		_borderColor = value;
-		invalid = true;
+		updater.markForUpdate();
 		return value;
 	}
 }

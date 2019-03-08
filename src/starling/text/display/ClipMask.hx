@@ -1,10 +1,11 @@
 package starling.text.display;
 
-import imagsyd.time.EnterFrame;
+import starling.time.Tick;
 import starling.display.Quad;
 import starling.events.Event;
+import starling.events.TextDisplayEvent;
 
-#if starling2
+#if (starling >= "2.0.0")
 
 #else
 	import starling.utils.VAlign;
@@ -34,7 +35,7 @@ class ClipMask extends Quad
 	private function UpdateMark(e:Event):Void 
 	{
 		Update();
-		EnterFrame.delay(Update, 2);
+		Tick.once(Update, 2);
 	}
 	
 	public function Update():Void 

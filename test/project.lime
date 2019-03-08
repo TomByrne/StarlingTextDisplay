@@ -1,0 +1,26 @@
+
+<?xml version="1.0" encoding="utf-8"?>
+<project>
+	<meta title="Text Display Test" package="imagsyd.textdisplay.test"/>
+	<app file="TextDisplayTest" main="TextDisplayTest" path="bin"/>
+
+	<window width="0" height="0" orientation="landsacpe" background="0xffffff" />
+	<window depth-buffer="true" stencil-buffer="true" />
+	
+	<source path="src"/>
+	<source path="../src"/>
+
+    <haxelib name="lime" version="7.2.0"/>
+    <haxelib name="openfl" version="8.8.0"/>
+	<haxelib name="starling" version="2.4.1"/>
+	<haxelib name="haxeui-core" version="0.0.4"/>
+	<haxelib name="haxeui-openfl" version="0.0.2"/>
+	<haxelib name="hscript" version="2.3.0"/>
+	<haxelib name="actuate" version="1.8.9"/>
+	<haxelib name="SvgBitmapFont" version="0.0.1"/>
+	<haxelib name="signals" version="1.0.9"/>
+	<haxelib name="utils" version="1.0.2"/>
+	
+	<haxedef name="source-map-content"/>
+
+</project>

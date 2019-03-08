@@ -5,6 +5,7 @@ import starling.display.Quad;
 import starling.display.Sprite;
 import starling.events.Event;
 import starling.utils.VAlign;
+import starling.events.TextDisplayEvent;
 
 /**
  * ...
@@ -23,8 +24,8 @@ class BoundsControl extends Border
 		
 		this.textDisplay = textDisplay;
 		
-		textDisplay.addEventListener(TextDisplayEvent.SIZE_CHANGE, OnLayoutChange);
-		textDisplay.charLayout.addEventListener(Event.RESIZE, OnLayoutChange);
+		//textDisplay.addEventListener(TextDisplayEvent.SIZE_CHANGE, OnLayoutChange);
+		textDisplay.addEventListener(Event.RESIZE, OnLayoutChange);
 	}
 	
 	
@@ -54,8 +55,8 @@ class BoundsControl extends Border
 	
 	function resizeBoundsBorder() 
 	{
-		textDisplay.boundsBorder.width = textDisplay.targetWidth;
-		textDisplay.boundsBorder.height = textDisplay.targetHeight;
+		textDisplay.boundsBorder.width = textDisplay.actualWidth;
+		textDisplay.boundsBorder.height = textDisplay.actualHeight;
 	}
 	
 	function resizeTextBorder() 

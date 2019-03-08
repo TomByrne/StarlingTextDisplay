@@ -1,10 +1,10 @@
 package starling.text.control.input;
 
-import imagsyd.time.EnterFrame;
 import js.Browser;
 import js.html.ClipboardEvent;
 import js.html.InputElement;
 import starling.events.Event;
+import starling.time.Tick;
 
 /**
  * ...
@@ -77,7 +77,7 @@ class JSCopyPaste
 	function OnInputPaste(e:ClipboardEvent) 
 	{
 		input.value = "";
-		EnterFrame.delay(PasteOnNextFrame);
+		Tick.once(PasteOnNextFrame);
 	}
 	
 	function PasteOnNextFrame() 
@@ -93,7 +93,7 @@ class JSCopyPaste
 	{
 		if (ignoreChanges) return;
 		input.focus();
-		EnterFrame.delay(NextFrameSelectionChange.bind(focusedTextDisplay.getSelectedText()));
+		Tick.once(NextFrameSelectionChange.bind(focusedTextDisplay.getSelectedText()));
 	}
 	
 	function NextFrameSelectionChange(value:String) 

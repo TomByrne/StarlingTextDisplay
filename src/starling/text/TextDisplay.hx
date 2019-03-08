@@ -5,6 +5,7 @@ import starling.display.Border;
 import starling.display.DisplayObjectContainer;
 import starling.display.Quad;
 import starling.events.Event;
+import starling.events.TextDisplayEvent;
 import starling.events.EventDispatcher;
 import starling.text.TextFieldAutoSize;
 import starling.text.control.ChangeControl;
@@ -36,7 +37,7 @@ import starling.text.model.layout.Char;
 import starling.text.util.CharRenderer;
 import starling.text.util.FormatParser;
 
-#if starling2
+#if (starling >= "2.0.0")
 
 #else
 	import starling.utils.HAlign;
@@ -396,7 +397,7 @@ class TextDisplay extends DisplayObjectContainer
 	{
 		if (hasFocus == value) return value;
 		hasFocus = value;
-		dispatchEvent(new Event(Event.FOCUS_CHANGE));
+		dispatchEvent(new TextDisplayEvent(TextDisplayEvent.FOCUS_CHANGE));
 		UpdateActive();
 		return hasFocus;
 	}

@@ -5,7 +5,7 @@ import openfl.geom.Rectangle;
 import openfl.text.TextField;
 import openfl.text.TextFieldType;
 import starling.core.Starling;
-import starling.events.Event;
+import starling.events.TextDisplayEvent;
 import starling.text.TextDisplay;
 
 /**
@@ -32,10 +32,10 @@ class SoftKeyboardIO
 			nativeTextField.needsSoftKeyboard = true;
 		}
 		
-		textDisplay.addEventListener(starling.events.Event.FOCUS_CHANGE, OnFocusChange);
+		textDisplay.addEventListener(TextDisplayEvent.FOCUS_CHANGE, OnFocusChange);
 	}
 	
-	private function OnFocusChange(e:starling.events.Event):Void 
+	private function OnFocusChange(e:TextDisplayEvent):Void 
 	{
 		if (textDisplay.hasFocus == hasFocus) return;
 		hasFocus = textDisplay.hasFocus;

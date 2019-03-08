@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<vbox width="200" height="100%">
+
+	<textarea id="text" width="100%" height="100" placeholder="Text"/>
+
+	<dropdown id="hAlign" width="100%" text="HAlign">
+		<data>
+			<item value="HAlign: Left" childId="left" />
+			<item value="HAlign: Center" childId="center" />
+			<item value="HAlign: Right" childId="right" />
+		</data>
+	</dropdown>
+
+	<dropdown id="vAlign" width="100%" text="VAlign">
+		<data>
+			<item value="VAlign: Top" childId="top" />
+			<item value="VAlign: Center" childId="center" />
+			<item value="VAlign: Bottom" childId="bottom" />
+		</data>
+	</dropdown>
+
+	<dropdown id="autoSize" width="100%" text="AutoSize">
+		<data>
+			<item value="AutoSize: None" childId="none" />
+			<item value="AutoSize: Both Directions" childId="bothDirections" />
+			<item value="AutoSize: Horizontal" childId="horizontal" />
+			<item value="AutoSize: Vertical" childId="vertical" />
+		</data>
+	</dropdown>
+
+	<label width="100%" text="Width:"/>
+	<hslider id="width" width="100%" height="20" min="50" max="1000"/>
+
+	<label width="100%" text="Height:"/>
+	<hslider id="height" width="100%" height="20" min="50" max="1000"/>
+</vbox>

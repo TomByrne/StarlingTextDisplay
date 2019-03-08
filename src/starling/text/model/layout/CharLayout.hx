@@ -104,22 +104,14 @@ class CharLayout extends EventDispatcher
 			textDisplay._textBounds.x = 0;
 		}
 		
+		var actualWidth:Float = (textDisplay.autoSize == TextFieldAutoSize.BOTH_DIRECTIONS || textDisplay.autoSize == TextFieldAutoSize.HORIZONTAL ? textDisplay.textWidth : textDisplay.targetWidth);
+		var actualHeight:Float = (textDisplay.autoSize == TextFieldAutoSize.BOTH_DIRECTIONS || textDisplay.autoSize == TextFieldAutoSize.VERTICAL ? textDisplay.textHeight : textDisplay.targetHeight);
 		
-		if (textDisplay.autoSize == TextFieldAutoSize.NONE) {
-			textDisplay.actualWidth = textDisplay.targetWidth;
-			textDisplay.actualHeight = textDisplay.targetHeight;
-		}
-		else if (textDisplay.autoSize == TextFieldAutoSize.BOTH_DIRECTIONS) {
-			textDisplay.actualWidth = textDisplay.textWidth;
-			textDisplay.actualHeight = textDisplay.textHeight;
-		}
-		else if (textDisplay.autoSize == TextFieldAutoSize.HORIZONTAL) {
-			textDisplay.actualWidth = textDisplay.textWidth;
-			textDisplay.actualHeight = textDisplay.targetHeight;
-		}
-		else if (textDisplay.autoSize == TextFieldAutoSize.VERTICAL) {
-			textDisplay.actualWidth = textDisplay.targetWidth;
-			textDisplay.actualHeight = textDisplay.textHeight;
+		if(textDisplay.actualWidth != actualWidth || textDisplay.actualHeight != actualHeight)
+		{
+			textDisplay.actualWidth = actualWidth;
+			textDisplay.actualHeight = actualHeight;
+			sizeChange = true;
 		}
 		
 		this.dispatchEvent(changeEvent);

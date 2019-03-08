@@ -1,6 +1,6 @@
 package starling.utils;
 
-import imagsyd.time.EnterFrame;
+import starling.time.Tick;
 
 /**
  * Creates an update loop.
@@ -25,7 +25,7 @@ class Updater
 	{
 		if (pendingUpdate) return;
 		pendingUpdate = true;
-		if(active) EnterFrame.signal.add(doUpdate, true, -heirarchyDepth);
+		if(active) Tick.once(doUpdate, -heirarchyDepth);
 	}
 	
 	function doUpdate() 
@@ -41,7 +41,7 @@ class Updater
 		
 		if (pendingUpdate) {
 			pendingUpdate = false;
-			EnterFrame.remove(doUpdate);
+			Tick.remove(doUpdate);
 		}
 		updateHandler();
 	}

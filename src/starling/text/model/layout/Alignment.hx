@@ -4,7 +4,7 @@ import starling.events.Event;
 import starling.events.EventDispatcher;
 
 
-#if starling2
+#if (starling >= "2.0.0")
 	import starling.utils.Align;
 	typedef HAlign = Align;
 	typedef VAlign = Align;
