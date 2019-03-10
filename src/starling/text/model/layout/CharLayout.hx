@@ -87,22 +87,21 @@ class CharLayout extends EventDispatcher
 		setPlacementX();
 		findWords();
 		findLineHeight();
-		//findLinePositions();
 		setLinePositions();
 		
 		var sizeChange = calcTextSize();
 		this.dispatchEvent(resizeEvent);
 		align();
 		
-		textDisplay._textBounds.x = Math.POSITIVE_INFINITY;
-		if (lines.length > 0) textDisplay._textBounds.y = lines[0].y;
-		for (i in 0...lines.length) 
-		{
-			if (textDisplay._textBounds.x > lines[i].x) textDisplay._textBounds.x = lines[i].x;
-		}
-		if (textDisplay._textBounds.x == Math.POSITIVE_INFINITY) {
-			textDisplay._textBounds.x = 0;
-		}
+		// textDisplay._textBounds.x = Math.POSITIVE_INFINITY;
+		// if (lines.length > 0) textDisplay._textBounds.y = lines[0].y;
+		// for (i in 0...lines.length) 
+		// {
+		// 	if (textDisplay._textBounds.x > lines[i].x) textDisplay._textBounds.x = lines[i].x;
+		// }
+		// if (textDisplay._textBounds.x == Math.POSITIVE_INFINITY) {
+		// 	textDisplay._textBounds.x = 0;
+		// }
 		
 		var actualWidth:Float = (textDisplay.autoSize == TextFieldAutoSize.BOTH_DIRECTIONS || textDisplay.autoSize == TextFieldAutoSize.HORIZONTAL ? textDisplay.textWidth : textDisplay.targetWidth);
 		var actualHeight:Float = (textDisplay.autoSize == TextFieldAutoSize.BOTH_DIRECTIONS || textDisplay.autoSize == TextFieldAutoSize.VERTICAL ? textDisplay.textHeight : textDisplay.targetHeight);
@@ -373,6 +372,7 @@ class CharLayout extends EventDispatcher
 		var leading:Float = Math.NaN;
 		var top:Float = Math.NaN;
 		var bottom:Float = Math.NaN;
+		var lineHeight:Float = Math.NaN;
 		
 		var line:Line = null;
 		var lineStack:Float = 0;
@@ -381,7 +381,7 @@ class CharLayout extends EventDispatcher
 			var char:Char = allCharacters[i];
 			if (char.lineNumber >= lines.length) {
 				if (line != null){
-					lineStack = finishLine(line, rise, fall, leading, lineStack, top, bottom, lines.length == 1, false);
+					lineStack = finishLine(line, lineHeight, rise, fall, leading, lineStack, top, bottom, lines.length == 1, false);
 				}
 				
 				line = new Line();
@@ -392,6 +392,7 @@ class CharLayout extends EventDispatcher
 				leading = Math.NaN;
 				top = Math.NaN;
 				bottom = Math.NaN;
+                lineHeight = Math.NaN;
 				lastFont = null;
 			}
 			char.line = line;
@@ -399,6 +400,7 @@ class CharLayout extends EventDispatcher
 				var scale = char.scale;
 				
 				var charRise = char.font.baseline * scale;
+				var charLineHeight = char.font.lineHeight * scale;
 				var charFall = (char.font.lineHeight - char.font.baseline) * scale;
 				var charLeading = char.format.leading;
 				
@@ -406,10 +408,12 @@ class CharLayout extends EventDispatcher
 					rise = charRise;
 					fall = charFall;
 					leading = charLeading;
+                    lineHeight = charLineHeight;
 				}else{
 					if (rise < charRise) rise = charRise;
 					if (fall < charFall) fall = charFall;
 					if (leading < charLeading) leading = charLeading;
+					if (lineHeight < charLineHeight) lineHeight = charLineHeight;
 				}
 				lastFont = char.font;
 			}
@@ -430,18 +434,18 @@ class CharLayout extends EventDispatcher
 			line.chars.push(char);
 		}
 		if (line != null){
-			finishLine(line, rise, fall, leading, lineStack, top, bottom, lines.length == 1, true);
+			finishLine(line, lineHeight, rise, fall, leading, lineStack, top, bottom, lines.length == 1, true);
 		}
 	}
 	
-	function finishLine(line:Line, rise:Float, fall:Float, leading:Float, lineStack:Float, top:Float, bottom:Float, first:Bool, last:Bool) : Float 
+	function finishLine(line:Line, lineHeight:Float, rise:Float, fall:Float, leading:Float, lineStack:Float, top:Float, bottom:Float, first:Bool, last:Bool) : Float 
 	{
 		lineStack += leading;
 		
 		var paddingTop:Float = (Math.isNaN(top) ? 0 : top);
 		var paddingBottom:Float = (Math.isNaN(bottom) ? 0 : (rise + fall) - bottom);
 		
-		line.setMetrics(rise, fall, leading, paddingTop, paddingBottom);
+		line.setMetrics(lineHeight, rise, fall, leading, paddingTop, paddingBottom);
 		line.y = lineStack;
 		
 		lineStack += line.height;
@@ -488,8 +492,12 @@ class CharLayout extends EventDispatcher
 			boundsH = (lastLine.y + lastLine.height - lastLine.paddingBottom) - boundsY;
 		}
 		
-		var hasChanged:Bool = true;
-		if (textDisplay._textBounds.width == boundsW && textDisplay._textBounds.height == boundsH) hasChanged = false;
+		var hasChanged:Bool = (
+			textDisplay._textBounds.x != boundsX ||
+			textDisplay._textBounds.y != boundsY ||
+			textDisplay._textBounds.width != boundsW ||
+			textDisplay._textBounds.height != boundsH
+		);
 		textDisplay._textBounds.setTo(boundsX, boundsY, boundsW, boundsH);
 		return hasChanged;
 	}
@@ -499,7 +507,7 @@ class CharLayout extends EventDispatcher
 		var textY:Float = textDisplay._textBounds.y;
 		var textHeight:Float = textDisplay._textBounds.height;
 		
-		var alignOffsetY:Float = -textY;
+		var alignOffsetY:Float = 0;//-textY;
 		if (textDisplay.targetHeight != null){
 			if (textDisplay.vAlign == VAlign.CENTER){
 				alignOffsetY += (textDisplay.targetHeight - textHeight) / 2;
@@ -520,9 +528,12 @@ class CharLayout extends EventDispatcher
 				widestLine = line.width;
 			}
 		}
+
 		
 		var targetWidth:Float = (textDisplay.autoSize == TextFieldAutoSize.HORIZONTAL || textDisplay.autoSize == TextFieldAutoSize.BOTH_DIRECTIONS ? textDisplay.textWidth : textDisplay.targetWidth);
 		
+        var minLineOffset:Float = 0;
+
 		for (i in 0 ... lines.length) 
 		{
 			var line = lines[i];
@@ -535,7 +546,11 @@ class CharLayout extends EventDispatcher
 			}
 			else if (textDisplay.hAlign == HAlign.RIGHT || textDisplay.hAlign == HAlign.JUSTIFY) {
 				lineOffset = targetWidth - line.width;
+                trace("lineOffset: "+lineOffset+" "+targetWidth +" "+ line.width);
 			}
+
+            if(i == 0) minLineOffset = lineOffset;
+            else if(minLineOffset > lineOffset) minLineOffset = lineOffset;
 			
 			if (textDisplay.hAlign == HAlign.JUSTIFY){
 				//line.width += lineOffset;
@@ -544,23 +559,13 @@ class CharLayout extends EventDispatcher
 			}
 			line.y += alignOffsetY;
 			
-			/*if (textDisplay.vAlign == VAlign.TOP) {
-				line.y -= line.rise;
-			}
-			else if (textDisplay.vAlign == VAlign.CENTER) {
-				line.y -= (line.largestChar.font.lineHeight - line.largestChar.font.baseline) * line.largestChar.scale * 0.5;
-			}
-			else if (textDisplay.vAlign == VAlign.BOTTOM) {
-				// Do nothing
-			}*/
-			
 			var first = true;
 			var t:Float = 0;
 			for (char in line.chars) 
 			{
 				if (textDisplay.hAlign == HAlign.JUSTIFY) {
-					if (line.validJustify && char.lineNumber < lines.length - 1) {	
-						var t:Float = char.charLinePositionX / (line.chars.length-2);
+					if (line.validJustify || lineOffset < 0) {	
+						var t:Float = char.charLinePositionX / (line.chars.length-1);
 						char.x += lineOffset * t;
 					}
 				}
@@ -570,6 +575,11 @@ class CharLayout extends EventDispatcher
 				char.x = snap(char.x, true);
 			}
 		}
+
+        if(textDisplay.hAlign != HAlign.JUSTIFY)
+            textDisplay._textBounds.x += minLineOffset;
+        textDisplay._textBounds.y += alignOffsetY;
+
 	}
 
 	function snap(value:Float, ?forwardOnly:Bool):Float

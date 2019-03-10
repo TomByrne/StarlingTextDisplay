@@ -19,12 +19,7 @@ class TextDisplayLayer extends Sprite
         format.color = 0x000000;
         
         textDisplay = new TextDisplay();
-        textDisplay.text = 'Testing';
-        textDisplay.showBoundsBorder = true;
-        textDisplay.showTextBorder = true;
         addChild(textDisplay);
-
-        updateFormat();
 
         Models.text.text.bind(textDisplay, 'text');
         
@@ -34,8 +29,19 @@ class TextDisplayLayer extends Sprite
         Models.text.hAlign.bind(textDisplay, 'hAlign');
         Models.text.vAlign.bind(textDisplay, 'vAlign');
         Models.text.autoSize.bind(textDisplay, 'autoSize');
+        
+        Models.text.showTextBorder.bind(textDisplay, 'showTextBorder');
+        Models.text.showBoundsBorder.bind(textDisplay, 'showBoundsBorder');
+        Models.text.clipOverflow.bind(textDisplay, 'clipOverflow');
+        Models.text.smoothing.bind(textDisplay, 'textureSmoothing');
+        
+        Models.text.size.bind(format, 'size');
+        Models.text.size.add(updateFormat);
+        
+        Models.font.selectedFont.bind(format, 'face');
+        Models.font.selectedFont.add(updateFormat);
 
-        //Models.text.hAlign.add(updateFormat);
+        updateFormat();
     }
 
     function updateFormat()

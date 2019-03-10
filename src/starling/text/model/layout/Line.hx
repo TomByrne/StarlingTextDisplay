@@ -46,7 +46,7 @@ class Line
 	
 	public function new() { }	
 	
-	public function setMetrics(rise:Float, fall:Float, leading:Float, paddingTop:Float, paddingBottom:Float) 
+	public function setMetrics(lineHeight:Float, rise:Float, fall:Float, leading:Float, paddingTop:Float, paddingBottom:Float) 
 	{
 		_height = rise + fall;
 		_rise = rise;
@@ -93,7 +93,9 @@ class Line
 	
 	function get_validJustify():Bool 
 	{
+        if(chars.length < 2) return false;
 		var char:Char = chars[chars.length - 1];
+        if (char.isEndChar) return false;
 		if (SpecialChar.isLineBreak(char.character)) return false;
 		return true;
 	}

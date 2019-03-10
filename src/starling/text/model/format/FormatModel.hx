@@ -12,7 +12,7 @@ import starling.text.util.InputFormatHelper;
  */
 class FormatModel
 {
-	@:allow(starling.text) static var miniFont:BitmapFont;
+	@:allow(starling.text) static var baseDefaultFont:BitmapFont;
 	
 	private var textDisplay:TextDisplay;
 	@:allow(starling.text) var defaultFormat:InputFormat;
@@ -22,14 +22,19 @@ class FormatModel
 	private function new(textDisplay:TextDisplay) 
 	{
 		this.textDisplay = textDisplay;
-		
-		if(miniFont == null){
-			miniFont = new BitmapFont(MiniBitmapFont.texture, MiniBitmapFont.xml);
-			FontRegistry.registerBitmapFont(miniFont);
-		}
+
+		checkDefaultFont();
 		
 		var defaultColor:UInt = 0xFFFFFF;
-		defaultFormat = new InputFormat(miniFont.name, 16, defaultColor);
+		defaultFormat = new InputFormat(baseDefaultFont.name, 16, defaultColor);
+	}
+
+	static function checkDefaultFont()
+	{
+		if(baseDefaultFont == null){
+			baseDefaultFont = new BitmapFont(MiniBitmapFont.texture, MiniBitmapFont.xml);
+			FontRegistry.registerBitmapFont(baseDefaultFont);
+		}
 	}
 	
 	public function setDefaults(format:InputFormat) 
@@ -40,7 +45,7 @@ class FormatModel
 	function get_defaultFont():BitmapFont 
 	{
 		var bitmapFont:BitmapFont = FontRegistry.getBitmapFont(defaultFormat.face);
-		if (bitmapFont == null) bitmapFont = miniFont;
+		if (bitmapFont == null) bitmapFont = baseDefaultFont;
 		return bitmapFont;
 	}
 }

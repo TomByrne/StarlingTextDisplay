@@ -7,6 +7,7 @@ import openfl.display.StageScaleMode;
 
 import ui.MainUI;
 import workspace.MainWorkspace;
+import logic.Logics;
 
 class TextDisplayTest extends openfl.display.Sprite
 {
@@ -30,6 +31,8 @@ class TextDisplayTest extends openfl.display.Sprite
 
         stage.addEventListener(Event.RESIZE, onResize, false, 1000000, true);
         onResize(null);
+
+        Logics.setup();
     }
     
     function onResize(e:Event):Void

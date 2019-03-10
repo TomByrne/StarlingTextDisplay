@@ -40,10 +40,9 @@ class CharRenderer
 {
 	
 	static var CharImageMap:Map<BitmapChar, Image> = new Map();
+
 	
 	private var textDisplay:TextDisplay;
-	//private var images:Array<Image> = new Array();
-	//private var imageCount:Int = 0;
 	private var quadBatches:Map<String, QuadBatch> = new Map();
 	private var lineQuads = new Array<Quad>();
 	var characters:Array<Char>;
@@ -98,8 +97,11 @@ class CharRenderer
 							image.touchable = false;
 							CharImageMap.set(char.bitmapChar, image);
 						}
-						//var image:Image = char.bitmapChar.createImage();
 						image.scaleX = image.scaleY = char.scale;
+
+                        var smoothing:String = textDisplay.textureSmoothing;
+                        if(smoothing == null) smoothing = char.font.smoothing;
+                        image.textureSmoothing = smoothing;
 						
 						image.x = char.x;
 						image.y = char.y;

@@ -104,6 +104,8 @@ class TextDisplay extends DisplayObjectContainer
 	@:isVar public var debug(default, set):Bool = false;
 	@:isVar public var clipOverflow(default, set):Bool = false;
 	@:isVar public var textWrapping(default, set):TextWrapping = TextWrapping.WORD;
+
+	@:isVar public var textureSmoothing(default, set):String; // Leave null to allow font to determine it's own smoothing
 	
 	@:allow(starling.text) var targetWidth:Null<Float>;
 	@:allow(starling.text) var targetHeight:Null<Float>;
@@ -117,6 +119,7 @@ class TextDisplay extends DisplayObjectContainer
 	public var textWidth(get, null):Float;
 	public var textHeight(get, null):Float;
 	public var textBounds(get, null):Rectangle;
+    
 	
 	public var undoSteps(get, set):Int;
 	public var clearUndoOnFocusLoss(get, set):Bool;
@@ -513,13 +516,12 @@ class TextDisplay extends DisplayObjectContainer
 	private function get_textBounds():Rectangle 			{ triggerUpdate(); return _textBounds; }
 	
 	
-	
 	override function get_height():Float { triggerUpdate(); return actualHeight; }
 	override function set_height(value:Float):Float 
 	{
 		if (targetHeight == value) return value;
 		targetHeight = value;
-		if(alignment.vAlign != VAlign.TOP) markForUpdate();
+		markForUpdate();
 		dispatchEvent(new TextDisplayEvent(TextDisplayEvent.SIZE_CHANGE));
 		return value;
 	}
@@ -540,6 +542,14 @@ class TextDisplay extends DisplayObjectContainer
 		editable = value;
 		UpdateActive();
 		return editable;
+	}
+	
+	function set_textureSmoothing(value:String):String 
+	{
+		if (textureSmoothing == value) return value;
+		textureSmoothing = value;
+		markForUpdate();
+		return textureSmoothing;
 	}
 	
 	@:allow(starling.text) function markForUpdate() updater.markForUpdate();

@@ -30,6 +30,7 @@ class MainWorkspace
         _starling.addEventListener(Event.ROOT_CREATED, function():Void
         {
             setRoot(cast _starling.root);
+            Models.starling.contextReady.data = true;
         });
 
         _starling.start();
@@ -43,6 +44,7 @@ class MainWorkspace
         root.addChild(world);
 
         world.addChild(new TextDisplayLayer());
+        world.addChild(new TextFieldLayer());
         world.addChild(new WorkspaceGrid());
 
         new WorkspaceInteractions(root);

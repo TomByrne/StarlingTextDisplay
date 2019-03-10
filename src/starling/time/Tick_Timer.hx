@@ -39,8 +39,9 @@ class Tick_Timer
     {
         if(pending.length == 0) return;
 
-        for(pendingCall in pending) pendingCall.handler();
+        var toCall = pending;
         pending = [];
+        for(pendingCall in toCall) pendingCall.handler();
     }
 
     static public function remove(handler:Void->Void) : Void

@@ -1,36 +1,96 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<vbox width="200" height="100%">
+<vbox id="main" height="100%">
 
-	<textarea id="text" width="100%" height="100" placeholder="Text"/>
+    <style source="/../css/main.css" />
 
-	<dropdown id="hAlign" width="100%" text="HAlign">
-		<data>
-			<item value="HAlign: Left" childId="left" />
-			<item value="HAlign: Center" childId="center" />
-			<item value="HAlign: Right" childId="right" />
-		</data>
-	</dropdown>
+    <textarea id="text" width="100%" height="100" placeholder="Text"/>
 
-	<dropdown id="vAlign" width="100%" text="VAlign">
-		<data>
-			<item value="VAlign: Top" childId="top" />
-			<item value="VAlign: Center" childId="center" />
-			<item value="VAlign: Bottom" childId="bottom" />
-		</data>
-	</dropdown>
+    <hbox width="100%">
+        <label text="Size:" verticalAlign="center" width="47"/>
+        <textfield id="sizeText" width="38" restrictChars="0-9"/>
+        <hslider id="sizeSlider" width="100%" height="30" min="2" max="400"/>
+    </hbox>
 
-	<dropdown id="autoSize" width="100%" text="AutoSize">
-		<data>
-			<item value="AutoSize: None" childId="none" />
-			<item value="AutoSize: Both Directions" childId="bothDirections" />
-			<item value="AutoSize: Horizontal" childId="horizontal" />
-			<item value="AutoSize: Vertical" childId="vertical" />
-		</data>
-	</dropdown>
+    <hbox width="100%">
+        <dropdown id="fontSelect" text="Font" width="100%"/>
+        <button id="addFont" text="+" width="20"/>
+    </hbox>
 
-	<label width="100%" text="Width:"/>
-	<hslider id="width" width="100%" height="20" min="50" max="1000"/>
+    <dropdown id="hAlign" width="100%" text="HAlign">
+        <data>
+            <item value="HAlign: Left" childId="left" />
+            <item value="HAlign: Center" childId="center" />
+            <item value="HAlign: Right" childId="right" />
+            <item value="HAlign: Justify" childId="justify" />
+        </data>
+    </dropdown>
 
-	<label width="100%" text="Height:"/>
-	<hslider id="height" width="100%" height="20" min="50" max="1000"/>
+    <dropdown id="vAlign" width="100%" text="VAlign">
+        <data>
+            <item value="VAlign: Top" childId="top" />
+            <item value="VAlign: Center" childId="center" />
+            <item value="VAlign: Bottom" childId="bottom" />
+        </data>
+    </dropdown>
+
+    <dropdown id="autoSize" width="100%" text="AutoSize">
+        <data>
+            <item value="AutoSize: None" childId="none" />
+            <item value="AutoSize: Both Directions" childId="bothDirections" />
+            <item value="AutoSize: Horizontal" childId="horizontal" />
+            <item value="AutoSize: Vertical" childId="vertical" />
+        </data>
+    </dropdown>
+
+    <dropdown id="smoothing" width="100%" text="Smoothing">
+        <data>
+            <item value="Smoothing: Auto" />
+            <item value="Smoothing: None" childId="none" />
+            <item value="Smoothing: Bilinear" childId="bilinear" />
+            <item value="Smoothing: Trilinear" childId="trilinear" />
+        </data>
+    </dropdown>
+
+    <hbox width="100%">
+        <label text="Width:" verticalAlign="center" width="47"/>
+        <textfield id="widthText" width="38" restrictChars="0-9"/>
+        <hslider id="widthSlider" width="100%" height="30" min="50" max="1000"/>
+    </hbox>
+
+    <hbox width="100%">
+        <label text="Height:" verticalAlign="center" width="47"/>
+        <textfield id="heightText" width="38" restrictChars="0-9"/>
+        <hslider id="heightSlider" width="100%" height="30" min="50" max="1000"/>
+    </hbox>
+
+    <checkbox id="showTextBorder" width="100%">
+        <label text="Show Text Border" />
+    </checkbox>
+
+    <checkbox id="showBoundsBorder" width="100%">
+        <label text="Show Bounds Border" />
+    </checkbox>
+
+    <checkbox id="clipOverflow" width="100%">
+        <label text="Clip Overflow" />
+    </checkbox>
+    
+    <box height="100"/>
+
+    <checkbox id="showTextField" width="100%">
+        <label text="Show Starling TextField" />
+    </checkbox>
+
+    <checkbox id="showGrid" width="100%">
+        <label text="Show Grid" />
+    </checkbox>
+
+    <hbox width="100%">
+        <button id="zoomButton" text="Zoom:" width="47"/>
+        <textfield id="zoomText" width="38" restrictChars="0-9%"/>
+        <hslider id="zoomSlider" width="100%" height="30" min="1" max="1000"/>
+    </hbox>
+    
+    <button id="clearData" text="Clear Data" width="100%"/>
+
 </vbox>

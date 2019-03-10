@@ -25,7 +25,6 @@ class Border extends MeshBatch
 	public var borderColor(default, set):UInt;
 	
 	
-	
 	var top:Quad;
 	var bottom:Quad;
 	var left:Quad;

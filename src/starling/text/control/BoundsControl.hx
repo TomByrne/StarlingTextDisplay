@@ -62,19 +62,20 @@ class BoundsControl extends Border
 	function resizeTextBorder() 
 	{
 		textDisplay.textBorder.x = textDisplay.textBounds.x;
+		textDisplay.textBorder.y = textDisplay.textBounds.y;
 		textDisplay.textBorder.width = textDisplay.textBounds.width;
 		textDisplay.textBorder.height = textDisplay.textBounds.height;
 		
-		switch(textDisplay.vAlign){
-			case VAlign.TOP:
-				textDisplay.textBorder.y = 0;
+		// switch(textDisplay.vAlign){
+		// 	case VAlign.TOP:
+		// 		textDisplay.textBorder.y = 0;
 				
-			case VAlign.CENTER:
-				textDisplay.textBorder.y = (textDisplay.targetHeight - textDisplay.textBounds.height) / 2;
+		// 	case VAlign.CENTER:
+		// 		textDisplay.textBorder.y = (textDisplay.targetHeight - textDisplay.textBounds.height) / 2;
 				
-			case VAlign.BOTTOM:
-				textDisplay.textBorder.y = (textDisplay.targetHeight - textDisplay.textBounds.height);
-		}
+		// 	case VAlign.BOTTOM:
+		// 		textDisplay.textBorder.y = (textDisplay.targetHeight - textDisplay.textBounds.height);
+		// }
 	}
 	
 	function get_showBoundsBorder():Bool 
