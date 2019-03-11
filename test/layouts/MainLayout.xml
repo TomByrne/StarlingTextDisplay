@@ -99,6 +99,11 @@
         <textfield id="snapAdvanceText" width="38" restrictChars="0-9"/>
         <hslider id="snapAdvanceSlider" width="100%" height="30" min="0" max="20"/>
     </hbox>
+    <hbox width="100%">
+        <label text="Inner Padding:" verticalAlign="center" width="62"/>
+        <textfield id="innerPaddingText" width="38" restrictChars="0-9"/>
+        <hslider id="innerPaddingSlider" width="100%" height="30" min="0" max="20"/>
+    </hbox>
     
     <box height="50"/>
 

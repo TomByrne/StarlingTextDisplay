@@ -12,6 +12,7 @@ class FontModel
     public var renderScaling:Value<Float> = new Value(1.0);
     public var renderSuperSampling:Value<Int> = new Value(1);
     public var renderSnapAdvance:Value<Float> = new Value(1.0);
+    public var renderInnerPadding:Value<Int> = new Value(1);
 
     public function new(){}
 }

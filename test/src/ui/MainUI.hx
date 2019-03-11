@@ -47,6 +47,7 @@ class MainUI extends Sprite
 		bindSliderText(main.findComponent('fontScalingText'), main.findComponent('fontScalingSlider'), Models.font.renderScaling, 0.01, false);
 		bindSliderText(main.findComponent('fontSuperSamplingText'), main.findComponent('fontSuperSamplingSlider'), Models.font.renderSuperSampling, 1, false);
 		bindSliderText(main.findComponent('snapAdvanceText'), main.findComponent('snapAdvanceSlider'), Models.font.renderSnapAdvance, 1, false);
+		bindSliderText(main.findComponent('innerPaddingText'), main.findComponent('innerPaddingSlider'), Models.font.renderInnerPadding, 1, false);
 
         var fontSelect = main.findComponent('fontSelect');
 		var updateSelected = bindDropdown(fontSelect, Models.font.selectedFont);

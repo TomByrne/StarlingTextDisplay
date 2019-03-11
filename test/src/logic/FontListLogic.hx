@@ -62,6 +62,7 @@ class FontListLogic
         fontModel.renderScaling.add(rerenderFontsDelayed);
         fontModel.renderSuperSampling.add(rerenderFontsDelayed);
         fontModel.renderSnapAdvance.add(rerenderFontsDelayed);
+        fontModel.renderInnerPadding.add(rerenderFontsDelayed);
 	}
     
     function rerenderFontsDelayed()
@@ -143,11 +144,14 @@ class FontListLogic
 		if(range == null){
 			range = CharacterRanges.LATIN_ALL.concat(CharacterRanges.UNICODE_SYMBOLS).concat(CharacterRanges.LATIN_SUPPLEMENT);
 		}
-		var charPadding = Math.ceil(fontInfo.size / 15);
 
-		var bitmapFontGenerator:SvgBitmapFontGenerator = new SvgBitmapFontGenerator( svgFontDisplays, fontInfo.size, 100, svgFont.fontFamily, charPadding, fontModel.renderScaling.data, onFontGenerated.bind(fontInfo, svgFont));
+		var bitmapFontGenerator:SvgBitmapFontGenerator = new SvgBitmapFontGenerator( svgFontDisplays, fontInfo.size, svgFont.fontFamily, onFontGenerated.bind(fontInfo, svgFont));
 		bitmapFontGenerator.superSampling = fontModel.renderSuperSampling.data;
 		bitmapFontGenerator.snapAdvanceXTo = fontModel.renderSnapAdvance.data;
+		bitmapFontGenerator.innerPadding = fontModel.renderInnerPadding.data;
+		bitmapFontGenerator.scaleFactor = fontModel.renderScaling.data;
+        bitmapFontGenerator.charsPerFrame = 150;
+		bitmapFontGenerator.gap = Math.ceil(fontInfo.size / 15);
         bitmapFontGenerator.generateBitmapFont( range );
 
 		return true;
