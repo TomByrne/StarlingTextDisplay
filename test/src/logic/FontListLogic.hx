@@ -61,6 +61,7 @@ class FontListLogic
 
         fontModel.renderScaling.add(rerenderFontsDelayed);
         fontModel.renderSuperSampling.add(rerenderFontsDelayed);
+        fontModel.renderSnapAdvance.add(rerenderFontsDelayed);
 	}
     
     function rerenderFontsDelayed()
@@ -146,6 +147,7 @@ class FontListLogic
 
 		var bitmapFontGenerator:SvgBitmapFontGenerator = new SvgBitmapFontGenerator( svgFontDisplays, fontInfo.size, 100, svgFont.fontFamily, charPadding, fontModel.renderScaling.data, onFontGenerated.bind(fontInfo, svgFont));
 		bitmapFontGenerator.superSampling = fontModel.renderSuperSampling.data;
+		bitmapFontGenerator.snapAdvanceXTo = fontModel.renderSnapAdvance.data;
         bitmapFontGenerator.generateBitmapFont( range );
 
 		return true;

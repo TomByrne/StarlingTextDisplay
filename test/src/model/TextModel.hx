@@ -21,6 +21,8 @@ class TextModel
 
     public var width:Value<Float> = new Value(300.0);
     public var height:Value<Float> = new Value(300.0);
+
+    public var snapCharsTo:Value<Float> = new Value(0.0);
     
     public var showTextBorder:Value<Bool> = new Value(true);
     public var showBoundsBorder:Value<Bool> = new Value(true);

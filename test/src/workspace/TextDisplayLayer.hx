@@ -34,6 +34,7 @@ class TextDisplayLayer extends Sprite
         Models.text.showBoundsBorder.bind(textDisplay, 'showBoundsBorder');
         Models.text.clipOverflow.bind(textDisplay, 'clipOverflow');
         Models.text.smoothing.bind(textDisplay, 'textureSmoothing');
+        Models.text.snapCharsTo.bind(textDisplay, 'snapCharsTo');
         
         Models.text.size.bind(format, 'size');
         Models.text.size.add(updateFormat);

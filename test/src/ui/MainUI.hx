@@ -31,6 +31,7 @@ class MainUI extends Sprite
 		bindSliderText(main.findComponent('sizeText'), main.findComponent('sizeSlider'), Models.text.size);
 		bindSliderText(main.findComponent('widthText'), main.findComponent('widthSlider'), Models.text.width);
 		bindSliderText(main.findComponent('heightText'), main.findComponent('heightSlider'), Models.text.height);
+		bindSliderText(main.findComponent('snapCharsText'), main.findComponent('snapCharsSlider'), Models.text.snapCharsTo);
 		bindSliderText(main.findComponent('zoomText'), main.findComponent('zoomSlider'), Models.workspacePos.scale, 1, true);
 
 		bindDropdown(main.findComponent('hAlign'), Models.text.hAlign);
@@ -45,6 +46,7 @@ class MainUI extends Sprite
         
 		bindSliderText(main.findComponent('fontScalingText'), main.findComponent('fontScalingSlider'), Models.font.renderScaling, 0.01, false);
 		bindSliderText(main.findComponent('fontSuperSamplingText'), main.findComponent('fontSuperSamplingSlider'), Models.font.renderSuperSampling, 1, false);
+		bindSliderText(main.findComponent('snapAdvanceText'), main.findComponent('snapAdvanceSlider'), Models.font.renderSnapAdvance, 1, false);
 
         var fontSelect = main.findComponent('fontSelect');
 		var updateSelected = bindDropdown(fontSelect, Models.font.selectedFont);

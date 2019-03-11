@@ -63,6 +63,12 @@
         <hslider id="heightSlider" width="100%" height="30" min="50" max="1000"/>
     </hbox>
 
+    <hbox width="100%">
+        <label text="Snap to:" verticalAlign="center" width="47"/>
+        <textfield id="snapCharsText" width="38" restrictChars="0-9"/>
+        <hslider id="snapCharsSlider" width="100%" height="30" min="0" max="20"/>
+    </hbox>
+
     <checkbox id="showTextBorder" width="100%">
         <label text="Show Text Border" />
     </checkbox>
@@ -87,6 +93,11 @@
         <label text="Super Sampling:" verticalAlign="center" width="62"/>
         <textfield id="fontSuperSamplingText" width="38" restrictChars="0-9"/>
         <hslider id="fontSuperSamplingSlider" width="100%" height="30" min="1" max="6"/>
+    </hbox>
+    <hbox width="100%">
+        <label text="Snap Advance:" verticalAlign="center" width="62"/>
+        <textfield id="snapAdvanceText" width="38" restrictChars="0-9"/>
+        <hslider id="snapAdvanceSlider" width="100%" height="30" min="0" max="20"/>
     </hbox>
     
     <box height="50"/>
