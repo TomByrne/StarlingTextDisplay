@@ -1,6 +1,6 @@
 package logic;
 
-import starling.text.model.format.FontRegistry;
+import starling.time.Tick;
 import model.Models;
 import model.FontModel;
 import starling.text.BitmapFont;
@@ -58,7 +58,27 @@ class FontListLogic
         // Add new default font
         fontModel.fonts.data.unshift(defaultFontInfo);
         fontModel.fonts.dispatch(); // In case processSvgFontInfo tweaked the object
+
+        fontModel.renderScaling.add(rerenderFontsDelayed);
+        fontModel.renderSuperSampling.add(rerenderFontsDelayed);
 	}
+    
+    function rerenderFontsDelayed()
+    {
+        Tick.once(rerenderFonts);
+    }
+
+    function rerenderFonts()
+    {
+        Tick.remove(rerenderFonts);
+
+		for(font in fontModel.fonts.data)
+		{
+            if(font != defaultFontInfo){
+                processSvgFontInfo(font);
+            }
+        }
+    }
 
 	function onFontAdd(font:FontInfo)
 	{
@@ -123,10 +143,10 @@ class FontListLogic
 			range = CharacterRanges.LATIN_ALL.concat(CharacterRanges.UNICODE_SYMBOLS).concat(CharacterRanges.LATIN_SUPPLEMENT);
 		}
 		var charPadding = Math.ceil(fontInfo.size / 15);
-		var scaleFactor:Float = 1.0;
 
-		var bitmapFontGenerator:SvgBitmapFontGenerator = new SvgBitmapFontGenerator( svgFontDisplays, fontInfo.size, 100, svgFont.fontFamily, charPadding, scaleFactor, onFontGenerated.bind(fontInfo, svgFont));
-		bitmapFontGenerator.generateBitmapFont( range );
+		var bitmapFontGenerator:SvgBitmapFontGenerator = new SvgBitmapFontGenerator( svgFontDisplays, fontInfo.size, 100, svgFont.fontFamily, charPadding, fontModel.renderScaling.data, onFontGenerated.bind(fontInfo, svgFont));
+		bitmapFontGenerator.superSampling = fontModel.renderSuperSampling.data;
+        bitmapFontGenerator.generateBitmapFont( range );
 
 		return true;
 	}

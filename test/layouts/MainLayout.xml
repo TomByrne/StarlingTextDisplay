@@ -74,8 +74,22 @@
     <checkbox id="clipOverflow" width="100%">
         <label text="Clip Overflow" />
     </checkbox>
+
+    <box height="50"/>
     
-    <box height="100"/>
+    <label text="Font Generating:" verticalAlign="center" width="100%"/>
+    <hbox width="100%">
+        <label text="Scaling:" verticalAlign="center" width="62"/>
+        <textfield id="fontScalingText" width="38" restrictChars="0-9."/>
+        <hslider id="fontScalingSlider" width="100%" height="30" min="0.1" max="5"/>
+    </hbox>
+    <hbox width="100%">
+        <label text="Super Sampling:" verticalAlign="center" width="62"/>
+        <textfield id="fontSuperSamplingText" width="38" restrictChars="0-9"/>
+        <hslider id="fontSuperSamplingSlider" width="100%" height="30" min="1" max="6"/>
+    </hbox>
+    
+    <box height="50"/>
 
     <checkbox id="showTextField" width="100%">
         <label text="Show Starling TextField" />

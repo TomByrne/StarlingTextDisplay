@@ -9,6 +9,9 @@ class FontModel
     public var fonts:Value<Array<FontInfo>> = new Value([]);
     public var selectedFont:Value<String> = new Value();
 
+    public var renderScaling:Value<Float> = new Value(1.0);
+    public var renderSuperSampling:Value<Int> = new Value(1);
+
     public function new(){}
 }
 

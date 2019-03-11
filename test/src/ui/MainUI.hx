@@ -31,7 +31,7 @@ class MainUI extends Sprite
 		bindSliderText(main.findComponent('sizeText'), main.findComponent('sizeSlider'), Models.text.size);
 		bindSliderText(main.findComponent('widthText'), main.findComponent('widthSlider'), Models.text.width);
 		bindSliderText(main.findComponent('heightText'), main.findComponent('heightSlider'), Models.text.height);
-		bindSliderText(main.findComponent('zoomText'), main.findComponent('zoomSlider'), Models.workspacePos.scale, true, true);
+		bindSliderText(main.findComponent('zoomText'), main.findComponent('zoomSlider'), Models.workspacePos.scale, 1, true);
 
 		bindDropdown(main.findComponent('hAlign'), Models.text.hAlign);
 		bindDropdown(main.findComponent('vAlign'), Models.text.vAlign);
@@ -42,6 +42,9 @@ class MainUI extends Sprite
 		bindComponent(main.findComponent('clipOverflow'), 'selected', Models.text.clipOverflow);
 		bindComponent(main.findComponent('showTextField'), 'selected', Models.layers.showTextField);
 		bindComponent(main.findComponent('showGrid'), 'selected', Models.layers.showGrid);
+        
+		bindSliderText(main.findComponent('fontScalingText'), main.findComponent('fontScalingSlider'), Models.font.renderScaling, 0.01, false);
+		bindSliderText(main.findComponent('fontSuperSamplingText'), main.findComponent('fontSuperSamplingSlider'), Models.font.renderSuperSampling, 1, false);
 
         var fontSelect = main.findComponent('fontSelect');
 		var updateSelected = bindDropdown(fontSelect, Models.font.selectedFont);
@@ -67,10 +70,12 @@ class MainUI extends Sprite
 		});
 	}
 
-	public function bindSliderText(textfield:TextField, slider:HSlider, model:Value<Dynamic>, round:Bool=true, percent:Bool=false)
+	public function bindSliderText(textfield:TextField, slider:HSlider, model:Value<Dynamic>, roundTo:Float = 0, percent:Bool=false)
 	{
         var handler = function(){
             var value = model.data;
+            if(value == null || Math.isNaN(value)) value = slider.min;
+
             if(percent){
                 value *= 100;
                 textfield.text = Std.string(value) + '%';
@@ -86,7 +91,13 @@ class MainUI extends Sprite
 		});
 		slider.registerEvent(UIEvent.CHANGE, function(e){
 			var newValue:Float = slider.pos;
-            if(round) newValue = Math.round(newValue);
+            if(newValue == null || Math.isNaN(newValue)) newValue = slider.min;
+
+            if(roundTo != 0){
+                if(roundTo != 1) newValue /= roundTo;
+                newValue = Math.round(newValue);
+                if(roundTo != 1) newValue *= roundTo;
+            }
             if(percent) newValue /= 100;
 			model.data = newValue;
 		});

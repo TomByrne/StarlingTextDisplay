@@ -440,7 +440,7 @@ class CharLayout extends EventDispatcher
 	
 	function finishLine(line:Line, lineHeight:Float, rise:Float, fall:Float, leading:Float, lineStack:Float, top:Float, bottom:Float, first:Bool, last:Bool) : Float 
 	{
-		lineStack += leading;
+		if(line.index > 0) lineStack += leading;
 		
 		var paddingTop:Float = (Math.isNaN(top) ? 0 : top);
 		var paddingBottom:Float = (Math.isNaN(bottom) ? 0 : (rise + fall) - bottom);
@@ -507,7 +507,13 @@ class CharLayout extends EventDispatcher
 		var textY:Float = textDisplay._textBounds.y;
 		var textHeight:Float = textDisplay._textBounds.height;
 		
-		var alignOffsetY:Float = 0;//-textY;
+		var alignOffsetY:Float;
+        if(textDisplay.autoSize == TextFieldAutoSize.VERTICAL || textDisplay.autoSize == TextFieldAutoSize.BOTH_DIRECTIONS){
+            alignOffsetY = -textY;
+        }else{
+            alignOffsetY = 0;
+        }
+        
 		if (textDisplay.targetHeight != null){
 			if (textDisplay.vAlign == VAlign.CENTER){
 				alignOffsetY += (textDisplay.targetHeight - textHeight) / 2;
