@@ -83,6 +83,11 @@ class CharLayout extends EventDispatcher
 		
 		var iformat:InputFormat = textDisplay.defaultFormat;
 		CharacterHelper.updateCharFormat(textDisplay.defaultFormat, defaultChar, textDisplay.formatModel.defaultFont);
+
+        var oldTextX:Float = textDisplay._textBounds.x;
+        var oldTextY:Float = textDisplay._textBounds.y;
+        var oldTextW:Float = textDisplay._textBounds.width;
+        var oldTextH:Float = textDisplay._textBounds.height;
 		
 		setPlacementX();
 		findWords();
@@ -93,16 +98,6 @@ class CharLayout extends EventDispatcher
 		this.dispatchEvent(resizeEvent);
 		align();
 		
-		// textDisplay._textBounds.x = Math.POSITIVE_INFINITY;
-		// if (lines.length > 0) textDisplay._textBounds.y = lines[0].y;
-		// for (i in 0...lines.length) 
-		// {
-		// 	if (textDisplay._textBounds.x > lines[i].x) textDisplay._textBounds.x = lines[i].x;
-		// }
-		// if (textDisplay._textBounds.x == Math.POSITIVE_INFINITY) {
-		// 	textDisplay._textBounds.x = 0;
-		// }
-		
 		var actualWidth:Float = (textDisplay.autoSize == TextFieldAutoSize.BOTH_DIRECTIONS || textDisplay.autoSize == TextFieldAutoSize.HORIZONTAL ? textDisplay.textWidth : textDisplay.targetWidth);
 		var actualHeight:Float = (textDisplay.autoSize == TextFieldAutoSize.BOTH_DIRECTIONS || textDisplay.autoSize == TextFieldAutoSize.VERTICAL ? textDisplay.textHeight : textDisplay.targetHeight);
 		
@@ -110,6 +105,11 @@ class CharLayout extends EventDispatcher
 		{
 			textDisplay.actualWidth = actualWidth;
 			textDisplay.actualHeight = actualHeight;
+			sizeChange = true;
+		}
+        
+		if(oldTextX != textDisplay._textBounds.x || oldTextY != textDisplay._textBounds.y || oldTextW != textDisplay._textBounds.width || oldTextH != textDisplay._textBounds.height)
+		{
 			sizeChange = true;
 		}
 		
@@ -506,23 +506,25 @@ class CharLayout extends EventDispatcher
 	{
 		var textY:Float = textDisplay._textBounds.y;
 		var textHeight:Float = textDisplay._textBounds.height;
+
+        var autoWidth:Bool = (textDisplay.autoSize == TextFieldAutoSize.HORIZONTAL || textDisplay.autoSize == TextFieldAutoSize.BOTH_DIRECTIONS);
+        var autoHeight:Bool = (textDisplay.autoSize == TextFieldAutoSize.VERTICAL || textDisplay.autoSize == TextFieldAutoSize.BOTH_DIRECTIONS);
+        var justify:Bool = (textDisplay.hAlign == HAlign.JUSTIFY);
 		
-		var alignOffsetY:Float;
-        if(textDisplay.autoSize == TextFieldAutoSize.VERTICAL || textDisplay.autoSize == TextFieldAutoSize.BOTH_DIRECTIONS){
-            alignOffsetY = -textY;
-        }else{
-            alignOffsetY = 0;
+		var alignOffsetY:Float = -textY;
+        if(!autoHeight){
+            if (textDisplay.targetHeight != null){
+                if (textDisplay.vAlign == VAlign.TOP){
+                    alignOffsetY = 0;
+                }
+                else if (textDisplay.vAlign == VAlign.CENTER){
+                    alignOffsetY += (textDisplay.targetHeight - textHeight) / 2;
+                }
+                else if (textDisplay.vAlign == VAlign.BOTTOM) {
+                    alignOffsetY += textDisplay.targetHeight - textHeight;
+                }
+            }
         }
-        
-		if (textDisplay.targetHeight != null){
-			if (textDisplay.vAlign == VAlign.CENTER){
-				alignOffsetY += (textDisplay.targetHeight - textHeight) / 2;
-			}
-			else if (textDisplay.vAlign == VAlign.BOTTOM) {
-				alignOffsetY += textDisplay.targetHeight - textHeight;
-			}
-		}
-		//alignOffsetY -= lines[0].leading;
 
 		alignOffsetY = snap(alignOffsetY);
 		
@@ -536,7 +538,7 @@ class CharLayout extends EventDispatcher
 		}
 
 		
-		var targetWidth:Float = (textDisplay.autoSize == TextFieldAutoSize.HORIZONTAL || textDisplay.autoSize == TextFieldAutoSize.BOTH_DIRECTIONS ? textDisplay.textWidth : textDisplay.targetWidth);
+		var targetWidth:Float = (autoWidth ? textDisplay.textWidth : textDisplay.targetWidth);
 		
         var minLineOffset:Float = 0;
 
@@ -545,34 +547,41 @@ class CharLayout extends EventDispatcher
 			var line = lines[i];
 			var lineOffset:Float = 0;
 			
-			
-			if (textDisplay.hAlign == HAlign.LEFT) lineOffset = 0;
+            var last:Int = line.chars.length - 1;
+			if(justify){
+                var char = line.chars[last];
+                while(last > 0 && char.isWhitespace)
+                {
+                    last--;
+                    char = line.chars[last];
+                }
+                var lineWidth:Float = char.x + char.width;
+				lineOffset = (targetWidth - lineWidth) / last;
+            }
+			else if (textDisplay.hAlign == HAlign.LEFT) {
+                lineOffset = 0;
+            }
 			else if (textDisplay.hAlign == HAlign.CENTER) {
 				lineOffset = (targetWidth - line.width) / 2;
 			}
-			else if (textDisplay.hAlign == HAlign.RIGHT || textDisplay.hAlign == HAlign.JUSTIFY) {
+			else if (textDisplay.hAlign == HAlign.RIGHT) {
 				lineOffset = targetWidth - line.width;
-                trace("lineOffset: "+lineOffset+" "+targetWidth +" "+ line.width);
 			}
 
             if(i == 0) minLineOffset = lineOffset;
             else if(minLineOffset > lineOffset) minLineOffset = lineOffset;
 			
-			if (textDisplay.hAlign == HAlign.JUSTIFY){
-				//line.width += lineOffset;
-			}else{
+			if (!justify){
 				line.x += lineOffset;
 			}
 			line.y += alignOffsetY;
 			
-			var first = true;
-			var t:Float = 0;
-			for (char in line.chars) 
+			for (i in 0 ... line.chars.length) 
 			{
-				if (textDisplay.hAlign == HAlign.JUSTIFY) {
+                var char = line.chars[i];
+				if (justify) {
 					if (line.validJustify || lineOffset < 0) {	
-						var t:Float = char.charLinePositionX / (line.chars.length-1);
-						char.x += lineOffset * t;
+						char.x += i <= last ? lineOffset * i : lineOffset;
 					}
 				}
 				else char.x += lineOffset;
@@ -582,8 +591,11 @@ class CharLayout extends EventDispatcher
 			}
 		}
 
-        if(textDisplay.hAlign != HAlign.JUSTIFY)
+        if(justify){
+            textDisplay._textBounds.width = textDisplay.targetWidth;
+        }else{
             textDisplay._textBounds.x += minLineOffset;
+        }
         textDisplay._textBounds.y += alignOffsetY;
 
 	}
