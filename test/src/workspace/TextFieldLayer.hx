@@ -42,6 +42,12 @@ class TextFieldLayer extends Sprite
         
         Models.font.selectedFont.bind(format, 'font');
         Models.font.selectedFont.add(updateFormat);
+        
+        Models.text.kerning.bind(format, 'kerning');
+        Models.text.kerning.add(updateFormat);
+
+        Models.text.leading.bind(format, 'leading');
+        Models.text.leading.add(updateFormat);
 
         updateFormat();
     }

@@ -6,7 +6,7 @@
     <textarea id="text" width="100%" height="100" placeholder="Text"/>
 
     <hbox width="100%">
-        <label text="Size:" verticalAlign="center" width="47"/>
+        <label text="Size:" verticalAlign="center" width="62"/>
         <textfield id="sizeText" width="38" restrictChars="0-9"/>
         <hslider id="sizeSlider" width="100%" height="30" min="2" max="400"/>
     </hbox>
@@ -52,19 +52,31 @@
     </dropdown>
 
     <hbox width="100%">
-        <label text="Width:" verticalAlign="center" width="47"/>
+        <label text="Width:" verticalAlign="center" width="62"/>
         <textfield id="widthText" width="38" restrictChars="0-9"/>
         <hslider id="widthSlider" width="100%" height="30" min="50" max="1000"/>
     </hbox>
 
     <hbox width="100%">
-        <label text="Height:" verticalAlign="center" width="47"/>
+        <label text="Height:" verticalAlign="center" width="62"/>
         <textfield id="heightText" width="38" restrictChars="0-9"/>
         <hslider id="heightSlider" width="100%" height="30" min="50" max="1000"/>
     </hbox>
 
     <hbox width="100%">
-        <label text="Snap to:" verticalAlign="center" width="47"/>
+        <label text="Kerning:" verticalAlign="center" width="62"/>
+        <textfield id="kerningText" width="38" restrictChars="0-9"/>
+        <hslider id="kerningSlider" width="100%" height="30" min="0" max="20"/>
+    </hbox>
+
+    <hbox width="100%">
+        <label text="Leading:" verticalAlign="center" width="62"/>
+        <textfield id="leadingText" width="38" restrictChars="0-9"/>
+        <hslider id="leadingSlider" width="100%" height="30" min="0" max="100"/>
+    </hbox>
+
+    <hbox width="100%">
+        <label text="Snap to:" verticalAlign="center" width="62"/>
         <textfield id="snapCharsText" width="38" restrictChars="0-9"/>
         <hslider id="snapCharsSlider" width="100%" height="30" min="0" max="20"/>
     </hbox>
@@ -116,7 +128,7 @@
     </checkbox>
 
     <hbox width="100%">
-        <button id="zoomButton" text="Zoom:" width="47"/>
+        <button id="zoomButton" text="Zoom:" width="62"/>
         <textfield id="zoomText" width="38" restrictChars="0-9%"/>
         <hslider id="zoomSlider" width="100%" height="30" min="1" max="1000"/>
     </hbox>

@@ -41,6 +41,12 @@ class TextDisplayLayer extends Sprite
         
         Models.font.selectedFont.bind(format, 'face');
         Models.font.selectedFont.add(updateFormat);
+        
+        Models.text.kerning.bind(format, 'kerning');
+        Models.text.kerning.add(updateFormat);
+
+        Models.text.leading.bind(format, 'leading');
+        Models.text.leading.add(updateFormat);
 
         updateFormat();
     }
