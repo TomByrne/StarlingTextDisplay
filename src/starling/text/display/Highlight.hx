@@ -77,7 +77,7 @@ class Highlight extends DisplayObjectContainer
 			
 			var rectX = line.x;
 			var rectY = line.y;
-			var rectW = line.width;
+			var rectW = line.boundsWidth;
 			var rectH = line.height;
 			if (i == 0 && i == len-1) {
 				rectX = beginChar.x;
@@ -86,7 +86,7 @@ class Highlight extends DisplayObjectContainer
 			}
 			else if (i == 0) {
 				rectX = beginChar.x;
-				rectW = line.width - rectX + line.x;
+				rectW = line.boundsWidth - rectX + line.x;
 			}
 			else if (i == len-1) {
 				rectW = endChar.x - line.x;

@@ -94,13 +94,14 @@ class CharLayout extends EventDispatcher
 		findLineHeight();
 		setLinePositions();
 		
-		var sizeChange = calcTextSize();
+		calcTextSize();
 		this.dispatchEvent(resizeEvent);
 		align();
 		
+        var sizeChange:Bool = false;
 		var actualWidth:Float = (textDisplay.autoSize == TextFieldAutoSize.BOTH_DIRECTIONS || textDisplay.autoSize == TextFieldAutoSize.HORIZONTAL ? textDisplay.textWidth : textDisplay.targetWidth);
 		var actualHeight:Float = (textDisplay.autoSize == TextFieldAutoSize.BOTH_DIRECTIONS || textDisplay.autoSize == TextFieldAutoSize.VERTICAL ? textDisplay.textHeight : textDisplay.targetHeight);
-		
+
 		if(textDisplay.actualWidth != actualWidth || textDisplay.actualHeight != actualHeight)
 		{
 			textDisplay.actualWidth = actualWidth;
@@ -249,6 +250,7 @@ class CharLayout extends EventDispatcher
 		var i:Int = 0;
 		var goBack:Bool = false;
 		limitReached = false;
+		wordBreakFound = false;
 		
 		var lastChar:Char = null;
 		var hasWrap:Bool = (textWrapping != TextWrapping.NONE);
@@ -266,36 +268,36 @@ class CharLayout extends EventDispatcher
 			}
 			
 			if (!textDisplay.allowLineBreaks && (char.character == SpecialChar.Return || char.character == SpecialChar.NewLine)) {
-				i++;
+                i++;
 				continue;
 			}
+            
+            char.spaceAsLineBreak = false;
 			
 			if (char.character == SpecialChar.Space) {
 				lastSpaceIndex = i;
 				wordBreakFound = true;
 			}
 			
-			if (withinBoundsX(placement.x + char.width) == false && i < allCharacters.length-1 && char.character != SpecialChar.Space && hasWrap) {
-				
+            var charOffset = char.bitmapChar == null ? 0 : char.bitmapChar.xOffset * char.scale;
+			if (i < allCharacters.length-1 && char.character != SpecialChar.Space && hasWrap && !withinBoundsX(placement.x + charOffset + char.width)) {
 				if (lastSpaceIndex != i && wordBreakFound) {
 					var lastSpaceChar:Char = allCharacters[lastSpaceIndex];
+                    lastSpaceChar.spaceAsLineBreak = true;
 					if (lastSpaceChar.lineNumber == lineNumber) {
 						i = lastSpaceIndex+1;
 						goBack = true;
 					}
 				}
 				progressLine();
-				if (goBack) {
-					var backChar:Char = allCharacters[i];
-					continue;
-				}
+				if (goBack) continue;
 			}
 			
 			char.x = placement.x;
 			if (limitReached) char.visible = false;
 			else char.visible = true;
 			
-			if (char.bitmapChar != null) char.x += char.bitmapChar.xOffset * char.scale;
+			if (char.bitmapChar != null) char.x += charOffset;
 			
 			char.lineNumber = lineNumber;
 			char.charLinePositionX = charLinePositionX;
@@ -310,7 +312,7 @@ class CharLayout extends EventDispatcher
 				}
 			}
 			
-			if (withinBoundsX(placement.x) == false && i < allCharacters.length-2 && char.character != SpecialChar.Space && hasWrap) {
+			if (i < allCharacters.length-2 && char.character != SpecialChar.Space && hasWrap && !withinBoundsX(placement.x)) {
 				if (lastSpaceIndex != i && wordBreakFound) {
 					var lastSpaceChar:Char = allCharacters[lastSpaceIndex];
 					if (lastSpaceChar.lineNumber == lineNumber) {
@@ -319,10 +321,7 @@ class CharLayout extends EventDispatcher
 					}
 				}
 				progressLine();
-				if (goBack) {
-					var backChar:Char = allCharacters[i];
-					continue;
-				}
+				if (goBack) continue;
 			}
 			else if (char.character == SpecialChar.Return) {
 				progressLine();
@@ -335,6 +334,17 @@ class CharLayout extends EventDispatcher
 			}
 			lastChar = char;
 			i++;
+		}
+	}
+	
+	private function progressLine():Void
+	{
+		wordBreakFound = false;	
+		charLinePositionX = 0;
+		placement.x = 0;
+		lineNumber++;
+		if (!textDisplay.allowLineBreaks) {
+			limitReached = true;
 		}
 	}
 	
@@ -469,37 +479,41 @@ class CharLayout extends EventDispatcher
 		}
 	}
 	
-	function calcTextSize() : Bool
+	function calcTextSize() : Void
 	{
-		var boundsX:Float = 0;
-		var boundsY:Float = 0;
-		var boundsW:Float = 0;
-		var boundsH:Float = 0;
+		var boundsL:Float = 0;
+		var boundsT:Float = 0;
+		var boundsR:Float = 0;
+		var boundsB:Float = 0;
+
+        var firstLine:Line = null;
+        var lastLine:Line = null;
 		
 		for (i in 0...lines.length) 
 		{
 			var line = lines[i];
-			if (boundsW < line.width) {
-				boundsW = line.width;
-			}
+            line.calcDimensions();
+            if(line.boundsWidth == 0 || line.height == 0) continue;
+
+            if(firstLine == null)
+            {
+                firstLine = line;
+			    boundsT = firstLine.y + firstLine.paddingTop;
+                boundsL = line.x;
+                boundsR = line.right;
+            }
+            else{
+                if (boundsL > line.x) boundsL = line.x;
+                if (boundsR < line.right) boundsR = line.right;
+            }
+            lastLine = line;
 		}
 		
-		if (lines.length > 0) {
-			var firstLine = lines[0];
-			var lastLine = lines[lines.length-1];
-			boundsX = firstLine.x;
-			boundsY = firstLine.y + firstLine.paddingTop;// + firstLine.rise - firstLine.top;
-			boundsH = (lastLine.y + lastLine.height - lastLine.paddingBottom) - boundsY;
+		if (lastLine != null) {
+			boundsB = (lastLine.y + lastLine.height - lastLine.paddingBottom);
 		}
 		
-		var hasChanged:Bool = (
-			textDisplay._textBounds.x != boundsX ||
-			textDisplay._textBounds.y != boundsY ||
-			textDisplay._textBounds.width != boundsW ||
-			textDisplay._textBounds.height != boundsH
-		);
-		textDisplay._textBounds.setTo(boundsX, boundsY, boundsW, boundsH);
-		return hasChanged;
+		textDisplay._textBounds.setTo(boundsL, boundsT, boundsR - boundsL, boundsB - boundsT);
 	}
 	
 	function align() 
@@ -528,19 +542,10 @@ class CharLayout extends EventDispatcher
 
 		alignOffsetY = snap(alignOffsetY);
 		
-		var widestLine:Float = 0;
-		for (i in 0 ... lines.length) 
-		{
-			var line = lines[i];
-			if (widestLine< line.width) {
-				widestLine = line.width;
-			}
-		}
-
-		
 		var targetWidth:Float = (autoWidth ? textDisplay.textWidth : textDisplay.targetWidth);
 		
         var minLineOffset:Float = 0;
+        //var autoShiftX:Float = (autoWidth ? -textDisplay._textBounds.x : 0);
 
 		for (i in 0 ... lines.length) 
 		{
@@ -549,24 +554,22 @@ class CharLayout extends EventDispatcher
 			
             var last:Int = line.chars.length - 1;
 			if(justify){
-                var char = line.chars[last];
-                while(last > 0 && char.isWhitespace)
-                {
-                    last--;
-                    char = line.chars[last];
-                }
-                var lineWidth:Float = char.x + char.width;
-				lineOffset = (targetWidth - lineWidth) / last;
+				lineOffset = -line.x + (targetWidth - line.boundsWidth) / last;
             }
 			else if (textDisplay.hAlign == HAlign.LEFT) {
                 lineOffset = 0;
             }
 			else if (textDisplay.hAlign == HAlign.CENTER) {
-				lineOffset = (targetWidth - line.width) / 2;
+                var lineWidth:Float = (autoWidth ? line.boundsWidth : line.totalWidth);
+				lineOffset = (targetWidth - lineWidth) / 2;
 			}
 			else if (textDisplay.hAlign == HAlign.RIGHT) {
-				lineOffset = targetWidth - line.width;
+                var lineWidth:Float = (autoWidth ? line.boundsWidth : line.totalWidth);
+				lineOffset = targetWidth - lineWidth;
 			}
+            if (autoWidth) {
+                lineOffset -= textDisplay._textBounds.x;
+            }
 
             if(i == 0) minLineOffset = lineOffset;
             else if(minLineOffset > lineOffset) minLineOffset = lineOffset;
@@ -607,17 +610,6 @@ class CharLayout extends EventDispatcher
 		if(forwardOnly)value = Math.ceil(value);
 		else value = Math.round(value);
 		return value * snapCharsTo;
-	}
-	
-	private function progressLine():Void
-	{
-		wordBreakFound = false;	
-		charLinePositionX = 0;
-		placement.x = 0;
-		lineNumber++;
-		if (!textDisplay.allowLineBreaks) {
-			limitReached = true;
-		}
 	}
 	
 	function withinBoundsX(value:Float):Bool

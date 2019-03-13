@@ -1,7 +1,6 @@
 package starling.text.model.layout;
 
 import starling.text.model.layout.Char;
-import starling.utils.SpecialChar;
 
 /**
  * ...
@@ -14,8 +13,13 @@ class Line
 	private var _height:Float = 9;
 	public var height(get, null):Float;
 	
-	private var _width:Float = 0;
-	public var width(get, null):Float;
+	private var _totalWidth:Float = 0;
+	public var totalWidth(get, null):Float;
+	
+	private var _boundsWidth:Float = 0;
+	public var boundsWidth(get, null):Float;
+    
+	public var right(get, null):Float;
 	
 	private var _rise:Float;
 	public var rise(get, null):Float;
@@ -37,9 +41,6 @@ class Line
 	public var chars = new Array<Char>();
 	public var validJustify(get, null):Bool;
 	
-	//private var _largestChar:Char;
-	//public var largestChar(get, null):Char;
-	//public var outsizeBounds:Bool = false; // Needs a bit of a rethink
 	public var visible:Bool = true;
 	
 	@:isVar public var isEmptyLine(get, null):Bool;
@@ -86,78 +87,99 @@ class Line
 		return _paddingBottom;
 	}
 	
-	/*public function calcHeight():Void 
-	{
-		_height = largestChar.getLineHeight();
-	}*/
-	
 	function get_validJustify():Bool 
 	{
         if(chars.length < 2) return false;
 		var char:Char = chars[chars.length - 1];
         if (char.isEndChar) return false;
-		if (SpecialChar.isLineBreak(char.character)) return false;
+		if (char.isLineBreak) return false;
 		return true;
 	}
 	
-	/*function get_leading():Float
+	function get_totalWidth():Float 
 	{
-		var _v:Float = Math.NEGATIVE_INFINITY;
-		for (j in 0...chars.length) 
-		{
-			var char:Char = chars[j];
-			if (char.format.leading == null) continue;
-			if (_v < char.format.leading && !char.isEndChar) {
-				_v = char.format.leading;
-			}
-		}
-		if (_v == Math.NEGATIVE_INFINITY) _v = 0;
-		return _v;
-	}*/
+		return _totalWidth;
+	}
 	
-	/*function get_largestChar():Char 
+	function get_boundsWidth():Float 
 	{
-		for (j in 0...chars.length) 
-		{
-			var char:Char = chars[j];
-			if (char.isEndChar) continue;
-			
-			if (_largestChar == null) {
-				_largestChar = char;
-			}
-			else if (_largestChar.getLineHeight() < char.getLineHeight()) {
-				_largestChar = char;
-			}
-		}
-		if (_largestChar == null) _largestChar = chars[0];
-		return _largestChar;
-	}*/
+		return _boundsWidth;
+	}
 	
-	function get_width():Float 
+	function get_right():Float 
 	{
-		var v:Float = 0;
-		var validChar:Bool = false;
-		var lastKerning:Null<Float> = null;
-		for (i in 0...chars.length) 
-		{
-			var char = chars[i];
-			if (!SpecialChar.isWhitespace(char.character)) validChar = true;
-			if (validChar && char.bitmapChar != null) {
-				v += char.bitmapChar.xAdvance * char.scale;
-				lastKerning = char.format.kerning;
-				if (lastKerning != null) v += lastKerning;
-			}
-		}
-		if (lastKerning != null) v -= lastKerning;
-		return v;
+		return x + _boundsWidth;
 	}
 	
 	function get_isEmptyLine():Bool 
 	{
 		for (i in 0...chars.length) 
 		{
-			if (!SpecialChar.isWhitespace(chars[i].character)) return false;
+			if (!chars[i].isWhitespace) return false;
 		}
 		return true;
 	}
+
+    public function calcDimensions()
+    {
+		/*var x:Float = 0;
+		var width:Float = 0;
+
+		var validChar:Bool = false;
+        var whiteChars:Float = 0;
+		for (i in 0...chars.length) 
+		{
+			var char = chars[i];
+			if (char.bitmapChar != null) {
+                var isWhitespace = char.isWhitespace;
+			    if (!isWhitespace) validChar = true;
+                var charSize:Float = char.bitmapChar.xAdvance * char.scale;
+                if(i < chars.length - 1) charSize += char.format.kerning;
+				if(validChar){
+                    width += charSize;
+                    if(isWhitespace){
+                        whiteChars += charSize;
+                    }else{
+                        whiteChars = 0;
+                    }
+                }else{
+                    x += charSize;
+                }
+			}
+		}
+        this.x = x;
+        _width = width - whiteChars;*/
+        
+        var firstBoundsChar:Char = null;
+        var lastBoundsChar:Char = null;
+        var lastValidChar:Char = null;
+		for (i in 0...chars.length) 
+		{
+			var char = chars[i];
+            if(char.bitmapChar == null || char.spaceAsLineBreak) continue;
+
+            lastValidChar = char;
+
+            if(!char.isWhitespace)
+            {
+                if(firstBoundsChar == null) firstBoundsChar = char;
+                lastBoundsChar = char;
+            }
+        }
+        if(lastValidChar == null){
+            _totalWidth = 0;
+        }else{
+            var lastX:Float = lastValidChar.x - (lastValidChar.bitmapChar.xOffset * lastValidChar.scale);
+            _totalWidth = (lastX + lastValidChar.format.kerning + lastValidChar.bitmapChar.xAdvance * lastValidChar.scale);
+        }
+
+        if(firstBoundsChar == null){
+            x = 0;
+            _boundsWidth = 0;
+        }else{
+            x = firstBoundsChar.x - (firstBoundsChar.bitmapChar.xOffset * firstBoundsChar.scale);
+            var lastX:Float = lastBoundsChar.x - (lastBoundsChar.bitmapChar.xOffset * lastBoundsChar.scale);
+            _boundsWidth = (lastX + lastBoundsChar.format.kerning + lastBoundsChar.bitmapChar.xAdvance * lastBoundsChar.scale) - x;
+        }
+    }
 }

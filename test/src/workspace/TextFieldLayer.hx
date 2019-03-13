@@ -54,7 +54,6 @@ class TextFieldLayer extends Sprite
 
     function updateFormat()
     {
-        trace('format: ' + format.font);
         textField.format = format;
     }
 }

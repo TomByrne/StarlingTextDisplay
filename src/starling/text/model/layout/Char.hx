@@ -3,6 +3,7 @@ package starling.text.model.layout;
 import starling.text.BitmapChar;
 import starling.text.BitmapFont;
 import starling.text.model.format.InputFormat;
+import starling.utils.SpecialChar;
 
 
 /**
@@ -35,10 +36,14 @@ class Char
 	@:allow(starling.text)
 	private var isWhitespace:Bool = false;
 	
+	@:allow(starling.text)
+	private var isLineBreak:Bool = false;
+	
 	
 	public var bitmapChar:BitmapChar;
 	public var font:BitmapFont;
 	public var format:InputFormat = new InputFormat();
+    public var spaceAsLineBreak:Bool;
 	
 	public function new(character:String, index:Int=0) 
 	{
@@ -50,7 +55,8 @@ class Char
 		this.id = character.charCodeAt(0);
 		this.character = character;
 		this.index = index;
-		this.isWhitespace = (character == ' ' || character == '\r' || character == '\n'  || character == '\t');
+		this.isWhitespace = SpecialChar.isWhitespace(character);
+		this.isLineBreak = SpecialChar.isLineBreak(character);
 	}
 	
 	
