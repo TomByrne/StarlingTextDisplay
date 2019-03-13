@@ -30,4 +30,6 @@ class TextModel
     public var showTextBorder:Value<Bool> = new Value(true);
     public var showBoundsBorder:Value<Bool> = new Value(true);
     public var clipOverflow:Value<Bool> = new Value(false);
+    public var editable:Value<Bool> = new Value(false);
+    public var allowLineBreaks:Value<Bool> = new Value(true);
 }

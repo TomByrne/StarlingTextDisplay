@@ -93,6 +93,14 @@
         <label text="Clip Overflow" />
     </checkbox>
 
+    <checkbox id="editable" width="100%">
+        <label text="Editable" />
+    </checkbox>
+
+    <checkbox id="allowLineBreaks" width="100%">
+        <label text="Allow Line Breaks" />
+    </checkbox>
+
     <box height="50"/>
     
     <label text="Font Generating:" verticalAlign="center" width="100%"/>

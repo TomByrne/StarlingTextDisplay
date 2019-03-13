@@ -43,6 +43,8 @@ class MainUI extends Sprite
 		bindComponent(main.findComponent('showTextBorder'), 'selected', Models.text.showTextBorder);
 		bindComponent(main.findComponent('showBoundsBorder'), 'selected', Models.text.showBoundsBorder);
 		bindComponent(main.findComponent('clipOverflow'), 'selected', Models.text.clipOverflow);
+		bindComponent(main.findComponent('editable'), 'selected', Models.text.editable);
+		bindComponent(main.findComponent('allowLineBreaks'), 'selected', Models.text.allowLineBreaks);
 		bindComponent(main.findComponent('showTextField'), 'selected', Models.layers.showTextField);
 		bindComponent(main.findComponent('showGrid'), 'selected', Models.layers.showGrid);
         
