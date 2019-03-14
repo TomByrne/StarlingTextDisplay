@@ -505,9 +505,15 @@ class CharLayout extends EventDispatcher
             }
             lastLine = line;
 		}
-		
-		if (lastLine != null) {
-			boundsB = (lastLine.y + lastLine.height - lastLine.paddingBottom);
+
+        if(lastLine == null && !autoHeight)
+        {
+			var line = lines[0];
+            boundsT = line.y;
+            boundsB = boundsT + line.height;
+
+        }else if (lastLine != null) {
+			boundsB = (lastLine.y + lastLine.height);
 		}
 		
 		textDisplay._textBounds.setTo(boundsL, boundsT, boundsR - boundsL, boundsB - boundsT);

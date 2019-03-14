@@ -49,7 +49,7 @@ class Line
 	
 	public function setMetrics(lineHeight:Float, rise:Float, fall:Float, leading:Float, paddingTop:Float, paddingBottom:Float) 
 	{
-		_height = rise + fall;
+		_height = rise - fall;
 		_rise = rise;
 		_fall = fall;
 		_leading = leading;

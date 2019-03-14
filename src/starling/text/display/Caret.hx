@@ -115,7 +115,7 @@ class Caret extends DisplayObjectContainer
 			this.y = 0;
 		}else {
 			this.y = selectedChar.line.y;
-			this.height = (selectedChar.line.y + selectedChar.line.height - selectedChar.line.paddingBottom) - this.y;
+			this.height = selectedChar.line.height;
 		}
 	}
 	

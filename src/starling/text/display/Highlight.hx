@@ -81,9 +81,10 @@ class Highlight extends DisplayObjectContainer
             var rect:Rectangle = getRect(total);
 			
 			rect.x = line.x;
-			rect.y = line.y;// + line.paddingTop;
+			rect.y = line.y;
 			rect.width = line.boundsWidth;
-			rect.height = (line.y + line.height - line.paddingBottom) - rect.y;
+			rect.height = line.height;
+
 			if (i == 0 && i == len-1) {
 				rect.x = beginChar.x;
 				rect.width = endChar.x - rect.x;
