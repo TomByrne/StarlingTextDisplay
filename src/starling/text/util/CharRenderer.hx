@@ -18,7 +18,7 @@ import starling.display.Image;
 #if (starling >= "2.0.0")
 	import starling.display.MeshBatch;
 #else
-	import starling.display.QuadBatch;
+	import starling.display.QuadBatch as MeshBatch;
 #end
 
 import starling.events.Event;
@@ -31,11 +31,6 @@ import starling.textures.Texture;
  * ...
  * @author P.J.Shand
  */
-
-#if (starling >= "2.0.0")
-	typedef QuadBatch = MeshBatch;
-#end
-
 class CharRenderer
 {
 	
@@ -43,8 +38,8 @@ class CharRenderer
 
 	
 	private var textDisplay:TextDisplay;
-	private var quadBatches:Map<String, QuadBatch> = new Map();
-	private var lineQuads = new Array<Quad>();
+	private var batches:Map<String, MeshBatch> = new Map();
+    
 	var characters:Array<Char>;
 	var color:Null<UInt>;
 
@@ -60,7 +55,7 @@ class CharRenderer
 		
 		if (color == null) color = 0;
 		#if (starling >= "2.0.0")
-		for (quadBatch in quadBatches) 
+		for (quadBatch in batches) 
 		{
 			quadBatch.color = color;
 		}
@@ -70,15 +65,7 @@ class CharRenderer
 	public function render(characters:Array<Char>) 
 	{
 		this.characters = characters;
-		for(quadBatch in quadBatches){
-			#if (starling >= "2.0.0")
-				quadBatch.clear();
-			#else
-				quadBatch.reset();
-			#end
-		}
-		
-		//clearImages();
+		clearBatches();
 		
 		for (j in 0...characters.length) 
 		{
@@ -115,14 +102,14 @@ class CharRenderer
 						//images[imageCount] = image;
 						//imageCount++;
 						
-						var quadBatch = quadBatches[char.format.face];
+						var quadBatch = batches[char.format.face];
 						if (quadBatch==null){
-							quadBatch = new QuadBatch();
+							quadBatch = new MeshBatch();
 							quadBatch.batchable = true;
 							quadBatch.touchable = false;
 							if (textDisplay.numChildren > 0) textDisplay.addChildAt(quadBatch, 1);
 							else textDisplay.addChild(quadBatch); 
-							quadBatches[char.format.face] = quadBatch;
+							batches[char.format.face] = quadBatch;
 						}
 						#if (starling >= "2.0.0")
 							quadBatch.addMesh(image);
@@ -137,20 +124,20 @@ class CharRenderer
 		if(textDisplay.color != -1 && textDisplay.color != null) setColor(textDisplay.color);
 	}
 	
-	/*function clearImages() 
-	{
-		if(imageCount > 0){
-			for (image in images){
-				image.dispose();
-			}
-			imageCount = 0;
-			images = [];
-		}
-	}*/
-	
 	public function dispose() 
 	{
-		//clearImages();
-		quadBatches = new Map();
+		clearBatches();
+		batches = new Map();
 	}
+
+    function clearBatches()
+    {
+        for(quadBatch in batches){
+			#if (starling >= "2.0.0")
+				quadBatch.clear();
+			#else
+				quadBatch.reset();
+			#end
+		}
+    }
 }

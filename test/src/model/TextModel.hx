@@ -32,4 +32,6 @@ class TextModel
     public var clipOverflow:Value<Bool> = new Value(false);
     public var editable:Value<Bool> = new Value(false);
     public var allowLineBreaks:Value<Bool> = new Value(true);
+
+    public var hasFocus:Value<Bool> = new Value(false);
 }

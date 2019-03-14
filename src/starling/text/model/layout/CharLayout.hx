@@ -33,7 +33,8 @@ import starling.text.TextFieldAutoSize;
 class CharLayout extends EventDispatcher
 {
 	private var lineNumber:Int;
-	private var placement:Point;
+	private var placementX:Float;
+	private var placementY:Float;
 	private var words:Array<Word>;
 	private var charLinePositionX:Int;
 	private var textDisplay:TextDisplay;
@@ -58,7 +59,6 @@ class CharLayout extends EventDispatcher
 	public var characters = new Array<Char>();
 	public var allCharacters:Array<Char>;
 	public var lines = new Array<Line>();
-	public var textWrapping:TextWrapping = TextWrapping.WORD;
 	
 	@:allow(starling.text)
 	private function new(textDisplay:TextDisplay) 
@@ -147,34 +147,28 @@ class CharLayout extends EventDispatcher
 		return null;
 	}
 	
-	public function getCharByPosition(_x:Float, _y:Float, allowEndChar:Bool=true):Char
+	public function getCharByPosition(x:Float, y:Float, allowEndChar:Bool=true):Char
 	{
 		var closestIndex:Int = -1;
 		var closestValue:Float = Math.POSITIVE_INFINITY;
 		
 		for (i in 0...lines.length) 
 		{
-			var top:Float = lines[i].y;
-			var bottom:Float = lines[i].y + lines[i].height;
-			if (_y > top && _y < bottom) {
-				closestIndex = i;
-				break;
-			}
-			else {
-				var dif:Float = Math.abs(lines[i].y - _y);
-				if (Math.abs(dif) < closestValue) {
-					closestValue = dif;
-					closestIndex = i;
-				}
-				else {
-					break; // closest found and now moving away from closest line
-				}
-			}	
+            var line = lines[i];
+			var midY:Float = line.y + line.paddingTop + line.height / 2;
+            var dif:Float = Math.abs(midY - y);
+            if (Math.abs(dif) < closestValue) {
+                closestValue = dif;
+                closestIndex = i;
+            }
+            else {
+                break; // closest found and now moving away from closest line
+            }
 		}
 		if (closestIndex == -1){
 			return null;
 		}
-		return getCharByLineAndPosX(closestIndex, _x, allowEndChar);
+		return getCharByLineAndPosX(closestIndex, x, allowEndChar);
 	}
 	
 	public function getCharByLineAndPosX(lineNumber:Int, _x:Float, allowEndChar:Bool=true):Char
@@ -241,7 +235,8 @@ class CharLayout extends EventDispatcher
 	
 	function setPlacementX() 
 	{
-		placement = new Point(0, 0);
+		placementX = 0;
+        placementY = 0;
 		lineNumber = 0;
 		
 		var lastSpaceIndex:Int = 0;
@@ -253,7 +248,7 @@ class CharLayout extends EventDispatcher
 		wordBreakFound = false;
 		
 		var lastChar:Char = null;
-		var hasWrap:Bool = (textWrapping != TextWrapping.NONE);
+		var hasWrap:Bool = (textDisplay.textWrapping != TextWrapping.NONE);
 		
 		while (i < allCharacters.length) 
 		{
@@ -267,7 +262,7 @@ class CharLayout extends EventDispatcher
 				if(!char.isEndChar) CharacterHelper.findBitmapChar(char);
 			}
 			
-			if (!textDisplay.allowLineBreaks && (char.character == SpecialChar.Return || char.character == SpecialChar.NewLine)) {
+			if (!textDisplay.allowLineBreaks && char.isLineBreak) {
                 i++;
 				continue;
 			}
@@ -280,7 +275,7 @@ class CharLayout extends EventDispatcher
 			}
 			
             var charOffset = char.bitmapChar == null ? 0 : char.bitmapChar.xOffset * char.scale;
-			if (i < allCharacters.length-1 && char.character != SpecialChar.Space && hasWrap && !withinBoundsX(placement.x + charOffset + char.width)) {
+			if (i < allCharacters.length-1 && char.character != SpecialChar.Space && hasWrap && !withinBoundsX(placementX + charOffset + char.width)) {
 				if (lastSpaceIndex != i && wordBreakFound) {
 					var lastSpaceChar:Char = allCharacters[lastSpaceIndex];
                     lastSpaceChar.spaceAsLineBreak = true;
@@ -293,7 +288,7 @@ class CharLayout extends EventDispatcher
 				if (goBack) continue;
 			}
 			
-			char.x = placement.x;
+			char.x = placementX;
 			if (limitReached) char.visible = false;
 			else char.visible = true;
 			
@@ -305,14 +300,14 @@ class CharLayout extends EventDispatcher
 			
 			if (char.character != SpecialChar.Space || charLinePositionX != 0) {
 				if (char.bitmapChar != null) {
-					placement.x += (char.bitmapChar.xAdvance * char.scale);
+					placementX += (char.bitmapChar.xAdvance * char.scale);
 					if (char.format.kerning != null) {
-						placement.x += char.format.kerning;
+						placementX += char.format.kerning;
 					}
 				}
 			}
 			
-			if (i < allCharacters.length-2 && char.character != SpecialChar.Space && hasWrap && !withinBoundsX(placement.x)) {
+			if (i < allCharacters.length-2 && char.character != SpecialChar.Space && hasWrap && !withinBoundsX(placementX)) {
 				if (lastSpaceIndex != i && wordBreakFound) {
 					var lastSpaceChar:Char = allCharacters[lastSpaceIndex];
 					if (lastSpaceChar.lineNumber == lineNumber) {
@@ -341,7 +336,7 @@ class CharLayout extends EventDispatcher
 	{
 		wordBreakFound = false;	
 		charLinePositionX = 0;
-		placement.x = 0;
+		placementX = 0;
 		lineNumber++;
 		if (!textDisplay.allowLineBreaks) {
 			limitReached = true;
@@ -481,6 +476,8 @@ class CharLayout extends EventDispatcher
 	
 	function calcTextSize() : Void
 	{
+        var autoHeight:Bool = (textDisplay.autoSize == TextFieldAutoSize.VERTICAL || textDisplay.autoSize == TextFieldAutoSize.BOTH_DIRECTIONS);
+        
 		var boundsL:Float = 0;
 		var boundsT:Float = 0;
 		var boundsR:Float = 0;
@@ -498,7 +495,7 @@ class CharLayout extends EventDispatcher
             if(firstLine == null)
             {
                 firstLine = line;
-			    boundsT = firstLine.y + firstLine.paddingTop;
+			    boundsT = firstLine.y + (autoHeight ? firstLine.paddingTop : 0);
                 boundsL = line.x;
                 boundsR = line.right;
             }

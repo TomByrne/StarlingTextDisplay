@@ -46,7 +46,7 @@ class WorkspaceInteractions
             }else{
                 dragTouch = null;
             }
-        }else{
+        }else if(!Models.text.hasFocus.data){
             dragTouch = e.getTouch(dispatcher, TouchPhase.BEGAN);
         }
     }

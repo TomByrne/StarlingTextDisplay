@@ -104,6 +104,7 @@ class TextDisplay extends DisplayObjectContainer
 	@:isVar public var debug(default, set):Bool = false;
 	@:isVar public var clipOverflow(default, set):Bool = false;
 	@:isVar public var textWrapping(default, set):TextWrapping = TextWrapping.WORD;
+	@:isVar public var allowLineBreaks(default, set):Bool = true;
 
 	@:isVar public var textureSmoothing(default, set):String; // Leave null to allow font to determine it's own smoothing
 	
@@ -132,7 +133,6 @@ class TextDisplay extends DisplayObjectContainer
 	
 	public var maxLines:Null<Int>;
 	public var maxCharacters:Null<Int>;
-	public var allowLineBreaks:Bool = true;
 	
 	public var ellipsis:String = "...";
 	
@@ -172,12 +172,12 @@ class TextDisplay extends DisplayObjectContainer
 		this.width = width;
 		this.height = height;
 		
-		addEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
-		addEventListener(Event.REMOVED_FROM_STAGE, onRemovedToStage);
+		//addEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
+		//addEventListener(Event.REMOVED_FROM_STAGE, onRemovedToStage);
 		
 		this.snapCharsTo = defaultSnapCharsTo;
 	}
-	private function onAddedToStage(e:Event):Void 
+	/*private function onAddedToStage(e:Event):Void 
 	{
 		TextDisplay.focusDispatcher.addEventListener(TextDisplayEvent.FOCUS, OnFocusChange);
 	}
@@ -190,7 +190,7 @@ class TextDisplay extends DisplayObjectContainer
 	{
 		if (TextDisplay.focus == this) hasFocus = true;
 		else hasFocus = false;
-	}
+	}*/
 	
 	function createModels() 
 	{
@@ -325,7 +325,7 @@ class TextDisplay extends DisplayObjectContainer
 	{
 		if (this.text == v) return v;
 		if (v == null) v = "";
-		if (!allowLineBreaks) v = FormatParser.removeLineBreaks(v);
+		//if (!allowLineBreaks) v = FormatParser.removeLineBreaks(v);
 		
 		if (maxCharacters != null) {
 			if (v.length >= maxCharacters) v = v.substr(0, maxCharacters - ellipsis.length) + ellipsis;
@@ -347,7 +347,7 @@ class TextDisplay extends DisplayObjectContainer
 	private function set_htmlText(v:String):String 
 	{
 		if (v == null) v = "";
-		if (!allowLineBreaks) v = FormatParser.removeLineBreaks(v);
+		//if (!allowLineBreaks) v = FormatParser.removeLineBreaks(v);
 		else v = v.split("<BR/>").join("<br/>");
 		
 		FormatParser.recycleNodes(contentModel.nodes);
@@ -400,6 +400,7 @@ class TextDisplay extends DisplayObjectContainer
 	{
 		if (hasFocus == value) return value;
 		hasFocus = value;
+        //if(!value && selection!= null) selection.clear();
 		dispatchEvent(new TextDisplayEvent(TextDisplayEvent.FOCUS_CHANGE));
 		UpdateActive();
 		return hasFocus;
@@ -493,7 +494,12 @@ class TextDisplay extends DisplayObjectContainer
 	private function set_textWrapping(value:TextWrapping):TextWrapping
 	{
 		textWrapping = value;
-		this.charLayout.textWrapping = value;
+		markForUpdate();
+		return value;
+	}
+	private function set_allowLineBreaks(value:Bool):Bool
+	{
+		allowLineBreaks = value;
 		markForUpdate();
 		return value;
 	}
@@ -668,7 +674,8 @@ class TextDisplay extends DisplayObjectContainer
 	
 	override function dispose() 
 	{
-		TextDisplay.focusDispatcher.removeEventListener(TextDisplayEvent.FOCUS, OnFocusChange);
+		if(TextDisplay.focus == this) TextDisplay.focus = null;
+
 		super.dispose();
 		charRenderer.dispose();
 	}
@@ -685,8 +692,12 @@ class TextDisplay extends DisplayObjectContainer
 	
 	static function set_focus(value:TextDisplay):TextDisplay 
 	{
+        if(focus == value) return value;
+
+        if(focus != null) focus.hasFocus = false;
 		focus = value;
-		TextDisplay.focusDispatcher.dispatchEvent(new Event(TextDisplayEvent.FOCUS));
+        if(focus != null) focus.hasFocus = true;
+		TextDisplay.focusDispatcher.dispatchEvent(new TextDisplayEvent(TextDisplayEvent.FOCUS_CHANGE));
 		return focus;
 	}
 	

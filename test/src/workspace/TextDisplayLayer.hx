@@ -3,6 +3,7 @@ package workspace;
 import starling.display.Sprite;
 import starling.text.TextDisplay;
 import starling.text.model.format.InputFormat;
+import starling.events.*;
 
 import model.Models;
 
@@ -10,6 +11,7 @@ class TextDisplayLayer extends Sprite
 {
     var format:InputFormat;
     var textDisplay:TextDisplay;
+    var ignoreChanges:Bool;
 
     public function new()
     {
@@ -19,7 +21,12 @@ class TextDisplayLayer extends Sprite
         format.color = 0x000000;
         
         textDisplay = new TextDisplay();
+        textDisplay.addEventListener(Event.CHANGE, onTextDisplayChange);
+        textDisplay.addEventListener(TextDisplayEvent.FOCUS_CHANGE, onFocusChange);
         addChild(textDisplay);
+
+        Models.text.text.add(onTextModelChange);
+        onTextModelChange();
 
         Models.text.text.bind(textDisplay, 'text');
         
@@ -51,6 +58,27 @@ class TextDisplayLayer extends Sprite
         Models.text.leading.add(updateFormat);
 
         updateFormat();
+    }
+
+    function onFocusChange(e:Event)
+    {
+        Models.text.hasFocus.data = (TextDisplay.focus == textDisplay);
+    }
+
+    function onTextDisplayChange(e:Event)
+    {
+        if(ignoreChanges) return;
+        ignoreChanges = true;
+        Models.text.text.data = textDisplay.text;
+        ignoreChanges = false;
+    }
+
+    function onTextModelChange()
+    {
+        if(ignoreChanges) return;
+        ignoreChanges = true;
+        textDisplay.text = Models.text.text.data;
+        ignoreChanges = false;
     }
 
     function updateFormat()

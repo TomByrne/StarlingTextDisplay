@@ -62,7 +62,6 @@ class JSCopyPaste
 			focusedTextDisplay.removeEventListener(Event.SELECT, OnTextSelectionChange);
 		}
 		focusedTextDisplay = value;
-		trace("focusedTextDisplay = " + (focusedTextDisplay != null));
 		
 		if (focusedTextDisplay != null) {
 			input.focus();

@@ -1,8 +1,6 @@
 package starling.text.control.focus;
 import starling.core.Starling;
-import starling.events.Touch;
-import starling.events.TouchEvent;
-import starling.events.TouchPhase;
+import starling.events.*;
 
 /**
  * ...
@@ -11,30 +9,51 @@ import starling.events.TouchPhase;
 @:access(starling.text)
 class ClickFocus
 {
-	private var textDisplay:TextDisplay;
+	var textDisplay:TextDisplay;
+    var stageListening:Bool;
 
 	@:allow(starling.text)
 	private function new(textDisplay:TextDisplay) 
 	{
 		this.textDisplay = textDisplay;
 		textDisplay.addEventListener(TouchEvent.TOUCH, onTouch);
+        textDisplay.addEventListener(TextDisplayEvent.FOCUS_CHANGE, onFocusChange);
 	}
 	
 	private function onTouch(e:TouchEvent):Void 
 	{
 		if (e.getTouch(textDisplay, TouchPhase.BEGAN) != null){
-			haxe.Timer.delay(SetFocus, 1);
+			haxe.Timer.delay(setFocus, 1);
 		}
 	}
 	
-	function SetFocus() 
+	function setFocus() 
 	{
-		textDisplay.hasFocus = true;
+        TextDisplay.focus = textDisplay;
 	}
-	
-	function OnPressStage(touch:Touch) 
-	{
-		textDisplay.hasFocus = false;
-	}
+
+    function onFocusChange(e:Event)
+    {
+        if(textDisplay.hasFocus)
+        {
+            if(!stageListening){
+                stageListening = true;
+                textDisplay.root.addEventListener(TouchEvent.TOUCH, onStageTouch);
+            }
+        }else if(stageListening){
+            stageListening = false;
+            textDisplay.root.removeEventListener(TouchEvent.TOUCH, onStageTouch);
+        }
+    }
+
+    function onStageTouch(e:TouchEvent)
+    {
+        if(e.data == null) return;
+
+        var beganTouch:Touch = e.getTouch(textDisplay.root, TouchPhase.BEGAN);
+        if(beganTouch == null) return;
+
+        if(e.getTouch(textDisplay) == null) TextDisplay.focus = null;
+    }
 	
 }

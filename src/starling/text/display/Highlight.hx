@@ -7,6 +7,7 @@ import starling.display.Canvas;
 import starling.display.DisplayObjectContainer;
 import starling.events.Event;
 import starling.events.TextDisplayEvent;
+import openfl.geom.Rectangle;
 
 /**
  * ...
@@ -14,6 +15,9 @@ import starling.events.TextDisplayEvent;
  */
 class Highlight extends DisplayObjectContainer
 {
+    static var rect:Rectangle = new Rectangle();
+    static var RectPool:Array<Rectangle> = [];
+
 	@:isVar public var highlightAlpha(get, set):Float = 0.5;
 	@:isVar public var highlightColour(get, set):UInt = 0x0000FF;
 	
@@ -61,39 +65,87 @@ class Highlight extends DisplayObjectContainer
 		
 		if (canvas == null) {
 			canvas = new Canvas();
-			//canvas.alpha = 0.5;
 			addChild(canvas);
 		}
 		
-		canvas.beginFill(textDisplay.highlightColour, textDisplay.highlightAlpha);
 		
 		var len:Int = (endChar.lineNumber - beginChar.lineNumber + 1);
+        var total:Int = 0;
+        var collisions:Array<Int> = [];
 		for (i in 0...len) 
 		{
 			var lineIndex:Int = beginChar.line.index + i;
 			var line:Line = textDisplay.charLayout.getLine(lineIndex);
 			if (textDisplay.maxLines != null && line.index >= textDisplay.maxLines) return;
-			//if (line.outsizeBounds) return;
+
+            var rect:Rectangle = getRect(total);
 			
-			var rectX = line.x;
-			var rectY = line.y;
-			var rectW = line.boundsWidth;
-			var rectH = line.height;
+			rect.x = line.x;
+			rect.y = line.y;// + line.paddingTop;
+			rect.width = line.boundsWidth;
+			rect.height = (line.y + line.height - line.paddingBottom) - rect.y;
 			if (i == 0 && i == len-1) {
-				rectX = beginChar.x;
-				rectW = endChar.x - rectX;
+				rect.x = beginChar.x;
+				rect.width = endChar.x - rect.x;
 				
 			}
 			else if (i == 0) {
-				rectX = beginChar.x;
-				rectW = line.boundsWidth - rectX + line.x;
+				rect.x = beginChar.x;
+				rect.width = line.boundsWidth - rect.x + line.x;
 			}
 			else if (i == len-1) {
-				rectW = endChar.x - line.x;
+				rect.width = endChar.x - line.x;
 			}
-			canvas.drawRectangle(rectX, rectY, rectW, rectH);
+
+            if(rect.width <= 0 || rect.height <= 0){
+                continue;
+            }
+
+            for(j in 0 ... total)
+            {
+                var otherRect:Rectangle = getRect(j);
+                if(otherRect.intersects(rect))
+                {
+                    var otherInd:Null<Int> = collisions[j];
+                    if(otherInd == null) otherInd = j;
+                    collisions[total] = otherInd;
+                }
+            }
+            total++;
 		}
+
+        // for(i in total)
+        // {
+        //     var group:Null<Int> = collisions[i];
+        //     if(group == null)
+        //     {
+        //         var
+        //         for(j in total)
+        //         {
+
+        //         }
+
+        //     }
+        // }
+
+		canvas.beginFill(textDisplay.highlightColour, textDisplay.highlightAlpha);
+		for (i in 0...total) 
+		{
+            var rect:Rectangle = getRect(i);
+			canvas.drawRectangle(rect.x, rect.y, rect.width, rect.height);
+        }
 	}
+
+    inline function getRect(ind:Int) : Rectangle
+    {
+        if(RectPool.length <= ind){
+            var ret = new Rectangle();
+            RectPool[ind] = ret;
+            return ret;
+        }else{
+            return RectPool[ind];
+        }
+    }
 	
 	function get_highlightAlpha():Float 
 	{

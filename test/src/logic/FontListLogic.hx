@@ -142,7 +142,7 @@ class FontListLogic
 
 		var range:Array<Int> = fontInfo.range;
 		if(range == null){
-			range = CharacterRanges.LATIN_ALL.concat(CharacterRanges.UNICODE_SYMBOLS).concat(CharacterRanges.LATIN_SUPPLEMENT);
+			range = CharacterRanges.LATIN_ALL.concat(CharacterRanges.UNICODE_SYMBOLS).concat(CharacterRanges.LATIN_SUPPLEMENT).concat(CharacterRanges.DIGITS);
 		}
 
 		var bitmapFontGenerator:SvgBitmapFontGenerator = new SvgBitmapFontGenerator( svgFontDisplays, fontInfo.size, svgFont.fontFamily, onFontGenerated.bind(fontInfo, svgFont));

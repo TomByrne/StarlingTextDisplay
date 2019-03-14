@@ -688,10 +688,10 @@ class FormatParser
 		}
 	}
 	
-	static public function removeLineBreaks(v:String) 
+	/*static public function removeLineBreaks(v:String) 
 	{
 		return v.split(SpecialChar.Return).join("").split(SpecialChar.NewLine).join("").split("<br>").join("").split("<br/>").join("");
-	}
+	}*/
 }
 
 class FormatNode
