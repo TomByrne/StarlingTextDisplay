@@ -406,7 +406,7 @@ class CharLayout extends EventDispatcher
 				
 				var charRise = char.font.baseline * scale;
 				var charLineHeight = char.font.lineHeight * scale;
-				var charFall = (char.font.lineHeight - char.font.baseline) * scale;
+				var charFall = charLineHeight - charRise;
 				var charLeading = char.format.leading;
 				
 				if (Math.isNaN(rise)){
@@ -513,7 +513,7 @@ class CharLayout extends EventDispatcher
             boundsB = boundsT + line.height;
 
         }else if (lastLine != null) {
-			boundsB = (lastLine.y + lastLine.height);
+			boundsB = (lastLine.y + lastLine.height) - (autoHeight ? lastLine.paddingBottom : 0);
 		}
 		
 		textDisplay._textBounds.setTo(boundsL, boundsT, boundsR - boundsL, boundsB - boundsT);
