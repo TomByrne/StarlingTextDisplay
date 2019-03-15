@@ -40,7 +40,7 @@ class FontSelect
     function onFiles(files:Array<FileString>)
     {
         if(files == null) return;
-
+        
         for(file in files){
             var fontInfo = {
                 filename: file.name,

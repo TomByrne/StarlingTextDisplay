@@ -1,6 +1,9 @@
 package logic;
 
 import starling.time.Tick;
+import starling.textures.Texture;
+import starling.text.TextField;
+import starling.text.model.format.FontRegistry;
 import model.Models;
 import model.FontModel;
 import starling.text.BitmapFont;
@@ -9,6 +12,10 @@ import font.svg.SvgBitmapFontGenerator;
 import font.svg.SvgFontDisplays;
 import font.svg.SvgFont;
 import font.CharacterRanges;
+import utils.FilePicker;
+import openfl.display.BitmapData;
+import utils.Base64ToBitmapData;
+import haxe.Timer;
 
 @:access(starling.text.model.format.FormatModel)
 class FontListLogic
@@ -51,13 +58,13 @@ class FontListLogic
                 // Remove old default font
                 fontModel.fonts.data.splice(i, 1);
             }else{
-		    	processSvgFontInfo(font);
+		    	processFontInfo(font);
                 i++;
             }
 		}
         // Add new default font
         fontModel.fonts.data.unshift(defaultFontInfo);
-        fontModel.fonts.dispatch(); // In case processSvgFontInfo tweaked the object
+        fontModel.fonts.dispatch(); // In case processFontInfo tweaked the object
 
         fontModel.renderScaling.add(rerenderFontsDelayed);
         fontModel.renderSuperSampling.add(rerenderFontsDelayed);
@@ -77,7 +84,7 @@ class FontListLogic
 		for(font in fontModel.fonts.data)
 		{
             if(font != defaultFontInfo){
-                processSvgFontInfo(font);
+                processFontInfo(font);
             }
         }
     }
@@ -89,22 +96,42 @@ class FontListLogic
 			switch(ext)
 			{
 				case 'svg': font.type = FontType.SVG;
+				case 'fnt': font.type = FontType.ANGEL_FONT;
 			}
 		}
 		if(font.type == null){
 			trace('Unknown font type');
 			return;
 		}
+
 		if(font.size == null){
 			font.size = Math.ceil(Models.text.size.data);
 		}
-		
-		if(processSvgFontInfo(font)){
+
+        if(font.type == FontType.ANGEL_FONT && font.fontData2 == null) {
+            // TODO: Clean this up - Delay to allow file picker to reset
+            Timer.delay(function(){
+                FilePicker.selectSingleBase64(onFontTextureLoaded.bind(_, font));
+            }, 1000);
+        }else{
+            doFontAdd(font);
+        }
+	}
+
+    function onFontTextureLoaded(file:FileString, font:FontInfo)
+    {
+        font.fontData2 = file.content;
+        doFontAdd(font);
+    }
+
+    function doFontAdd(font:FontInfo)
+    {
+		if(processFontInfo(font)){
 			fontModel.fonts.data.push(font);
 			fontModel.fonts.data.sort(sortFonts);
 			fontModel.fonts.dispatch();
 		}
-	}
+    }
 
 	function sortFonts(font1:FontInfo, font2:FontInfo) : Int
 	{
@@ -117,6 +144,56 @@ class FontListLogic
 		else if(n1 > n2) return 1;
 		else return 0;
 	}
+
+	function processFontInfo(fontInfo:FontInfo) : Bool
+	{
+        return switch(fontInfo.type)
+        {
+            case SVG: processSvgFontInfo(fontInfo);
+            case ANGEL_FONT: processAngelFontInfo(fontInfo);
+            case BUILT_IN: false;
+        }
+    }
+    
+	function processAngelFontInfo(fontInfo:FontInfo) : Bool
+	{
+		if(fontInfo.fontData == null)
+		{
+			trace('No font data');
+			return false;
+		}
+		if(fontInfo.fontData2 == null)
+		{
+			trace('No font texture');
+			return false;
+		}
+
+        var fontData:Xml = Xml.parse(fontInfo.fontData);
+        Base64ToBitmapData.go(fontInfo.fontData2, onBitmapLoaded.bind(_, fontData));
+
+        return true;
+    }
+
+    function onBitmapLoaded(bitmapData:BitmapData, fontData:Xml)
+    {
+        if(bitmapData == null){
+            trace("Failed to load font texture");
+            return;
+        }
+        var texture:Texture = Texture.fromBitmapData(bitmapData);
+        registerFont(new BitmapFont(texture, fontData));
+    }
+
+    function registerFont(bitmapFont:BitmapFont)
+    {
+		var regName = bitmapFont.name + "_" + bitmapFont.size;
+		#if (starling < '2.0.0')
+		TextField.registerBitmapFont( bitmapFont, regName );
+		#else
+		TextField.registerCompositor( bitmapFont, regName );
+		#end
+		FontRegistry.registerBitmapFont(bitmapFont, regName);
+    }
 
 	function processSvgFontInfo(fontInfo:FontInfo) : Bool
 	{

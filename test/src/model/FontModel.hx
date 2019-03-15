@@ -24,6 +24,7 @@ typedef FontInfo =
     ?filename:String,
     ?type:FontType,
     ?fontData:String,
+    ?fontData2:String,
     ?size:Int,
     ?range:Array<Int>,
 }
@@ -31,5 +32,6 @@ typedef FontInfo =
 @:enum abstract FontType(String)
 {
     var SVG = 'svg';
+    var ANGEL_FONT = 'angelFont';
     var BUILT_IN = 'builtIn';
 }
