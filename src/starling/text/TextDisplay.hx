@@ -694,8 +694,10 @@ class TextDisplay extends DisplayObjectContainer
 	{
         if(focus == value) return value;
 
-        if(focus != null) focus.hasFocus = false;
+        var oldFocus:TextDisplay = focus;
+
 		focus = value;
+        if(oldFocus != null) oldFocus.hasFocus = false;
         if(focus != null) focus.hasFocus = true;
 		TextDisplay.focusDispatcher.dispatchEvent(new TextDisplayEvent(TextDisplayEvent.FOCUS_CHANGE));
 		return focus;

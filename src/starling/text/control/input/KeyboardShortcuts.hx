@@ -19,7 +19,6 @@ class KeyboardShortcuts
 	public var active(get, set):Null<Bool>;
 	
 	var selection:Selection;
-	//var get_value:Void-> String;
 	var textDisplay:TextDisplay;
 
 	@:allow(starling.text)
@@ -33,7 +32,6 @@ class KeyboardShortcuts
 	{
 		if (e.isDefaultPrevented()) return;
 		
-		//trace(e);
 		if (!e.altKey){
 			if (e.keyCode == Keyboard.LEFT && e.shiftKey == false) ChangeIndex( -1, e.ctrlKey);
 			else if (e.keyCode == Keyboard.RIGHT && e.shiftKey == false) ChangeIndex( 1, e.ctrlKey);
@@ -124,30 +122,24 @@ class KeyboardShortcuts
 		var newChar:Char = textDisplay.charLayout.getCharByLineAndPosX(selection.line + offset, char.x);
 		if (newChar != null) char = newChar;
 		if (selection.begin == null || selection.begin == selection.end) {
-			trace("line 1");
 			if (selection.index > char.index) {
-				trace("line 2");
 				begin = char.index;
 				end = selection.index;
 				index = begin;
 			}
 			else if (selection.index < char.index) {
-				trace("line 3");
 				begin = selection.index;
 				end = char.index;
 				index = end;
 			}
 			else {
-				trace("line 4");
 				if (offset < 0) {
-					trace("line 5");
 					if (newChar == null) begin = 0;
 					else begin = char.index;
 					end = char.index;
 					index = begin;
 				}
 				else {
-					trace("line 6");
 					begin = selection.index;
 					if (newChar == null) end = textDisplay.value.length;
 					else end = char.index;
@@ -157,16 +149,13 @@ class KeyboardShortcuts
 			}
 		}
 		else if (selection.begin < char.index) {
-			trace("line 7");
 			if (selection.end == selection.index) {
-				trace("line 8");
 				begin = selection.begin;
 				if (newChar == null) end = textDisplay.value.length;
 				else end = char.index;
 				index = end;
 			}
 			else {
-				trace("line 9");
 				begin = selection.end;
 				end = char.index;
 				index = end;
@@ -174,15 +163,12 @@ class KeyboardShortcuts
 			
 		}
 		else if (selection.end > char.index) {
-			trace("line 10");
 			if (selection.end == selection.index) {
-				trace("line 11");
 				begin = char.index;
 				end = selection.begin;
 				index = begin;
 			}
 			else {
-				trace("line 12");
 				if (newChar == null) begin = 0;
 				else begin = char.index;
 				end = selection.end;
