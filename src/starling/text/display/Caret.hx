@@ -47,7 +47,7 @@ class Caret extends DisplayObjectContainer
 		addChild(quad);
 		
 		textDisplay.selection.addEventListener(Event.SELECT, OnSelectionChange);
-		textDisplay.charLayout.addEventListener(Event.CHANGE, UpdateVis);
+		textDisplay.charLayout.layoutChanged.add(UpdateVis);
 		
 		timer = new Timer(500, 0);
 		timer.addEventListener(TimerEvent.TIMER, OnTick);

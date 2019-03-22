@@ -8,7 +8,6 @@ import starling.events.Event;
 import starling.events.TextDisplayEvent;
 import starling.events.EventDispatcher;
 import starling.text.TextFieldAutoSize;
-import starling.text.control.ChangeControl;
 import starling.text.control.focus.ClickFocus;
 import starling.text.control.history.HistoryControl;
 import starling.text.control.input.KeyboardInput;
@@ -52,6 +51,8 @@ class TextDisplay extends DisplayObjectContainer
 {
 	static public var defaultSnapCharsTo:Float = 0;
 
+    static var resizeEvent:Event;
+
 	// DISPLAY
 	@:allow(starling.text) var caret:Caret;
 	@:allow(starling.text) var highlight:Highlight;
@@ -74,7 +75,6 @@ class TextDisplay extends DisplayObjectContainer
 	@:allow(starling.text) var charRenderer:CharRenderer;
 	
 	// CONTROLLERS
-	private var changeControl:ChangeControl;
 	private var keyboardShortcuts:KeyboardShortcuts;
 	private var keyboardInput:KeyboardInput;
 	private var mouseInput:MouseInput;
@@ -164,33 +164,14 @@ class TextDisplay extends DisplayObjectContainer
 		createModels();
 		createUtils();
 		createDisplays();
-		
-		changeControl = new ChangeControl(this);
 		createListeners();
 		
 		hasFocus = false;
 		this.width = width;
 		this.height = height;
 		
-		//addEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
-		//addEventListener(Event.REMOVED_FROM_STAGE, onRemovedToStage);
-		
 		this.snapCharsTo = defaultSnapCharsTo;
 	}
-	/*private function onAddedToStage(e:Event):Void 
-	{
-		TextDisplay.focusDispatcher.addEventListener(TextDisplayEvent.FOCUS, OnFocusChange);
-	}
-	private function onRemovedToStage(e:Event):Void 
-	{
-		TextDisplay.focusDispatcher.removeEventListener(TextDisplayEvent.FOCUS, OnFocusChange);
-	}
-	
-	private function OnFocusChange(e:Event):Void 
-	{
-		if (TextDisplay.focus == this) hasFocus = true;
-		else hasFocus = false;
-	}*/
 	
 	function createModels() 
 	{
@@ -201,7 +182,16 @@ class TextDisplay extends DisplayObjectContainer
 		historyModel = new HistoryModel(this);
 		alignment = new Alignment(this);
 		boundsControl = new BoundsControl(this);
+
+        charLayout.boundsChanged.add(onBoundsChanged);
 	}
+
+    function onBoundsChanged(){
+        if(hasEventListener(Event.RESIZE)){
+            if(resizeEvent == null) resizeEvent = new Event(Event.RESIZE);
+            dispatchEvent(resizeEvent);
+        }
+    }
 	
 	function createUtils() 
 	{
@@ -488,7 +478,7 @@ class TextDisplay extends DisplayObjectContainer
 	private function set_clipOverflow(value:Bool):Bool
 	{
 		clipOverflow = value;
-		this.clipMask.Update();
+		this.clipMask.update();
 		return value;
 	}
 	private function set_textWrapping(value:TextWrapping):TextWrapping

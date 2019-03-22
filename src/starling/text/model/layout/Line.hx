@@ -8,32 +8,40 @@ import starling.text.model.layout.Char;
  */
 class Line
 {
+    static var pool:Array<Line> = [];
+
+    public static function take() : Line
+    {
+        if(pool.length > 0) return pool.pop();
+        return new Line();
+    }
+
 	public var index:Int;
 	
-	private var _height:Float = 9;
+	var _height:Float;
 	public var height(get, null):Float;
 	
-	private var _totalWidth:Float = 0;
+	var _totalWidth:Float;
 	public var totalWidth(get, null):Float;
 	
-	private var _boundsWidth:Float = 0;
+	var _boundsWidth:Float;
 	public var boundsWidth(get, null):Float;
     
 	public var right(get, null):Float;
 	
-	private var _rise:Float;
+	var _rise:Float;
 	public var rise(get, null):Float;
 	
-	private var _fall:Float;
+	var _fall:Float;
 	public var fall(get, null):Float;
 	
-	private var _leading:Float;
+	var _leading:Float;
 	public var leading(get, null):Float;
 	
-	private var _paddingTop:Float;
+	var _paddingTop:Float;
 	public var paddingTop(get, null):Float;
 	
-	private var _paddingBottom:Float;
+	var _paddingBottom:Float;
 	public var paddingBottom(get, null):Float;
 	
 	public var y:Float = 0;
@@ -45,7 +53,7 @@ class Line
 	
 	@:isVar public var isEmptyLine(get, null):Bool;
 	
-	public function new() { }	
+    function new(){}
 	
 	public function setMetrics(lineHeight:Float, rise:Float, fall:Float, leading:Float, paddingTop:Float, paddingBottom:Float) 
 	{
@@ -55,6 +63,8 @@ class Line
 		_leading = leading;
 		_paddingTop = paddingTop;
 		_paddingBottom = paddingBottom;
+
+        calcDimensions();
 	}
 	
 	function get_height():Float 
@@ -120,36 +130,8 @@ class Line
 		return true;
 	}
 
-    public function calcDimensions()
+    function calcDimensions()
     {
-		/*var x:Float = 0;
-		var width:Float = 0;
-
-		var validChar:Bool = false;
-        var whiteChars:Float = 0;
-		for (i in 0...chars.length) 
-		{
-			var char = chars[i];
-			if (char.bitmapChar != null) {
-                var isWhitespace = char.isWhitespace;
-			    if (!isWhitespace) validChar = true;
-                var charSize:Float = char.bitmapChar.xAdvance * char.scale;
-                if(i < chars.length - 1) charSize += char.format.kerning;
-				if(validChar){
-                    width += charSize;
-                    if(isWhitespace){
-                        whiteChars += charSize;
-                    }else{
-                        whiteChars = 0;
-                    }
-                }else{
-                    x += charSize;
-                }
-			}
-		}
-        this.x = x;
-        _width = width - whiteChars;*/
-        
         var firstBoundsChar:Char = null;
         var lastBoundsChar:Char = null;
         var lastValidChar:Char = null;
@@ -181,5 +163,28 @@ class Line
             var lastX:Float = lastBoundsChar.x - (lastBoundsChar.bitmapChar.xOffset * lastBoundsChar.scale);
             _boundsWidth = (lastX + lastBoundsChar.format.kerning + lastBoundsChar.bitmapChar.xAdvance * lastBoundsChar.scale) - x;
         }
+    }
+
+    public function dispose(){
+		_height = 0;
+		_rise = 0;
+		_fall = 0;
+		_leading = 0;
+		_paddingTop = 0;
+		_paddingBottom = 0;
+        _boundsWidth = 0;
+        _totalWidth = 0;
+
+        index = 0;
+        visible = true;
+        x = 0;
+        y = 0;
+
+        while(chars.length > 0)
+        {
+            chars.pop();
+        }
+
+        pool.push(this);
     }
 }

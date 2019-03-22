@@ -10,38 +10,33 @@ import starling.text.model.layout.Line;
 import starling.text.model.selection.Selection;
 import starling.text.model.layout.Word;
 import starling.display.Quad;
-import starling.events.Event;
-import starling.events.EventDispatcher;
 import starling.text.BitmapChar;
 import starling.text.TextDisplay;
 import starling.text.util.CharacterHelper;
 import starling.utils.SpecialChar;
 
-/*#if starling2
-	import starling.utils.Align;
-#else*/
-	import starling.utils.HAlign;
-	import starling.utils.VAlign;
-//#end
-
+import starling.utils.HAlign;
+import starling.utils.VAlign;
+import starling.utils.On;
 import starling.text.TextFieldAutoSize;
 
 /**
  * ...
  * @author P.J.Shand
  */
-class CharLayout extends EventDispatcher
+class CharLayout
 {
-	private var lineNumber:Int;
-	private var placementX:Float;
-	private var placementY:Float;
-	private var words:Array<Word>;
-	private var charLinePositionX:Int;
-	private var textDisplay:TextDisplay;
-	private var _endChar:EndChar;
-	private var endChar(get, null):EndChar;
-	private var changeEvent:Event;
-	private var resizeEvent:Event;
+    public var layoutChanged:On = new On();
+    public var boundsChanged:On = new On();
+
+	var lineNumber:Int;
+	var placementX:Float;
+	var placementY:Float;
+	var words:Array<Word>;
+	var charLinePositionX:Int;
+	var textDisplay:TextDisplay;
+	var _endChar:EndChar;
+	var endChar(get, null):EndChar;
 	var wordBreakFound:Bool;
 	var limitReached:Bool;
 	
@@ -63,7 +58,6 @@ class CharLayout extends EventDispatcher
 	@:allow(starling.text)
 	private function new(textDisplay:TextDisplay) 
 	{
-		super();
 		this.textDisplay = textDisplay;
 		
 		_endChar = new EndChar("", 0, textDisplay);
@@ -71,9 +65,6 @@ class CharLayout extends EventDispatcher
 		allCharacters = [_endChar];
 		
 		defaultChar = new Char(null, 0);
-		
-		resizeEvent = new Event(Event.RESIZE);
-		changeEvent = new Event(Event.CHANGE);
 	}
 	
 	public function doProcess() 
@@ -95,7 +86,6 @@ class CharLayout extends EventDispatcher
 		setLinePositions();
 		
 		calcTextSize();
-		this.dispatchEvent(resizeEvent);
 		align();
 		
         var sizeChange:Bool = false;
@@ -114,10 +104,8 @@ class CharLayout extends EventDispatcher
 			sizeChange = true;
 		}
 		
-		this.dispatchEvent(changeEvent);
-		if (sizeChange && textDisplay.hasEventListener(Event.RESIZE)){
-			textDisplay.dispatchEvent(resizeEvent);
-		}
+		layoutChanged.fire();
+		if (sizeChange) boundsChanged.fire();
 	}
 	
 	public function getChar(index:Int):Char
@@ -370,7 +358,9 @@ class CharLayout extends EventDispatcher
 	
 	function findLineHeight() 
 	{
-		lines = new Array<Line>();
+		while(lines.length > 0){
+            lines.pop().dispose();
+        }
 		
 		var rise:Float = Math.NaN;
 		var fall:Float = Math.NaN;
@@ -389,7 +379,7 @@ class CharLayout extends EventDispatcher
 					lineStack = finishLine(line, lineHeight, rise, fall, leading, lineStack, top, bottom, lines.length == 1, false);
 				}
 				
-				line = new Line();
+				line = Line.take();
 				line.index = lines.length;
 				lines.push(line);
 				rise = Math.NaN;
@@ -489,7 +479,6 @@ class CharLayout extends EventDispatcher
 		for (i in 0...lines.length) 
 		{
 			var line = lines[i];
-            line.calcDimensions();
             if(line.boundsWidth == 0 || line.height == 0) continue;
 
             if(firstLine == null)

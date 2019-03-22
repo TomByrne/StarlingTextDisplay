@@ -25,17 +25,17 @@ class HitArea extends Quad
 		
 		alpha = 0;
 		
-		textDisplay.charLayout.addEventListener(Event.CHANGE, OnLayoutChange);
+		textDisplay.charLayout.layoutChanged.add(onLayoutChange);
 		textDisplay.addEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
-		OnLayoutChange(null);
+		onLayoutChange();
 	}
 	
 	private function onAddedToStage(e:Event):Void 
 	{
-		OnLayoutChange(null);
+		onLayoutChange();
 	}
 	
-	private function OnLayoutChange(e:Event):Void 
+	private function onLayoutChange():Void 
 	{
 		if (textDisplay.stage == null) return;
 		

@@ -33,7 +33,7 @@ class HistoryControl
 		
 		historyModel.onActiveChange.add(OnActiveChange);
 		
-		textDisplay.charLayout.addEventListener(Event.CHANGE, onTextChange);
+		textDisplay.charLayout.layoutChanged.add(onTextChange);
 		selection.addEventListener(Event.SELECT, onSelectionChange);
 	}
 	
@@ -68,7 +68,7 @@ class HistoryControl
 		}
 	}
 	
-	private function onTextChange(e:Event):Void 
+	private function onTextChange():Void 
 	{
 		if (historyModel.ignoreChanges || !historyModel.active || ignoreChanges) return;
 		

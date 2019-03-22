@@ -47,6 +47,7 @@ class CharRenderer
 	private function new(textDisplay:TextDisplay)
 	{
 		this.textDisplay = textDisplay;
+        textDisplay.charLayout.layoutChanged.add(render);
 	}
 	
 	public function setColor(color:Null<UInt>):Void
@@ -62,9 +63,9 @@ class CharRenderer
 		#end
 	}
 	
-	public function render(characters:Array<Char>) 
+	public function render() 
 	{
-		this.characters = characters;
+		this.characters = textDisplay.contentModel.characters;
 		clearBatches();
 		
 		for (j in 0...characters.length) 

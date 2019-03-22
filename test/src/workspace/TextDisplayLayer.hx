@@ -58,6 +58,8 @@ class TextDisplayLayer extends Sprite
         Models.text.leading.add(updateFormat);
 
         updateFormat();
+
+        onFocusChange(null); // reset model
     }
 
     function onFocusChange(e:Event)

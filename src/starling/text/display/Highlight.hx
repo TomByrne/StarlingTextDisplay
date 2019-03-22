@@ -30,13 +30,13 @@ class Highlight extends DisplayObjectContainer
 		super();
 		this.textDisplay = textDisplay;
 		
-		textDisplay.selection.addEventListener(Event.SELECT, OnSelectionChange);
-		textDisplay.charLayout.addEventListener(Event.CHANGE, OnSelectionChange);
-		textDisplay.addEventListener(TextDisplayEvent.FOCUS_CHANGE, OnFocusChange);
+		textDisplay.selection.addEventListener(Event.SELECT, onSelectionChange);
+		textDisplay.charLayout.layoutChanged.add(onSelectionChange);
+		textDisplay.addEventListener(TextDisplayEvent.FOCUS_CHANGE, onFocusChange);
 		
 	}
 	
-	private function OnFocusChange(e:Event):Void 
+	private function onFocusChange(e:Event):Void 
 	{
 		if (textDisplay != TextDisplay.focus) {
 			if (canvas != null) {
@@ -45,7 +45,7 @@ class Highlight extends DisplayObjectContainer
 		}
 	}
 	
-	private function OnSelectionChange(e:Event):Void 
+	private function onSelectionChange():Void 
 	{
 		updateDisplay();
 	}

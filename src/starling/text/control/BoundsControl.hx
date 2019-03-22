@@ -23,9 +23,7 @@ class BoundsControl extends Border
 		super();
 		
 		this.textDisplay = textDisplay;
-		
-		//textDisplay.addEventListener(TextDisplayEvent.SIZE_CHANGE, OnLayoutChange);
-		textDisplay.addEventListener(Event.RESIZE, OnLayoutChange);
+		textDisplay.charLayout.boundsChanged.add(onLayoutChange);
 	}
 	
 	
@@ -47,7 +45,7 @@ class BoundsControl extends Border
 		}
 	}
 	
-	private function OnLayoutChange(e:Event):Void 
+	private function onLayoutChange():Void 
 	{
 		if (textDisplay.textBorder != null) resizeTextBorder();
 		if (textDisplay.boundsBorder != null) resizeBoundsBorder();

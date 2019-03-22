@@ -26,26 +26,21 @@ class ClipMask extends Quad
 		super(textDisplay.width, textDisplay.height, 0xFFFF00FF);
 		this.textDisplay = textDisplay;
 		
-		//textDisplay.addEventListener(TextDisplayEvent.SIZE_CHANGE, updateMask);
-		textDisplay.addEventListener(Event.RESIZE, updateMask);
+		textDisplay.charLayout.boundsChanged.add(updateMask);
 		textDisplay.alignment.addEventListener(Event.CHANGE, updateMask);
-		updateMask(null);
+		updateMask();
 	}
 	
-	private function updateMask(e:Event):Void 
+	private function updateMask():Void 
 	{
-		Update();
-		Tick.once(Update, 2);
+		update();
+		Tick.once(update, 2);
 	}
 	
-	public function Update():Void 
+	public function update():Void 
 	{
 		this.width = textDisplay.targetWidth;
 		this.height = textDisplay.targetHeight;
-		/*if (textDisplay.charLayout.lines.length > 0) {
-			var lastLineHeight:Float = textDisplay.charLayout.lines[textDisplay.charLayout.lines.length - 1].height;
-			this.height += lastLineHeight;
-		}*/
 		
 		if (textDisplay.clipOverflow && (textDisplay.textBounds.width > textDisplay.width || textDisplay.textBounds.height > textDisplay.height)) {
 			this.visible = true;

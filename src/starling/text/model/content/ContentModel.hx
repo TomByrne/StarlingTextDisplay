@@ -16,8 +16,6 @@ class ContentModel
 	
 	private var textDisplay:TextDisplay;
 	public var characters = new Array<Char>();
-	//public var chars = new Array<Character>();
-	//public var formatLengths:Array<FormatLength>;
 	
 	public var _nodes = new Array<FormatNode>();
 	public var nodes(get, set):Array<FormatNode>;
