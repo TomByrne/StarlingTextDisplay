@@ -65,21 +65,25 @@ class CharLayout
 		allCharacters = [_endChar];
 		
 		defaultChar = new Char(null, 0);
+
+        textDisplay.contentModel.charactersChanged.add(onCharsChanged);
 	}
+
+    function onCharsChanged()
+    {
+		this.characters = textDisplay.contentModel.characters;
+		this.allCharacters = characters.concat([_endChar]);
+    }
 	
 	public function doProcess() 
 	{
-		this.characters = textDisplay.contentModel.characters;
-		this.allCharacters = characters.concat([_endChar]);
-		
-		var iformat:InputFormat = textDisplay.defaultFormat;
-		CharacterHelper.updateCharFormat(textDisplay.defaultFormat, defaultChar, textDisplay.formatModel.defaultFont);
 
         var oldTextX:Float = textDisplay._textBounds.x;
         var oldTextY:Float = textDisplay._textBounds.y;
         var oldTextW:Float = textDisplay._textBounds.width;
         var oldTextH:Float = textDisplay._textBounds.height;
 		
+        CharacterHelper.updateCharFormat(textDisplay.defaultFormat, defaultChar, textDisplay.formatModel.defaultFont);
 		setPlacementX();
 		findWords();
 		findLineHeight();
@@ -87,26 +91,9 @@ class CharLayout
 		
 		calcTextSize();
 		align();
-		
-        var sizeChange:Bool = false;
-		var actualWidth:Float = (textDisplay.autoSize == TextFieldAutoSize.BOTH_DIRECTIONS || textDisplay.autoSize == TextFieldAutoSize.HORIZONTAL ? textDisplay.textWidth : textDisplay.targetWidth);
-		var actualHeight:Float = (textDisplay.autoSize == TextFieldAutoSize.BOTH_DIRECTIONS || textDisplay.autoSize == TextFieldAutoSize.VERTICAL ? textDisplay.textHeight : textDisplay.targetHeight);
 
-		if(textDisplay.actualWidth != actualWidth || textDisplay.actualHeight != actualHeight)
-		{
-			textDisplay.actualWidth = actualWidth;
-			textDisplay.actualHeight = actualHeight;
-			sizeChange = true;
-		}
-        
-		if(oldTextX != textDisplay._textBounds.x || oldTextY != textDisplay._textBounds.y || oldTextW != textDisplay._textBounds.width || oldTextH != textDisplay._textBounds.height)
-		{
-			sizeChange = true;
-		}
-		
-		layoutChanged.fire();
-		if (sizeChange) boundsChanged.fire();
-	}
+        checkChange(oldTextX, oldTextY, oldTextW, oldTextH);
+    }
 	
 	public function getChar(index:Int):Char
 	{
@@ -221,7 +208,7 @@ class CharLayout
 		textDisplay.selection.index += newStrSplit.length;
 	}
 	
-	function setPlacementX() 
+	#if !debug inline #end function setPlacementX() 
 	{
 		placementX = 0;
         placementY = 0;
@@ -320,7 +307,7 @@ class CharLayout
 		}
 	}
 	
-	private function progressLine():Void
+	#if !debug inline #end function progressLine():Void
 	{
 		wordBreakFound = false;	
 		charLinePositionX = 0;
@@ -331,7 +318,7 @@ class CharLayout
 		}
 	}
 	
-	function findWords() 
+	#if !debug inline #end function findWords() 
 	{
 		words = new Array<Word>();
 		
@@ -356,7 +343,7 @@ class CharLayout
 		}
 	}
 	
-	function findLineHeight() 
+	#if !debug inline #end function findLineHeight() 
 	{
 		while(lines.length > 0){
             lines.pop().dispose();
@@ -433,7 +420,7 @@ class CharLayout
 		}
 	}
 	
-	function finishLine(line:Line, lineHeight:Float, rise:Float, fall:Float, leading:Float, lineStack:Float, top:Float, bottom:Float, first:Bool, last:Bool) : Float 
+	#if !debug inline #end function finishLine(line:Line, lineHeight:Float, rise:Float, fall:Float, leading:Float, lineStack:Float, top:Float, bottom:Float, first:Bool, last:Bool) : Float 
 	{
 		if(line.index > 0) lineStack += leading;
 		
@@ -447,7 +434,7 @@ class CharLayout
 		return lineStack;
 	}
 	
-	function setLinePositions() 
+	#if !debug inline #end function setLinePositions() 
 	{
 		for (i in 0...allCharacters.length) 
 		{
@@ -464,7 +451,7 @@ class CharLayout
 		}
 	}
 	
-	function calcTextSize() : Void
+	#if !debug inline #end function calcTextSize() : Void
 	{
         var autoHeight:Bool = (textDisplay.autoSize == TextFieldAutoSize.VERTICAL || textDisplay.autoSize == TextFieldAutoSize.BOTH_DIRECTIONS);
         
@@ -508,7 +495,7 @@ class CharLayout
 		textDisplay._textBounds.setTo(boundsL, boundsT, boundsR - boundsL, boundsB - boundsT);
 	}
 	
-	function align() 
+	#if !debug inline #end function align() 
 	{
 		var textY:Float = textDisplay._textBounds.y;
 		var textHeight:Float = textDisplay._textBounds.height;
@@ -534,7 +521,7 @@ class CharLayout
 
 		alignOffsetY = snap(alignOffsetY);
 		
-		var targetWidth:Float = (autoWidth ? textDisplay.textWidth : textDisplay.targetWidth);
+		var targetWidth:Float = (autoWidth ? textDisplay._textBounds.width : textDisplay.targetWidth);
 		
         var minLineOffset:Float = 0;
         //var autoShiftX:Float = (autoWidth ? -textDisplay._textBounds.x : 0);
@@ -594,6 +581,28 @@ class CharLayout
         textDisplay._textBounds.y += alignOffsetY;
 
 	}
+
+    #if !debug inline #end function checkChange(oldTextX:Float, oldTextY:Float, oldTextW:Float, oldTextH:Float)
+    {
+        var sizeChange:Bool = false;
+		var actualWidth:Float = (textDisplay.autoSize == TextFieldAutoSize.BOTH_DIRECTIONS || textDisplay.autoSize == TextFieldAutoSize.HORIZONTAL ? textDisplay._textBounds.width : textDisplay.targetWidth);
+		var actualHeight:Float = (textDisplay.autoSize == TextFieldAutoSize.BOTH_DIRECTIONS || textDisplay.autoSize == TextFieldAutoSize.VERTICAL ? textDisplay._textBounds.height : textDisplay.targetHeight);
+
+		if(textDisplay.actualWidth != actualWidth || textDisplay.actualHeight != actualHeight)
+		{
+			textDisplay.actualWidth = actualWidth;
+			textDisplay.actualHeight = actualHeight;
+			sizeChange = true;
+		}
+        
+		if(oldTextX != textDisplay._textBounds.x || oldTextY != textDisplay._textBounds.y || oldTextW != textDisplay._textBounds.width || oldTextH != textDisplay._textBounds.height)
+		{
+			sizeChange = true;
+		}
+		
+		layoutChanged.fire();
+		if (sizeChange) boundsChanged.fire();
+    }
 
 	function snap(value:Float, ?forwardOnly:Bool):Float
 	{

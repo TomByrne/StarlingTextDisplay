@@ -5,6 +5,7 @@ import starling.text.model.layout.Char;
 import starling.text.util.FormatParser;
 import starling.text.util.FormatParser.FormatNode;
 import starling.text.util.InputFormatHelper;
+import starling.utils.On;
 
 /**
  * ...
@@ -14,9 +15,11 @@ class ContentModel
 {
 	static var charPool:Array<Char> = [];
 	
-	private var textDisplay:TextDisplay;
+	var textDisplay:TextDisplay;
+
+    public var charactersChanged:On = new On();
+
 	public var characters = new Array<Char>();
-	
 	public var _nodes = new Array<FormatNode>();
 	public var nodes(get, set):Array<FormatNode>;
 	
@@ -40,6 +43,7 @@ class ContentModel
 				characters[i] = newChar(str.charAt(i), i);
 			}
 		}
+        charactersChanged.fire();
 	}
 	
 	function clearChars() 

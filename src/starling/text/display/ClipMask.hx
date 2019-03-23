@@ -3,7 +3,6 @@ package starling.text.display;
 import starling.time.Tick;
 import starling.display.Quad;
 import starling.events.Event;
-import starling.events.TextDisplayEvent;
 
 #if (starling >= "2.0.0")
 

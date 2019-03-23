@@ -85,7 +85,7 @@ class CharRenderer
 							image.touchable = false;
 							CharImageMap.set(char.bitmapChar, image);
 						}
-						image.scaleX = image.scaleY = char.scale;
+						if(char.scale != image.scaleX) image.scaleX = image.scaleY = char.scale;
 
                         var smoothing:String = textDisplay.textureSmoothing;
                         if(smoothing == null) smoothing = char.font.smoothing;
@@ -93,15 +93,14 @@ class CharRenderer
 						
 						image.x = char.x;
 						image.y = char.y;
-						image.rotation = char.rotation;
+						if(image.rotation != char.rotation) image.rotation = char.rotation;
 						
-						if (char.color != null) image.color = char.color;
-						else if (color == null) image.color = char.format.color;
-						else image.color = color;
-						
-						//image.touchable = false;
-						//images[imageCount] = image;
-						//imageCount++;
+                        var color:UInt;
+						if (char.color != null) color = char.color;
+						else if (this.color == null) color = char.format.color;
+						else color = this.color;
+
+                        if(image.color != color) image.color = color;
 						
 						var quadBatch = batches[char.format.face];
 						if (quadBatch==null){

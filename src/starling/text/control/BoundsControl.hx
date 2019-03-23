@@ -5,7 +5,6 @@ import starling.display.Quad;
 import starling.display.Sprite;
 import starling.events.Event;
 import starling.utils.VAlign;
-import starling.events.TextDisplayEvent;
 
 /**
  * ...
