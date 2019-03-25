@@ -181,6 +181,8 @@ class CharLayout
 		}
 		textDisplay.triggerUpdate(true);
 		textDisplay.selection.index = start; // Must set index after updating text otherwise HistoryControl will modify previous HistoryStep
+        
+        onCharsChanged();
 	}
 	
 	public function add(newStr:String, index:Int):Void
@@ -206,6 +208,8 @@ class CharLayout
 		}
 		textDisplay.triggerUpdate(true);
 		textDisplay.selection.index += newStrSplit.length;
+
+        onCharsChanged();
 	}
 	
 	#if !debug inline #end function setPlacementX() 
