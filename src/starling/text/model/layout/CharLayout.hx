@@ -51,7 +51,7 @@ class CharLayout
 		return value;
 	}
 	
-	public var characters = new Array<Char>();
+	public var characters:Array<Char>;
 	public var allCharacters:Array<Char>;
 	public var lines = new Array<Line>();
 	
@@ -67,11 +67,13 @@ class CharLayout
 		defaultChar = new Char(null, 0);
 
         textDisplay.contentModel.charactersChanged.add(onCharsChanged);
+
+        characters = textDisplay.contentModel.characters;
+        onCharsChanged();
 	}
 
     function onCharsChanged()
     {
-		this.characters = textDisplay.contentModel.characters;
 		this.allCharacters = characters.concat([_endChar]);
     }
 	
@@ -179,10 +181,10 @@ class CharLayout
 		{
 			characters[i].index -= end - start;
 		}
-		textDisplay.triggerUpdate(true);
-		textDisplay.selection.index = start; // Must set index after updating text otherwise HistoryControl will modify previous HistoryStep
         
         onCharsChanged();
+		textDisplay.triggerUpdate(true);
+		textDisplay.selection.index = start; // Must set index after updating text otherwise HistoryControl will modify previous HistoryStep
 	}
 	
 	public function add(newStr:String, index:Int):Void
@@ -206,10 +208,10 @@ class CharLayout
 		{
 			characters[i].index += newStrSplit.length;
 		}
-		textDisplay.triggerUpdate(true);
-		textDisplay.selection.index += newStrSplit.length;
 
         onCharsChanged();
+		textDisplay.triggerUpdate(true);
+		textDisplay.selection.index += newStrSplit.length;
 	}
 	
 	#if !debug inline #end function setPlacementX() 

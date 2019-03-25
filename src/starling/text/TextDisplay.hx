@@ -442,12 +442,14 @@ class TextDisplay extends DisplayObjectContainer
 		}
 	}
 	
-	private function add(letter:String, index:Int):Void
+	private function add(letter:String, ?index:Int):Void
 	{
 		if (!allowLineBreaks && SpecialChar.isLineBreak(letter)) return;
 		if (maxCharacters != null){
 			if (_value.length >= maxCharacters) return;
 		}
+
+        if(index == null) index = _value.length;
 		
 		var newValue:String = _value;
 		if (index == _value.length){
