@@ -74,7 +74,8 @@ class CharLayout
 
     function onCharsChanged()
     {
-		this.allCharacters = characters.concat([_endChar]);
+        characters = textDisplay.contentModel.characters;
+		allCharacters = characters.concat([_endChar]);
     }
 	
 	public function doProcess() 
