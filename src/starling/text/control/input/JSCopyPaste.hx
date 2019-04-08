@@ -39,7 +39,7 @@ class JSCopyPaste
 			_input.style.setProperty("z-index", "-1");
 			
 			var doc = Browser.document;
-			var openflContent = doc.getElementById('openfl-content');
+			var openflContent = doc.getElementById('content');
 			openflContent.appendChild(_input);
 		}
 		return _input;
