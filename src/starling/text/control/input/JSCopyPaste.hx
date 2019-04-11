@@ -40,7 +40,8 @@ class JSCopyPaste
 			
 			var doc = Browser.document;
 			var openflContent = doc.getElementById('content');
-			if(openflContent == null) = doc.getElementById('openfl-content');
+			if(openflContent == null) openflContent = doc.getElementById('openfl-content');
+			if(openflContent == null) openflContent = js.Browser.document.body;
 			openflContent.appendChild(_input);
 		}
 		return _input;
