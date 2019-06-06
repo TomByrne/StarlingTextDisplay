@@ -3,6 +3,11 @@ package starling.time;
 import haxe.MainLoop;
 import signal.Signal;
 
+/**
+
+For whatever reason, using MainLoop seems to break Lime apps.
+
+**/
 @:noCompletion
 class Tick_MainLoop
 {

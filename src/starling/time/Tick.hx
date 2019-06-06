@@ -1,4 +1,7 @@
 package starling.time;
 
-
-typedef Tick = Tick_Timer;
+#if js
+typedef Tick = Tick_js;
+#else
+typedef Tick = Tick_MainLoop;
+#end
