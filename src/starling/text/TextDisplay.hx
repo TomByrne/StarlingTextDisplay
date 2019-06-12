@@ -83,7 +83,7 @@ class TextDisplay extends DisplayObjectContainer
 	private var eventForwarder:EventForwarder;
 	private var clickFocus:ClickFocus;
 	
-	@:isVar public var color(get, set):Null<UInt> = null;
+	@:isVar public var color(default, set):Null<UInt> = null;
 	
 	private var _value:String = "";
 	@:allow(starling.text) var value(get, set):String;
@@ -95,7 +95,7 @@ class TextDisplay extends DisplayObjectContainer
 	
 	@:isVar public var text(get, set):String;
 	@:isVar public var htmlText(get, set):String;
-	@:isVar public var autoSize(get, set):String;
+	@:isVar public var autoSize(default, set):String;
 	@:isVar private var hasFocus(default, set):Bool = false;
 	@:isVar public var editable(default, set):Bool = false;
 	
@@ -140,7 +140,7 @@ class TextDisplay extends DisplayObjectContainer
 	
 	@:isVar public var numLines(get, null):Int;
 	
-	@:isVar public static var focus(get, set):TextDisplay = null;
+	@:isVar public static var focus(default, set):TextDisplay = null;
 	static var focusDispatcher = new EventDispatcher();
 	
 	var editabilitySetup:Bool = false;
@@ -480,7 +480,7 @@ class TextDisplay extends DisplayObjectContainer
 	private function set_clipOverflow(value:Bool):Bool
 	{
 		clipOverflow = value;
-		this.clipMask.update();
+		this.clipMask.updateMask();
 		return value;
 	}
 	private function set_textWrapping(value:TextWrapping):TextWrapping
@@ -635,11 +635,6 @@ class TextDisplay extends DisplayObjectContainer
 		}
 	}
 	
-	function get_autoSize():String 
-	{
-		return autoSize;
-	}
-	
 	function set_autoSize(value:String):String 
 	{
 		if (autoSize == value) return value;
@@ -677,11 +672,6 @@ class TextDisplay extends DisplayObjectContainer
 		return charLayout.lines.length;
 	}
 	
-	static function get_focus():TextDisplay 
-	{
-		return focus;
-	}
-	
 	static function set_focus(value:TextDisplay):TextDisplay 
 	{
         if(focus == value) return value;
@@ -693,11 +683,6 @@ class TextDisplay extends DisplayObjectContainer
         if(focus != null) focus.hasFocus = true;
 		TextDisplay.focusDispatcher.dispatchEvent(new TextDisplayEvent(TextDisplayEvent.FOCUS_CHANGE));
 		return focus;
-	}
-	
-	function get_color():Int 
-	{
-		return color;
 	}
 	
 	function set_color(value:Null<UInt>):Null<UInt> 
