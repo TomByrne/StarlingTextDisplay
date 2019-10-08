@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<vbox id="main" height="100%">
+
+    <style source="/../css/main.css" />
+
+    <textarea id="text" width="100%" height="100" placeholder="Text"/>
+
+    <hbox width="100%">
+        <label text="Size:" verticalAlign="center" width="62"/>
+        <textfield id="sizeText" width="38" restrictChars="0-9"/>
+        <hslider id="sizeSlider" width="100%" height="30" min="2" max="400"/>
+    </hbox>
+
+    <hbox width="100%">
+        <dropdown id="fontSelect" text="Font" width="100%"/>
+        <button id="addFont" text="+" width="20"/>
+    </hbox>
+
+    <dropdown id="hAlign" width="100%" text="HAlign">
+        <data>
+            <item value="HAlign: Left" childId="left" />
+            <item value="HAlign: Center" childId="center" />
+            <item value="HAlign: Right" childId="right" />
+            <item value="HAlign: Justify" childId="justify" />
+        </data>
+    </dropdown>
+
+    <dropdown id="vAlign" width="100%" text="VAlign">
+        <data>
+            <item value="VAlign: Top" childId="top" />
+            <item value="VAlign: Center" childId="center" />
+            <item value="VAlign: Bottom" childId="bottom" />
+        </data>
+    </dropdown>
+
+    <dropdown id="autoSize" width="100%" text="AutoSize">
+        <data>
+            <item value="AutoSize: None" childId="none" />
+            <item value="AutoSize: Both Directions" childId="bothDirections" />
+            <item value="AutoSize: Horizontal" childId="horizontal" />
+            <item value="AutoSize: Vertical" childId="vertical" />
+        </data>
+    </dropdown>
+
+    <dropdown id="smoothing" width="100%" text="Smoothing">
+        <data>
+            <item value="Smoothing: Auto" />
+            <item value="Smoothing: None" childId="none" />
+            <item value="Smoothing: Bilinear" childId="bilinear" />
+            <item value="Smoothing: Trilinear" childId="trilinear" />
+        </data>
+    </dropdown>
+
+    <hbox width="100%">
+        <label text="Width:" verticalAlign="center" width="62"/>
+        <textfield id="widthText" width="38" restrictChars="0-9"/>
+        <hslider id="widthSlider" width="100%" height="30" min="50" max="1000"/>
+    </hbox>
+
+    <hbox width="100%">
+        <label text="Height:" verticalAlign="center" width="62"/>
+        <textfield id="heightText" width="38" restrictChars="0-9"/>
+        <hslider id="heightSlider" width="100%" height="30" min="50" max="1000"/>
+    </hbox>
+
+    <hbox width="100%">
+        <label text="Kerning:" verticalAlign="center" width="62"/>
+        <textfield id="kerningText" width="38" restrictChars="0-9"/>
+        <hslider id="kerningSlider" width="100%" height="30" min="0" max="20"/>
+    </hbox>
+
+    <hbox width="100%">
+        <label text="Leading:" verticalAlign="center" width="62"/>
+        <textfield id="leadingText" width="38" restrictChars="0-9"/>
+        <hslider id="leadingSlider" width="100%" height="30" min="0" max="100"/>
+    </hbox>
+
+    <hbox width="100%">
+        <label text="Snap to:" verticalAlign="center" width="62"/>
+        <textfield id="snapCharsText" width="38" restrictChars="0-9"/>
+        <hslider id="snapCharsSlider" width="100%" height="30" min="0" max="20"/>
+    </hbox>
+
+    <checkbox id="showTextBorder" width="100%">
+        <label text="Show Text Border" />
+    </checkbox>
+
+    <checkbox id="showBoundsBorder" width="100%">
+        <label text="Show Bounds Border" />
+    </checkbox>
+
+    <checkbox id="clipOverflow" width="100%">
+        <label text="Clip Overflow" />
+    </checkbox>
+
+    <checkbox id="editable" width="100%">
+        <label text="Editable" />
+    </checkbox>
+
+    <checkbox id="allowLineBreaks" width="100%">
+        <label text="Allow Line Breaks" />
+    </checkbox>
+
+    <box height="50"/>
+    
+    <label text="Font Generating:" verticalAlign="center" width="100%"/>
+    <hbox width="100%">
+        <label text="Scaling:" verticalAlign="center" width="62"/>
+        <textfield id="fontScalingText" width="38" restrictChars="0-9."/>
+        <hslider id="fontScalingSlider" width="100%" height="30" min="0.1" max="5"/>
+    </hbox>
+    <hbox width="100%">
+        <label text="Super Sampling:" verticalAlign="center" width="62"/>
+        <textfield id="fontSuperSamplingText" width="38" restrictChars="0-9"/>
+        <hslider id="fontSuperSamplingSlider" width="100%" height="30" min="1" max="6"/>
+    </hbox>
+    <hbox width="100%">
+        <label text="Snap Advance:" verticalAlign="center" width="62"/>
+        <textfield id="snapAdvanceText" width="38" restrictChars="0-9"/>
+        <hslider id="snapAdvanceSlider" width="100%" height="30" min="0" max="20"/>
+    </hbox>
+    <hbox width="100%">
+        <label text="Inner Padding:" verticalAlign="center" width="62"/>
+        <textfield id="innerPaddingText" width="38" restrictChars="0-9"/>
+        <hslider id="innerPaddingSlider" width="100%" height="30" min="0" max="20"/>
+    </hbox>
+    
+    <box height="50"/>
+
+    <checkbox id="showTextField" width="100%">
+        <label text="Show Starling TextField" />
+    </checkbox>
+
+    <checkbox id="showGrid" width="100%">
+        <label text="Show Grid" />
+    </checkbox>
+
+    <hbox width="100%">
+        <button id="zoomButton" text="Zoom:" width="62"/>
+        <textfield id="zoomText" width="38" restrictChars="0-9%"/>
+        <hslider id="zoomSlider" width="100%" height="30" min="1" max="1000"/>
+    </hbox>
+    
+    <button id="clearData" text="Clear Data" width="100%"/>
+
+</vbox>
