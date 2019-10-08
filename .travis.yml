@@ -8,7 +8,7 @@ haxe:
  - "development"
  
 hxml:
-- test/ImportAll.hxml
+ - test/ImportAll.hxml
 
 install:
  - haxelib install test/ImportAll.hxml --always
@@ -16,7 +16,8 @@ install:
  - haxelib run lime setup -y
  
 script:
-- lime build test/ImportAll.lime html5
+ - haxelib list
+ - lime build test/ImportAll.lime html5
  
 deploy:
  - provider: script
