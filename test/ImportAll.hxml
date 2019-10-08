@@ -1,0 +1,11 @@
+-lib lime:7.6.3
+-lib openfl:8.9.5
+-lib starling:2.4.1
+-lib haxeui-core:0.0.4
+-lib haxeui-openfl:0.0.2
+-lib hscript:2.3.0
+-lib actuate:1.8.9
+-lib signals:1.0.9
+-lib utils:1.0.2
+-lib svg:1.1.2
+-lib SvgBitmapFont:0.0.10
