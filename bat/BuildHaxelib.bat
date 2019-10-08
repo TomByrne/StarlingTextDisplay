@@ -1,0 +1,27 @@
+@echo off
+cd ../
+
+
+
+set /p Version=<version.txt
+del "dist\\StarlingTextDisplay %Version%.zip" /Q
+rmdir dist\\temp /S /Q
+timeout 1
+
+pause
+
+mkdir dist\\temp
+xcopy src dist\\temp\\src /S /I
+copy haxelib.json dist\\temp
+call bat\\repl.bat "{version}" "%Version%" L < "haxelib.json" >"dist\\temp\\haxelib.json"
+copy run.n dist\\temp
+
+copy extraParams.hxml dist\\temp\\extraParams.hxml
+copy README.md dist\\temp\\README.md
+
+pause
+
+powershell.exe -nologo -noprofile -command "& { Add-Type -A 'System.IO.Compression.FileSystem'; [IO.Compression.ZipFile]::CreateFromDirectory('dist\\temp', 'dist\\StarlingTextDisplay %Version%.zip'); }"
+haxelib submit "dist\\StarlingTextDisplay %Version%.zip"
+rmdir dist\\temp /S /Q
+pause

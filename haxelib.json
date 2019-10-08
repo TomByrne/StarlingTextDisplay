@@ -1,0 +1,14 @@
+{
+	"name": "starling-text-display",
+	"url": "https://github.com/TomByrne/StarlingTextDisplay",
+	"license": "BSD",
+	"tags": [ "starling", "adobe", "animate", "text", "input" ],
+	"description": "An advanced text display for Starling.",
+	"version": "{version}",
+	"releasenote": "",
+	"contributors": [ "tbyrne" ],
+	"dependencies": {
+		"starling": "2.5.1"
+	},
+	"classPath": "src"
+}

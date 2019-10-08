@@ -1,10 +1,10 @@
 {
-	"name": "testDisplay",
-	"version": "0.0.0",
-	"homepage": "https://github.com/Haxeling/textDisplay.git",
+	"name": "StarlingTextDisplay",
+	"version": "0.3.0",
+	"homepage": "https://github.com/TomByrne/StarlingTextDisplay.git",
 	"repository": {
 		"type" : "git",
-		"url" : "https://github.com/Haxeling/textDisplay.git"
+		"url" : "https://github.com/TomByrne/StarlingTextDisplay.git"
 	},
 	"source":[
 		"src"

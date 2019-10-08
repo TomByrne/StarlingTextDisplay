@@ -4,14 +4,14 @@
 	<meta title="Text Display Test" package="imagsyd.textdisplay.test"/>
 	<app file="TextDisplayTest" main="TextDisplayTest" path="bin"/>
 
-	<window width="0" height="0" orientation="landsacpe" background="0xffffff" />
+	<window width="0" height="0" orientation="landscape" background="0xffffff" />
 	<window depth-buffer="true" stencil-buffer="true" />
 	
 	<source path="src"/>
 	<source path="../src"/>
 
-    <haxelib name="lime" version="7.2.0"/>
-    <haxelib name="openfl" version="8.8.0"/>
+    <haxelib name="lime" version="7.6.3"/>
+    <haxelib name="openfl" version="8.9.5"/>
 	<haxelib name="starling" version="2.4.1"/>
 	<haxelib name="haxeui-core" version="0.0.4"/>
 	<haxelib name="haxeui-openfl" version="0.0.2"/>
