@@ -1,5 +1,4 @@
-Starling Text Display
-=========================================================
+## Starling Text Display ![](https://travis-ci.org/TomByrne/StarlingTextDisplay.svg?branch=master)[![Lang](https://img.shields.io/badge/language-haxe-orange.svg?style=flat-square&colorB=EA8220)](http://haxe.org)
 An advanced text display for Starling.
 
 Supports:

@@ -4,7 +4,7 @@
 	"license": "BSD",
 	"tags": [ "starling", "adobe", "animate", "text", "input" ],
 	"description": "An advanced text display for Starling.",
-	"version": "{version}",
+	"version": "0.3.0",
 	"releasenote": "",
 	"contributors": [ "tbyrne" ],
 	"dependencies": {
