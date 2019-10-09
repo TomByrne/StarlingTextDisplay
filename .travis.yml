@@ -11,13 +11,12 @@ hxml:
  - test/ImportAll.hxml
 
 install:
- - haxelib install test/ImportAll.hxml --always
- - haxelib install starling-text-display
- - haxelib dev starling-text-display .
- - haxelib run lime setup -y
+ - haxelib install test/ImportAll.hxml --always --quiet
+ - haxelib install starling-text-display --quiet
+ - haxelib dev starling-text-display . --quiet
+ - haxelib run lime setup -y --quiet
  
 script:
- - haxelib list
  - lime build test/ImportAll.lime html5
  
 deploy:
