@@ -1,7 +1,7 @@
 package starling.text.util;
 
 import starling.text.model.format.FontRegistry;
-import starling.text.model.format.InputFormat;
+import starling.text.model.format.Format;
 import starling.text.model.format.TextTransform;
 import starling.text.model.layout.Char;
 import starling.text.util.FormatParser.FormatNode;
@@ -27,7 +27,7 @@ class CharacterHelper
 		
 		updateCharFormat(format, char, textDisplay.formatModel.defaultFont);
 		
-		InputFormatHelper.copyMissingValues(format, textDisplay.defaultFormat);
+		FormatTools.copyMissingValues(format, textDisplay.defaultFormat);
 	}
 	
 	inline static public function findBitmapChar(char:Char):Void
@@ -43,7 +43,7 @@ class CharacterHelper
 		char.bitmapChar = char.font.getChar(charID);
 	}
 	
-	inline static public function updateCharFormat(format:InputFormat, char:Char, defaultFont:BitmapFont):Void
+	inline static public function updateCharFormat(format:Format, char:Char, defaultFont:BitmapFont):Void
 	{
 		char.format = format;
 		if (format.face != null){
@@ -53,12 +53,12 @@ class CharacterHelper
 		if (char.font == null) char.font = defaultFont;
 	}
 	
-	inline static private function applyFormats(format:InputFormat, char:Char, nodes:Array<FormatNode>) 
+	inline static private function applyFormats(format:Format, char:Char, nodes:Array<FormatNode>) 
 	{
 		for (j in 0...nodes.length) 
 		{
 			if (char.index >= nodes[j].startIndex && char.index <= nodes[j].endIndex){
-				InputFormatHelper.copyActiveValues(format, nodes[j].format);
+				FormatTools.copyActiveValues(format, nodes[j].format);
 			}
 			
 			if (nodes[j].children.length > 0) {

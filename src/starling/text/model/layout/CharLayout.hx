@@ -3,7 +3,7 @@ package starling.text.model.layout;
 import openfl.geom.Point;
 import openfl.geom.Rectangle;
 import starling.text.BitmapFont;
-import starling.text.model.format.InputFormat;
+import starling.text.model.format.Format;
 import starling.text.model.format.TextWrapping;
 import starling.text.model.layout.Char;
 import starling.text.model.layout.Line;
@@ -190,7 +190,7 @@ class CharLayout
 	
 	public function add(newStr:String, index:Int):Void
 	{
-		var format:InputFormat = textDisplay.formatModel.defaultFormat;
+		var format:Format = textDisplay.formatModel.defaultFormat;
 		var font:BitmapFont = textDisplay.formatModel.defaultFont;
 		
 		if (textDisplay.caret != null && textDisplay.caret.format != null){

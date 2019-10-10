@@ -1,10 +1,10 @@
 package starling.text.model.format;
 
 import starling.text.model.format.FontRegistry;
-import starling.text.model.format.InputFormat;
+import starling.text.model.format.Format;
 import starling.text.model.layout.Char;
 import starling.text.util.FormatParser.FormatNode;
-import starling.text.util.InputFormatHelper;
+import starling.text.util.FormatTools;
 
 /**
  * ...
@@ -15,7 +15,7 @@ class FormatModel
 	@:allow(starling.text) static var baseDefaultFont:BitmapFont;
 	
 	private var textDisplay:TextDisplay;
-	@:allow(starling.text) var defaultFormat:InputFormat;
+	@:allow(starling.text) var defaultFormat:Format;
 	@:allow(starling.text) var defaultFont(get, null):BitmapFont;
 	
 	@:allow(starling.text)
@@ -26,7 +26,7 @@ class FormatModel
 		checkDefaultFont();
 		
 		var defaultColor:UInt = 0xFFFFFF;
-		defaultFormat = new InputFormat(baseDefaultFont.name, 16, defaultColor);
+		defaultFormat = new Format(baseDefaultFont.name, 16, defaultColor);
 	}
 
 	static function checkDefaultFont()
@@ -37,9 +37,9 @@ class FormatModel
 		}
 	}
 	
-	public function setDefaults(format:InputFormat) 
+	public function setDefaults(format:Format) 
 	{
-		InputFormatHelper.copyActiveValues(defaultFormat, format);
+		FormatTools.copyActiveValues(defaultFormat, format);
 	}
 	
 	function get_defaultFont():BitmapFont 

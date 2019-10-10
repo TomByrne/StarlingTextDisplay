@@ -2,7 +2,7 @@ package starling.text.model.layout;
 
 import starling.text.BitmapChar;
 import starling.text.BitmapFont;
-import starling.text.model.format.InputFormat;
+import starling.text.model.format.Format;
 import starling.utils.SpecialChar;
 
 
@@ -42,7 +42,7 @@ class Char
 	
 	public var bitmapChar:BitmapChar;
 	public var font:BitmapFont;
-	public var format:InputFormat = new InputFormat();
+	public var format:Format = new Format();
     public var spaceAsLineBreak:Bool;
 	
 	public function new(character:String, index:Int=0) 

@@ -2,14 +2,14 @@ package workspace;
 
 import starling.display.Sprite;
 import starling.text.TextDisplay;
-import starling.text.model.format.InputFormat;
+import starling.text.model.format.Format;
 import starling.events.*;
 
 import model.Models;
 
 class TextDisplayLayer extends Sprite
 {
-    var format:InputFormat;
+    var format:Format;
     var textDisplay:TextDisplay;
     var ignoreChanges:Bool;
 
@@ -17,7 +17,7 @@ class TextDisplayLayer extends Sprite
     {
         super();
 
-        format = new InputFormat();
+        format = new Format();
         format.color = 0x000000;
         
         textDisplay = new TextDisplay();

@@ -1,10 +1,10 @@
 package starling.text.model.content;
 
-import starling.text.model.format.InputFormat;
+import starling.text.model.format.Format;
 import starling.text.model.layout.Char;
 import starling.text.util.FormatParser;
 import starling.text.util.FormatParser.FormatNode;
-import starling.text.util.InputFormatHelper;
+import starling.text.util.FormatTools;
 import starling.utils.On;
 
 /**
@@ -178,7 +178,7 @@ class ContentModel
 		if (nodes.length == 1) {
 			if (nodes[0].value != null){
 				if (nodes[0].value.length == 0) {
-					InputFormatHelper.copyMissingValues(nodes[0].format, textDisplay.defaultFormat);
+					FormatTools.copyMissingValues(nodes[0].format, textDisplay.defaultFormat);
 				}
 			}
 		}
@@ -222,7 +222,7 @@ class ContentModel
 		}
 	}
 	
-	public function setFormat(format:InputFormat, begin:Null<Int>=null, end:Null<Int>=null):Void
+	public function setFormat(format:Format, begin:Null<Int>=null, end:Null<Int>=null):Void
 	{
 		if (_nodes.length == 0 && begin == null && end == null) {
 			var plainText:String = FormatParser.nodesToPlainText(nodes);
@@ -245,7 +245,7 @@ class ContentModel
 		return true;
 	}
 	
-	function applyFormatToNodes(nodes:Array<FormatNode>, format:InputFormat, begin:Null<Int>, end:Null<Int>) 
+	function applyFormatToNodes(nodes:Array<FormatNode>, format:Format, begin:Null<Int>, end:Null<Int>) 
 	{
 		for (i in 0...nodes.length) 
 		{
@@ -269,8 +269,8 @@ class ContentModel
 				var rangeOverlap:RangeOverlap = getOverlap(testBegin, testEnd+1, node.startIndex, node.endIndex + 1);
 				
 				if (rangeOverlap == RangeOverlap.MATCH || rangeOverlap == RangeOverlap.SURROUND) {
-					InputFormatHelper.copyActiveValues(node.format, format);
-					if (node.parent != null) InputFormatHelper.removeDuplicates(node.format, node.parent.format);
+					FormatTools.copyActiveValues(node.format, format);
+					if (node.parent != null) FormatTools.removeDuplicates(node.format, node.parent.format);
 				}
 				else if (node.value != null){
 					if (rangeOverlap == RangeOverlap.INSIDE || rangeOverlap == RangeOverlap.BOTTOM_INSIDE || rangeOverlap == RangeOverlap.TOP_INSIDE) {
@@ -301,8 +301,8 @@ class ContentModel
 							
 							middleNode.value = node.value.substring(testBegin - node.startIndex, (testEnd + 1) - node.startIndex);
 							
-							InputFormatHelper.copyActiveValues(middleNode.format, format);
-							if (node.parent != null) InputFormatHelper.removeDuplicates(middleNode.format, node.format);
+							FormatTools.copyActiveValues(middleNode.format, format);
+							if (node.parent != null) FormatTools.removeDuplicates(middleNode.format, node.format);
 							
 							if (beginNode != null) node.children.push(beginNode);
 							if (middleNode != null) node.children.push(middleNode);
@@ -326,7 +326,7 @@ class ContentModel
 		var formatNode:FormatNode = new FormatNode();
 		formatNode.parent = node;
 		//formatNode.name = node.name;
-		formatNode.format = new InputFormat();
+		formatNode.format = new Format();
 		return formatNode;
 	}
 	

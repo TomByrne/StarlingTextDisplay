@@ -4,7 +4,7 @@ import openfl.events.TimerEvent;
 import openfl.utils.Timer;
 import openfl.geom.Matrix;
 
-import starling.text.model.format.InputFormat;
+import starling.text.model.format.Format;
 import starling.text.model.layout.Char;
 import starling.text.model.layout.CharLayout;
 import starling.text.model.selection.Selection;
@@ -23,7 +23,7 @@ class Caret extends DisplayObjectContainer
 	private var _active:Null<Bool> = null;
 	public var active(get, set):Null<Bool>;
 	
-	public var format:InputFormat;
+	public var format:Format;
 	public var font:BitmapFont;
 	
 	@:isVar private var selectedChar(get, set):Char;

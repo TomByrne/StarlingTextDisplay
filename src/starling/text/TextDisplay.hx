@@ -30,7 +30,7 @@ import starling.text.model.format.FormatModel;
 import starling.text.model.layout.Alignment;
 import starling.text.model.layout.CharLayout;
 import starling.text.model.selection.Selection;
-import starling.text.model.format.InputFormat;
+import starling.text.model.format.Format;
 import starling.text.model.history.HistoryModel;
 import starling.text.model.layout.Char;
 import starling.text.util.CharRenderer;
@@ -115,7 +115,7 @@ class TextDisplay extends DisplayObjectContainer
 	
 	@:allow(starling.text) var _textBounds = new Rectangle();
 	
-	public var defaultFormat(get, set):InputFormat;
+	public var defaultFormat(get, set):Format;
 	
 	public var textWidth(get, null):Float;
 	public var textHeight(get, null):Float;
@@ -247,32 +247,32 @@ class TextDisplay extends DisplayObjectContainer
 		dispatchEvent(e);
 	}
 	
-	public function setSelectionFormat(inputFormat:InputFormat):Void
+	public function setSelectionFormat(format:Format):Void
 	{
 		var begin:Null<UInt> = selection.begin;
 		var end:Null<UInt> = selection.end;
 		if (begin != null && end != null) {
-			setFormat(inputFormat, begin, end-1);
+			setFormat(format, begin, end-1);
 		}
 		else {
-			setFormat(inputFormat, selection.index, selection.index);
+			setFormat(format, selection.index, selection.index);
 		}
 	}
 	
-	public function setFormat(inputFormat:InputFormat, begin:Null<Int>=null, end:Null<Int>=null) 
+	public function setFormat(format:Format, begin:Null<Int>=null, end:Null<Int>=null) 
 	{
-		if (begin == null && end == null) formatModel.setDefaults(inputFormat);
-		contentModel.setFormat(inputFormat, begin, end);
+		if (begin == null && end == null) formatModel.setDefaults(format);
+		contentModel.setFormat(format, begin, end);
 		FormatParser.mergeNodes(contentModel.nodes);
 		markForUpdate();
 		dispatchEvent(new Event(Event.CHANGE));
 	}
-	public function getFormat(begin:Int, end:Int):InputFormat
+	public function getFormat(begin:Int, end:Int):Format
 	{
 		return FormatParser.getFormat(this, contentModel.nodes, begin, end);
 	}
 	
-	public function getSelectionFormat():InputFormat
+	public function getSelectionFormat():Format
 	{
 		var begin:Null<Int> = null;
 		var end:Null<Int> = null;
@@ -643,11 +643,11 @@ class TextDisplay extends DisplayObjectContainer
 		return value;
 	}
 	
-	function get_defaultFormat():InputFormat 
+	function get_defaultFormat():Format 
 	{
 		return formatModel.defaultFormat;
 	}
-	function set_defaultFormat(value:InputFormat):InputFormat 
+	function set_defaultFormat(value:Format):Format 
 	{
 		if(value != null){
 			formatModel.setDefaults(value);

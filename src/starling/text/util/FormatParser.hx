@@ -1,7 +1,7 @@
 package starling.text.util;
 
 import haxe.ds.StringMap;
-import starling.text.model.format.InputFormat;
+import starling.text.model.format.Format;
 import starling.text.model.layout.Char;
 import starling.text.util.FormatParser.FormatNode;
 import starling.utils.SpecialChar;
@@ -16,7 +16,7 @@ class FormatParser
 	//static var AttPool:Array<FormatAttribute> = [];
 	
 	
-	static var incompatibleCheck = new InputFormat();
+	static var incompatibleCheck = new Format();
 	
 	
 	public static function recycleNodes(nodes:Array<FormatNode>):Void
@@ -28,7 +28,7 @@ class FormatParser
 		}
 	}
 	
-	public static function textAndFormatToNodes(v:String, format:InputFormat):Array<FormatNode>
+	public static function textAndFormatToNodes(v:String, format:Format):Array<FormatNode>
 	{
 		var formatNode = newFormatNode();
 		formatNode.value = v;
@@ -88,7 +88,7 @@ class FormatParser
 				
 				if (node.children.length == 1){
 					var child = node.children[0];
-					InputFormatHelper.copyActiveValues(node.format, child.format);
+					FormatTools.copyActiveValues(node.format, child.format);
 					
 					// TODO: shouldn't have to do this, should already be same
 					node.startIndex = child.startIndex;
@@ -107,7 +107,7 @@ class FormatParser
 		}
 	}
 	
-	static private function isEqual(format1:InputFormat, format2:InputFormat) 
+	static private function isEqual(format1:Format, format2:Format) 
 	{
 		if (format1.color != format2.color) return false;
 		if (format1.face != format2.face) return false;
@@ -143,7 +143,7 @@ class FormatParser
 		}
 	}
 	
-	/*static private function isEmptyFormat(inputFormat:InputFormat):Bool
+	/*static private function isEmptyFormat(inputFormat:Format):Bool
 	{
 		if (inputFormat.color != null) return false;
 		if (inputFormat.face != null) return false;
@@ -185,7 +185,7 @@ class FormatParser
 				var formatLength:FormatLength = new FormatLength();
 				formatLength.startIndex = formatNodes[i].startIndex;
 				formatLength.endIndex = formatNodes[i].endIndex;
-				formatLength.format = new InputFormat();
+				formatLength.format = new Format();
 				for (j in 0...formatNodes[i].attributes.length) 
 				{
 					var propName:String = formatNodes[i].attributes[j].key;
@@ -301,7 +301,7 @@ class FormatParser
 		
 		return node;
 	}
-	static private function fillFormat(format:InputFormat, xml:Xml):Void
+	static private function fillFormat(format:Format, xml:Xml):Void
 	{
 		for (key in xml.attributes()) 
 		{
@@ -368,7 +368,7 @@ class FormatParser
 							//var childNode = newFormatNode();
 							//childNode.value = cast(children[j].nodeValue, String);
 							//childNode.parent = node;
-							//childNode.format = new InputFormat();
+							//childNode.format = new Format();
 							//node.children.push(childNode);
 						//}
 					//}
@@ -389,10 +389,10 @@ class FormatParser
 		//return nodes;
 	//}
 	
-	/*static private function createFormat(formatAttribute:Array<FormatAttribute>):InputFormat
+	/*static private function createFormat(formatAttribute:Array<FormatAttribute>):Format
 	{
 		
-		var inputFormat = new InputFormat();
+		var inputFormat = new Format();
 		var len:Int = formatAttribute.length;
 		for (i in 0...len)
 		{
@@ -469,7 +469,7 @@ class FormatParser
 		atts += ">";
 		return atts;*/
 		
-		var format:InputFormat = formatNode.format;
+		var format:Format = formatNode.format;
 		
 		
 		var returnVal:String = "<" + formatNode.name;
@@ -591,7 +591,7 @@ class FormatParser
 		return 0;
 	}*/
 	
-	private static function createInputFormatStartTag(inputFormat:InputFormat):String
+	private static function createInputFormatStartTag(inputFormat:Format):String
 	{
 		var atts:String = "";
 		
@@ -609,9 +609,9 @@ class FormatParser
 		return atts;
 	}
 	
-	public static function getFormat(textDisplay:TextDisplay, nodes:Array<FormatNode>, begin:Null<Int>, end:Null<Int>):InputFormat
+	public static function getFormat(textDisplay:TextDisplay, nodes:Array<FormatNode>, begin:Null<Int>, end:Null<Int>):Format
 	{
-		var returnFormat = new InputFormat();
+		var returnFormat = new Format();
 		if (nodes.length == 0 || begin < 0) return returnFormat;
 		
 		incompatibleCheck.clear();
@@ -630,7 +630,7 @@ class FormatParser
 		return returnFormat;
 	}
 	
-	public static function copyCommonValues(copyTo:InputFormat, incompatible:InputFormat, copyFrom:InputFormat) 
+	public static function copyCommonValues(copyTo:Format, incompatible:Format, copyFrom:Format) 
 	{
 		if (copyFrom == null) return;
 		if (copyFrom.size != null) {
@@ -704,7 +704,7 @@ class FormatNode
 	public var name:String = "font";
 	//public var attributes = new Array<FormatAttribute>();
 	public var children = new Array<FormatNode>();
-	public var format:InputFormat = new InputFormat();
+	public var format:Format = new Format();
 	
 	public function new()
 	{
