@@ -428,7 +428,7 @@ class FormatParser
 		var output:String = "";
 		for (i in 0...value.length) 
 		{
-			var startTag:String = createInputFormatStartTag(value[i].format);
+			var startTag:String = createFormatStartTag(value[i].format);
 			if (value[i].name != null) output += startTag;
 			if (value[i].value == null) {
 				output += nodesToHtml(value[i].children);
@@ -520,7 +520,7 @@ class FormatParser
 		{
 			if (f[i].isDefault) continue; // Don't output default format
 			var startIndex:Null<Int> = f[i].startIndex;
-			startTags.push( { index:startIndex, value:createInputFormatStartTag(f[i].format) } );
+			startTags.push( { index:startIndex, value:createFormatStartTag(f[i].format) } );
 		}
 		f.sort(SortByEnd);
 		for (i in 0...f.length) 
@@ -591,7 +591,7 @@ class FormatParser
 		return 0;
 	}*/
 	
-	private static function createInputFormatStartTag(inputFormat:Format):String
+	private static function createFormatStartTag(inputFormat:Format):String
 	{
 		var atts:String = "";
 		
