@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hbox width="100%">
+    <model-dropdown id="fontDropdown" text="Font" width="100%"/>
+    <button id="addFont" text="+" width="20"/>
+</hbox>

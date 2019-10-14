@@ -54,12 +54,18 @@ class WorkspaceInteractions
 	#if html5
 	function onHtmlMouseWheel(e:WheelEvent):Void 
 	{
+        if (e.screenX < 250) {
+            return;
+        }
 		mouseWheel(e.deltaY < 0 ? 1 : -1);
 		e.preventDefault();
 	}
 	#else
 	function onMouseWheel(e:MouseEvent):Void 
 	{
+        if (e.stageX < 250) {
+            return;
+        }
         mouseWheel(e.delta < 0 ? 1 : -1);
 		e.preventDefault();
 	}

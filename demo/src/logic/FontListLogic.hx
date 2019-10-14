@@ -1,5 +1,6 @@
 package logic;
 
+import font.svg.SvgFontGeneratorConfig;
 import starling.time.Tick;
 import starling.textures.Texture;
 import starling.text.TextField;
@@ -9,19 +10,21 @@ import model.FontModel;
 import starling.text.BitmapFont;
 import starling.text.model.format.FormatModel;
 import font.svg.SvgBitmapFontGenerator;
-import font.svg.SvgFontDisplays;
 import font.svg.SvgFont;
 import font.CharacterRanges;
 import utils.FilePicker;
 import openfl.display.BitmapData;
-import utils.Base64ToBitmapData;
 import haxe.Timer;
+import openfl.Assets;
+import utils.Base64ToBitmapData;
 
 @:access(starling.text.model.format.FormatModel)
 class FontListLogic
 {
 	var defaultFont:BitmapFont;
-	var defaultFontInfo:FontInfo;
+	var defaultFontInfo1:FontInfo;
+	//var defaultFontInfo2:FontInfo;
+	//var defaultFontInfo3:FontInfo;
 	var fontModel:FontModel;
 
 	public function new(){}
@@ -39,13 +42,33 @@ class FontListLogic
 		FormatModel.checkDefaultFont();
 		defaultFont = FormatModel.baseDefaultFont;
 
-        defaultFontInfo = {
+        defaultFontInfo1 = {
             label: 'Default (${defaultFont.name})',
             regName: defaultFont.name,
-            type: FontType.BUILT_IN,
+			builtIn: true,
+            type: FontType.DEFAULT,
         }
 
+        /*defaultFontInfo2 = {
+            label: 'Roboto Medium (embedded)',
+            regName: defaultFont.name,
+			filename: 'Roboto-Medium.svg',
+			size: 30,
+			builtIn: true,
+            type: FontType.SVG,
+        }
+
+        defaultFontInfo3 = {
+            label: 'Roboto Regular (embedded)',
+            regName: defaultFont.name,
+			filename: 'Roboto-Regular.svg',
+			size: 30,
+			builtIn: true,
+            type: FontType.SVG,
+        }*/
+
 		fontModel = Models.font;
+
 		fontModel.addFont.add(onFontAdd);
 		
 		if(fontModel.selectedFont.data == null) fontModel.selectedFont.data = defaultFont.name;
@@ -54,7 +77,7 @@ class FontListLogic
 		while(i < fontModel.fonts.data.length)
 		{
             var font = fontModel.fonts.data[i];
-            if(font.type == FontType.BUILT_IN){
+            if(font.builtIn){
                 // Remove old default font
                 fontModel.fonts.data.splice(i, 1);
             }else{
@@ -63,13 +86,27 @@ class FontListLogic
             }
 		}
         // Add new default font
-        fontModel.fonts.data.unshift(defaultFontInfo);
+        fontModel.fonts.data.unshift(defaultFontInfo1);
         fontModel.fonts.dispatch(); // In case processFontInfo tweaked the object
 
         fontModel.renderScaling.add(rerenderFontsDelayed);
         fontModel.renderSuperSampling.add(rerenderFontsDelayed);
         fontModel.renderSnapAdvance.add(rerenderFontsDelayed);
         fontModel.renderInnerPadding.add(rerenderFontsDelayed);
+		
+
+		//loadFont(defaultFontInfo2, 'fonts/Roboto-Medium.svg');
+		//loadFont(defaultFontInfo3, 'fonts/Roboto-Regular.svg');
+	}
+
+	// For loading SVG fonts that are included in the project
+	function loadFont(fontInfo:FontInfo, path:String)
+	{
+		Assets.loadText(path).then(function(svg){
+			fontInfo.fontData = svg;
+			fontModel.addFont.dispatch(fontInfo);
+			return null;
+		});
 	}
     
     function rerenderFontsDelayed()
@@ -83,7 +120,7 @@ class FontListLogic
 
 		for(font in fontModel.fonts.data)
 		{
-            if(font != defaultFontInfo){
+            if(font != defaultFontInfo1){
                 processFontInfo(font);
             }
         }
@@ -135,8 +172,8 @@ class FontListLogic
 
 	function sortFonts(font1:FontInfo, font2:FontInfo) : Int
 	{
-        if(font1 == defaultFontInfo) return -1;
-        else if(font2 == defaultFontInfo) return 1;
+        if(font1.builtIn && !font2.builtIn) return -1;
+        else if(!font1.builtIn && font2.builtIn) return 1;
 
 		var n1:String = font1.label.toLowerCase();
 		var n2:String = font2.label.toLowerCase();
@@ -151,7 +188,7 @@ class FontListLogic
         {
             case SVG: processSvgFontInfo(fontInfo);
             case ANGEL_FONT: processAngelFontInfo(fontInfo);
-            case BUILT_IN: false;
+            case DEFAULT: false;
         }
     }
     
@@ -209,7 +246,6 @@ class FontListLogic
 		}
 
 		var svgFont:SvgFont = SvgFont.fromString(fontInfo.fontData);
-		var svgFontDisplays = SvgFontDisplays.create(svgFont);
 
 		if(fontInfo.label == null)
 		{
@@ -222,21 +258,32 @@ class FontListLogic
 			range = CharacterRanges.LATIN_ALL.concat(CharacterRanges.UNICODE_SYMBOLS).concat(CharacterRanges.LATIN_SUPPLEMENT).concat(CharacterRanges.DIGITS);
 		}
 
-		var bitmapFontGenerator:SvgBitmapFontGenerator = new SvgBitmapFontGenerator( svgFontDisplays, fontInfo.size, svgFont.fontFamily, onFontGenerated.bind(fontInfo, svgFont));
-		bitmapFontGenerator.superSampling = fontModel.renderSuperSampling.data;
-		bitmapFontGenerator.snapAdvanceXTo = fontModel.renderSnapAdvance.data;
-		bitmapFontGenerator.innerPadding = fontModel.renderInnerPadding.data;
-		bitmapFontGenerator.scaleFactor = fontModel.renderScaling.data;
-        bitmapFontGenerator.charsPerFrame = 150;
-		bitmapFontGenerator.gap = Math.ceil(fontInfo.size / 15);
-        bitmapFontGenerator.generateBitmapFont( range );
+		var config:SvgFontGeneratorConfig = {
+			size: fontInfo.size,
+			forceFamily: svgFont.fontFamily,
+			superSampling: fontModel.renderSuperSampling.data,
+			snapAdvanceXTo: fontModel.renderSnapAdvance.data,
+			innerPadding: fontModel.renderInnerPadding.data,
+			scaleFactor: fontModel.renderScaling.data,
+			gap: Math.ceil(fontInfo.size / 15),
+			characters: range,
+		}
+
+		var generator:SvgBitmapFontGenerator = new SvgBitmapFontGenerator( svgFont, config );
+		generator.addDefaultRegisters();
+		Tick.once(doProcess.bind(generator, fontInfo, svgFont), 0);
 
 		return true;
 	}
 
-	function onFontGenerated(fontInfo:FontInfo, svgFont:SvgFont)
+	function doProcess(generator:SvgBitmapFontGenerator, fontInfo:FontInfo, svgFont:SvgFont)
 	{
-		if(fontModel.selectedFont.data == null) fontModel.selectedFont.data = fontInfo.regName;
-        else if(fontModel.selectedFont.data == fontInfo.regName) fontModel.selectedFont.dispatch();
+		if(generator.progress < generator.total){
+			generator.process(150);
+			Tick.once(doProcess.bind(generator, fontInfo, svgFont), 0);
+		}else{
+			if(fontModel.selectedFont.data == null) fontModel.selectedFont.data = fontInfo.regName;
+			else if(fontModel.selectedFont.data == fontInfo.regName) fontModel.selectedFont.dispatch();
+		}
 	}
 }

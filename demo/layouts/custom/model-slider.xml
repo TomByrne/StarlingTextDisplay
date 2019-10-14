@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hbox width="100%">
+    <button id="button" text="Button" width="75" verticalAlign="center" hidden="true" />
+    <label id="labelText" text="Label" width="75" verticalAlign="center" />
+    <textfield id="textValueField" text="${valueSlider.pos}" width="50" restrictChars="0-9.%" />
+    <slider id="valueSlider" width="100%" verticalAlign="center" />
+</hbox>

@@ -20,6 +20,7 @@ class FontModel
 typedef FontInfo =
 {
     ?label:String,
+    ?builtIn:Bool,
     ?regName:String,
     ?filename:String,
     ?type:FontType,
@@ -33,5 +34,5 @@ typedef FontInfo =
 {
     var SVG = 'svg';
     var ANGEL_FONT = 'angelFont';
-    var BUILT_IN = 'builtIn';
+    var DEFAULT = 'default';
 }

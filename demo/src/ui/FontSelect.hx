@@ -2,8 +2,8 @@ package ui;
 
 import haxe.ui.components.DropDown;
 import haxe.ui.components.Button;
-import haxe.ui.core.UIEvent;
-import haxe.ui.core.MouseEvent;
+import haxe.ui.events.UIEvent;
+import haxe.ui.events.MouseEvent;
 import utils.FilePicker;
 import model.Models;
 

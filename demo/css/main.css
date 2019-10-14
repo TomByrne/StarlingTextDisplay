@@ -1,4 +1,10 @@
 #main {
-    padding: 6px;
-    width: 200px;
+    padding: 0px;
+    width: 250px;
+}
+
+#mainScrollView {
+    border: none;
+    padding: 0;
+    background-color: white;
 }

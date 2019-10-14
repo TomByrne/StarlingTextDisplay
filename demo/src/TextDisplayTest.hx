@@ -37,6 +37,6 @@ class TextDisplayTest extends openfl.display.Sprite
     
     function onResize(e:Event):Void
     {
-        workspace.setPos(200, 0, stage.stageWidth - 200, stage.stageHeight);
+        workspace.setPos(250, 0, stage.stageWidth - 250, stage.stageHeight);
     }
 }
