@@ -7,8 +7,8 @@
     <haxelib name="lime" version="7.6.3"/>
     <haxelib name="openfl" version="8.9.5"/>
 	<haxelib name="starling" version="2.4.1"/>
-	<haxelib name="haxeui-core" version="0.0.4"/>
-	<haxelib name="haxeui-openfl" version="0.0.2"/>
+	<haxelib name="haxeui-core" version="1.0.0"/>
+	<haxelib name="haxeui-openfl" version="1.0.0"/>
 	<haxelib name="hscript" version="2.3.0"/>
 	<haxelib name="actuate" version="1.8.9"/>
 	<haxelib name="signals" version="1.0.9"/>
