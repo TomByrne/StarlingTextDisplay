@@ -12,7 +12,7 @@ hxml:
 
 install:
  - haxelib install test/ImportAll.hxml --always --quiet
- - haxelib install starling-text-display --quiet
+ - haxelib install starling-text-display --always --quiet
  - haxelib dev starling-text-display . --quiet
  - haxelib run lime setup -y --quiet
  
