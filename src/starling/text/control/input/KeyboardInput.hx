@@ -1,8 +1,6 @@
 package starling.text.control.input;
 
 import starling.time.Tick;
-import signal.Signal;
-import signal.Signal1;
 import openfl.system.Capabilities;
 import openfl.ui.Keyboard;
 import starling.text.model.layout.CharLayout;

@@ -1,7 +1,5 @@
 package starling.text.model.history;
 
-import signal.Signal;
-
 /**
  * ...
  * @author P.J.Shand
@@ -14,7 +12,7 @@ class HistoryModel
 	@:allow(starling.text.control.history) private var history:Array<HistoryStep> = [];
 	@:allow(starling.text.control.history) private var currStepIndex:Int = -1;
 	@:allow(starling.text.control.history) private var ignoreChanges:Bool;
-	@:allow(starling.text.control.history) private var onActiveChange = new Signal0();
+	@:allow(starling.text.control.history) private var onActiveChange:Void->Void;
 	
 	private var _active:Null<Bool> = null;
 	public var active(get, set):Null<Bool>;
@@ -87,7 +85,7 @@ class HistoryModel
 	{
 		if (_active == value) return value;
 		_active = value;
-		onActiveChange.dispatch();
+		if(onActiveChange != null) onActiveChange();
 		return _active;
 	}
 	

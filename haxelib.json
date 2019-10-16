@@ -4,8 +4,8 @@
 	"license": "BSD",
 	"tags": [ "starling", "adobe", "animate", "text", "input" ],
 	"description": "An advanced text display for Starling.",
-	"version": "0.5.0",
-	"releasenote": "Changed InputFormat to Format",
+	"version": "0.6.0",
+	"releasenote": "Removed signals",
 	"contributors": [ "tbyrne" ],
 	"dependencies": {
 		"starling": "2.5.1"

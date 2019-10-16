@@ -15,6 +15,7 @@ import starling.text.model.history.HistoryStep;
 /**
  * ...
  * @author Thomas Byrne
+ * @author Pete Shand
  */
 class HistoryControl
 {
@@ -31,7 +32,7 @@ class HistoryControl
 		this.historyModel = textDisplay.historyModel;
 		this.selection = textDisplay.selection;
 		
-		historyModel.onActiveChange.add(OnActiveChange);
+		historyModel.onActiveChange = onActiveChange;
 		
 		textDisplay.charLayout.layoutChanged.add(onTextChange);
 		selection.addEventListener(Event.SELECT, onSelectionChange);
@@ -42,7 +43,7 @@ class HistoryControl
 		ignoreChanges = ignore;
 	}
 	
-	function OnActiveChange() 
+	function onActiveChange() 
 	{
 		if (historyModel.active) {
 			textDisplay.addEventListener(KeyboardEvent.KEY_DOWN, OnKeyDown);
