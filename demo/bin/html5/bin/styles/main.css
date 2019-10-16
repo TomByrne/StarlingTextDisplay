@@ -1,9 +1,0 @@
-.label {
-    font-size: 13px;
-    __font-name: "_sans";
-}
-
-.checkbox, .optionbox {
-    background-color: white;
-    background-opacity: 0;
-}
