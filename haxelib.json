@@ -4,8 +4,8 @@
 	"license": "BSD",
 	"tags": [ "starling", "adobe", "animate", "text", "input" ],
 	"description": "An advanced text display for Starling.",
-	"version": "0.6.0",
-	"releasenote": "Removed signals",
+	"version": "0.7.0",
+	"releasenote": "Removed inheritance from BoundsControl (was causing memory leak)",
 	"contributors": [ "tbyrne" ],
 	"dependencies": {
 		"starling": "2.5.1"

@@ -10,7 +10,7 @@ import starling.utils.VAlign;
  * ...
  * @author P.J.Shand
  */
-class BoundsControl extends Border
+class BoundsControl
 {
 	var textDisplay:TextDisplay;
 	
@@ -19,8 +19,6 @@ class BoundsControl extends Border
 	
 	public function new(textDisplay:TextDisplay) 
 	{
-		super();
-		
 		this.textDisplay = textDisplay;
 		textDisplay.charLayout.boundsChanged.add(onLayoutChange);
 	}
