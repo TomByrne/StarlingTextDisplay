@@ -21,24 +21,31 @@ class Scale9Image extends Sprite
 	private var _grid:Rectangle;
 	private var _tW:Float;
 	private var _tH:Float;
-	private var scaleIfSmaller:Bool;
+	
 	
 	private var _width:Float;
 	private var _height:Float;
 	private var _color:UInt;
 	public var color(get, set):UInt;
 	
-	
-	public function getScaleIfSmaller():Bool
+	public var cornerScale(default, set):Float = 1.0;
+	public function set_cornerScale(value:Float):Float
 	{
-		return scaleIfSmaller;
+		if(cornerScale != value){
+			cornerScale = value;
+			apply9Scale(_width, _height);
+		}
+		return value;
 	}
-
-	public function setScaleIfSmaller(value:Bool):Void
+	
+	public var scaleIfSmaller(default, set):Bool;
+	public function set_scaleIfSmaller(value:Bool):Bool
 	{
-		if(scaleIfSmaller == value) return;
-		
-		scaleIfSmaller = value;
+		if(scaleIfSmaller != value){
+			scaleIfSmaller = value;
+			apply9Scale(_width, _height);
+		}
+		return value;
 	}
 
 	override function get_height():Float
@@ -120,8 +127,6 @@ class Scale9Image extends Sprite
 		
 		_br = new Image(Texture.fromTexture(texture, new Rectangle(_grid.x + _grid.width,_grid.y + _grid.height,texture.width -(_grid.x + _grid.width),texture.height -(_grid.y + _grid.height))));
 
-		_tc.x = _cc.x = _bc.x = _grid.x;
-		_cl.y = _cc.y = _cr.y = _grid.y;
 		
 		addChild(_tl);
 		addChild(_tc);
@@ -142,26 +147,25 @@ class Scale9Image extends Sprite
 	{	
 		var width:Float = x/scaleX;
 		var height:Float = y/scaleY;
+
+		var textureWidth = _tW;
+		var textureHeight = _tH;
+		var gridX = _grid.x * cornerScale;
+		var gridY = _grid.y * cornerScale;
+		var gridW = _grid.width + (_grid.x - gridX) * 2;
+		var gridH = _grid.height + (_grid.y - gridY) * 2;
 		
-		var bh:Float;
-		var lw:Float;
-		var rw:Float;
-		var pct:Float;
-		var rx:Float;
-		var cw:Float;
-		var tw:Float;
-		var by:Float;
-		var bx:Float;
-		var ch:Float;
+		_tc.x = _cc.x = _bc.x = gridX;
+		_cl.y = _cc.y = _cr.y = gridY;
 		
-		if(width < _tW-_grid.width)
+		if(width < _tW-gridW)
 		{
 			_tc.visible = false;
 			_bc.visible = false;
 			
 			if(!scaleIfSmaller)
 			{
-				lw = _grid.x;
+				var lw:Float = gridX;
 				
 				_tl.width = lw;
 				_cl.width = lw;
@@ -171,25 +175,25 @@ class Scale9Image extends Sprite
 				_cr.x = lw;
 				_br.x = lw;
 				
-				rw = (_tW - _grid.x - _grid.width);
+				var rw:Float = (_tW - gridX - gridW);
 				_tr.width = rw;
 				_cr.width = rw;
 				_br.width = rw;
 			}
 			else
 			{
-				pct = width / (_tW -_grid.width);
-				lw = _grid.x * pct;
+				var pct:Float = width / (_tW -gridW);
+				var lw:Float = gridX * pct;
 				_tl.width = lw;
 				_cl.width = lw;
 				_bl.width = lw;
 
-				rw = (_tW - _grid.x - _grid.width) * pct;
+				var rw:Float = (_tW - gridX - gridW) * pct;
 				_tr.width = rw;
 				_cr.width = rw;
 				_br.width = rw;
 				
-				rx = width - rw;
+				var rx:Float = width - rw;
 				_tr.x = rx;
 				_cr.x = rx;
 				_br.x = rx;
@@ -201,36 +205,35 @@ class Scale9Image extends Sprite
 			_tc.visible = true;
 			_bc.visible = true;
 							
-			lw = _grid.x;
+			var lw:Float = gridX;
 			_tl.width = lw;
 			_cl.width = lw;
 			_bl.width = lw;
 			
-			rw = (_tW - _grid.x - _grid.width);
+			var rw:Float = (_tW - gridX - gridW);
 			_tr.width = rw;
 			_cr.width = rw;
 			_br.width = rw;
 			
-			rx = width - rw;
+			var rx:Float = width - rw;
 			_tr.x = rx;
 			_cr.x = rx;
 			_br.x = rx;
 			
-			cw = rx - _grid.x;
+			var cw:Float = rx - gridX;
 			_tc.width = cw;
 			_cc.width = cw;
 			_bc.width = cw;
 		}
 		
-		if(height < _tH-_grid.height)
+		if(height < _tH-gridH)
 		{
 			_cl.visible = false;
 			_cr.visible = false;
 			
 			if(!scaleIfSmaller)
 			{
-				tw = _grid.y;
-
+				var tw:Float = gridY;
 				_tl.height = tw;
 				_tc.height = tw;
 				_tr.height = tw;
@@ -239,26 +242,26 @@ class Scale9Image extends Sprite
 				_bc.y = tw;
 				_bl.y = tw;
 
-				bh = (_tH - _grid.y - _grid.height);
+				var bh:Float = (_tH - gridY - gridH);
 				_br.height = bh;
 				_bc.height = bh;
 				_bl.height = bh;
 			}
 			else
 			{
-				pct = height / (_tH -_grid.height);
+				var pct:Float = height / (_tH -gridH);
 				
-				tw = _grid.y * pct;
+				var tw:Float = gridY * pct;
 				_tl.height = tw;
 				_tc.height = tw;
 				_tr.height = tw;
 				
-				bh = (_tH - _grid.y - _grid.height) * pct;
+				var bh:Float = (_tH - gridY - gridH) * pct;
 				_br.height = bh;
 				_bc.height = bh;
 				_bl.height = bh;
 				
-				bx = height - bh;
+				var bx:Float = height - bh;
 				_br.y = bx;
 				_bc.y = bx;
 				_bl.y = bx;
@@ -270,22 +273,21 @@ class Scale9Image extends Sprite
 			_cl.visible = true;
 			_cr.visible = true;
 			
-			_tl.height = _grid.y;
-			_tc.height = _grid.y;
-			_tr.height = _grid.y;
+			_tl.height = gridY;
+			_tc.height = gridY;
+			_tr.height = gridY;
 			
-			bh = (_tH - _grid.y - _grid.height);
-			
+			var bh:Float = (_tH - gridY - gridH);
 			_bl.height = bh;
 			_bc.height = bh;
 			_br.height = bh;
 			
-			by = height - bh;
+			var by:Float = height - bh;
 			_bl.y =	by;
 			_bc.y =	by;
 			_br.y =	by;
 
-			ch = by - _grid.y;
+			var ch:Float = by - gridY;
 			_cl.height = ch;
 			_cc.height = ch;
 			_cr.height = ch;				
